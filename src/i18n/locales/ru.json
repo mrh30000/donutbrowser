@@ -303,7 +303,12 @@
       "assignToGroup": "Назначить группе",
       "assignProxy": "Назначить прокси",
       "assignExtensionGroup": "Назначить группу расширений",
-      "copyCookies": "Копировать cookies"
+      "copyCookies": "Копировать cookies",
+      "launchSelected": "Launch selected",
+      "stopSelected": "Stop selected",
+      "arrangeWindows": "Arrange windows",
+      "diagnoseProxies": "Diagnose proxies",
+      "batchOperations": "Batch operations"
     },
     "passwordProtectedBadge": "Защищено паролем",
     "launchHook": {
@@ -1833,7 +1838,15 @@
     "proxyNotWorking": "Выбранный прокси не работает, поэтому профиль не создан.",
     "proxyPaymentRequired": "Выбранный прокси требует оплаты (402) — возможно, его подписка истекла — поэтому профиль не создан.",
     "vpnNotWorking": "Выбранный VPN не работает, поэтому профиль не создан.",
-    "camoufoxImportDeprecated": "Импорт профилей на основе Firefox (Camoufox) больше не поддерживается. Camoufox выводится из эксплуатации — используйте Wayfern."
+    "camoufoxImportDeprecated": "Импорт профилей на основе Firefox (Camoufox) больше не поддерживается. Camoufox выводится из эксплуатации — используйте Wayfern.",
+    "batchNoProfilesSelected": "Select at least one profile.",
+    "batchProfileNotFound": "One of the selected profiles no longer exists.",
+    "batchLaunchFailed": "Failed to launch one or more profiles.",
+    "batchStopFailed": "Не удалось остановить один или несколько профилей.",
+    "windowLayoutUnsupportedPlatform": "Window arrangement is not supported on this platform yet.",
+    "windowLayoutNoRunningWindows": "No running profile windows were found.",
+    "proxyDiagnosticTimeout": "Proxy diagnostic timed out.",
+    "proxyDiagnosticSourceFailed": "Proxy diagnostic source failed."
   },
   "rail": {
     "profiles": "Профили",
@@ -2049,5 +2062,38 @@
     "title": "Поддержка Camoufox прекращается",
     "description": "Поддержка профилей Camoufox прекращается 8 июля 2026 года. У вас есть один или несколько профилей Camoufox. Перенесите их на Wayfern до этой даты — после неё профили Camoufox могут перестать работать.",
     "acknowledge": "Понятно"
+  },
+  "batchOperations": {
+    "title": "Batch Operations",
+    "description": "Run actions across selected profiles.",
+    "targetSelected": "Selected profiles",
+    "concurrency": "Concurrency",
+    "launchInterval": "Launch interval",
+    "failurePolicy": "Failure policy",
+    "continueOnError": "Continue on error",
+    "stopOnFirstError": "Stop on first error",
+    "postLaunchAction": "After launch",
+    "postLaunchNone": "Do nothing",
+    "postLaunchArrange": "Arrange windows",
+    "layoutMode": "Window layout",
+    "layoutGrid": "Grid",
+    "layoutHorizontal": "Horizontal",
+    "layoutVertical": "Vertical",
+    "gap": "Gap",
+    "preserveAspectRatio": "Preserve aspect ratio",
+    "launchSelected": "Launch selected",
+    "stopSelected": "Stop selected",
+    "arrangeWindows": "Arrange windows",
+    "diagnoseProxies": "Diagnose proxies",
+    "results": "Results",
+    "noResults": "No results yet",
+    "profile": "Profile",
+    "result": "Result",
+    "exitIp": "Exit IP",
+    "country": "Country",
+    "latency": "Latency",
+    "source": "Source",
+    "valid": "Valid",
+    "failed": "Failed"
   }
 }

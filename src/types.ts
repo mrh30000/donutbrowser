@@ -145,6 +145,59 @@ export interface ProxyCheckResult {
   is_valid: boolean;
 }
 
+export type BatchProfileStatus =
+  | "queued"
+  | "launching"
+  | "running"
+  | "failed"
+  | "stopped"
+  | "arranging"
+  | "completed";
+
+export type FailurePolicy = "continue" | "stop_on_first_error";
+export type PostLaunchAction = "none" | "arrange_windows";
+export type WindowLayoutMode = "grid" | "horizontal" | "vertical";
+
+export interface BatchLaunchOptions {
+  concurrency: number;
+  launch_interval_ms: number;
+  failure_policy: FailurePolicy;
+  post_launch_action: PostLaunchAction;
+}
+
+export interface BatchTaskEvent {
+  task_id: string;
+  profile_id: string;
+  profile_name: string;
+  status: BatchProfileStatus;
+  error?: string;
+}
+
+export interface WindowLayoutOptions {
+  mode: WindowLayoutMode;
+  gap: number;
+  preserve_aspect_ratio: boolean;
+}
+
+export interface WindowLayoutCapabilities {
+  supported: boolean;
+  platform: string;
+}
+
+export interface ProfileProxyDiagnosticResult {
+  profile_id: string;
+  profile_name: string;
+  proxy_id?: string;
+  proxy_name?: string;
+  is_valid: boolean;
+  latency_ms?: number;
+  source?: "ip_api" | "ip_sb" | "ipapi_co";
+  ip?: string;
+  country?: string;
+  country_code?: string;
+  error?: string;
+}
+
 export function isSyncEnabled(profile: BrowserProfile): boolean {
   return profile.sync_mode != null && profile.sync_mode !== "Disabled";
 }

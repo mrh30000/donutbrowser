@@ -303,7 +303,12 @@
       "assignToGroup": "分配到分组",
       "assignProxy": "分配代理",
       "assignExtensionGroup": "分配扩展分组",
-      "copyCookies": "复制 Cookie"
+      "copyCookies": "复制 Cookie",
+      "launchSelected": "Launch selected",
+      "stopSelected": "Stop selected",
+      "arrangeWindows": "Arrange windows",
+      "diagnoseProxies": "Diagnose proxies",
+      "batchOperations": "Batch operations"
     },
     "passwordProtectedBadge": "密码保护",
     "launchHook": {
@@ -1833,7 +1838,15 @@
     "proxyNotWorking": "所选代理无法使用，因此未创建配置文件。",
     "proxyPaymentRequired": "所选代理需要付费（402），其订阅可能已过期，因此未创建配置文件。",
     "vpnNotWorking": "所选 VPN 无法使用，因此未创建配置文件。",
-    "camoufoxImportDeprecated": "不再支持导入基于 Firefox 的 (Camoufox) 配置文件。Camoufox 即将停用——请改用 Wayfern。"
+    "camoufoxImportDeprecated": "不再支持导入基于 Firefox 的 (Camoufox) 配置文件。Camoufox 即将停用——请改用 Wayfern。",
+    "batchNoProfilesSelected": "Select at least one profile.",
+    "batchProfileNotFound": "One of the selected profiles no longer exists.",
+    "batchLaunchFailed": "Failed to launch one or more profiles.",
+    "batchStopFailed": "无法停止一个或多个配置文件。",
+    "windowLayoutUnsupportedPlatform": "Window arrangement is not supported on this platform yet.",
+    "windowLayoutNoRunningWindows": "No running profile windows were found.",
+    "proxyDiagnosticTimeout": "Proxy diagnostic timed out.",
+    "proxyDiagnosticSourceFailed": "Proxy diagnostic source failed."
   },
   "rail": {
     "profiles": "配置文件",
@@ -2049,5 +2062,38 @@
     "title": "Camoufox 支持即将结束",
     "description": "Camoufox 配置文件的支持将于 2026 年 7 月 8 日结束。您有一个或多个 Camoufox 配置文件。请在此之前迁移到 Wayfern——之后 Camoufox 配置文件可能会停止工作。",
     "acknowledge": "知道了"
+  },
+  "batchOperations": {
+    "title": "Batch Operations",
+    "description": "Run actions across selected profiles.",
+    "targetSelected": "Selected profiles",
+    "concurrency": "Concurrency",
+    "launchInterval": "Launch interval",
+    "failurePolicy": "Failure policy",
+    "continueOnError": "Continue on error",
+    "stopOnFirstError": "Stop on first error",
+    "postLaunchAction": "After launch",
+    "postLaunchNone": "Do nothing",
+    "postLaunchArrange": "Arrange windows",
+    "layoutMode": "Window layout",
+    "layoutGrid": "Grid",
+    "layoutHorizontal": "Horizontal",
+    "layoutVertical": "Vertical",
+    "gap": "Gap",
+    "preserveAspectRatio": "Preserve aspect ratio",
+    "launchSelected": "Launch selected",
+    "stopSelected": "Stop selected",
+    "arrangeWindows": "Arrange windows",
+    "diagnoseProxies": "Diagnose proxies",
+    "results": "Results",
+    "noResults": "No results yet",
+    "profile": "Profile",
+    "result": "Result",
+    "exitIp": "Exit IP",
+    "country": "Country",
+    "latency": "Latency",
+    "source": "Source",
+    "valid": "Valid",
+    "failed": "Failed"
   }
 }

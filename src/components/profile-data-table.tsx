@@ -24,6 +24,7 @@ import {
   LuCookie,
   LuInfo,
   LuLock,
+  LuPanelTop,
   LuPlay,
   LuPuzzle,
   LuSquare,
@@ -1035,6 +1036,12 @@ interface ProfilesDataTableProps {
   onBulkProxyAssignment?: () => void;
   onBulkCopyCookies?: () => void;
   onBulkExtensionGroupAssignment?: () => void;
+  onOpenBatchOperations?: () => void;
+  onBatchLaunchSelected?: () => void;
+  onBatchStopSelected?: () => void;
+  onBatchArrangeSelected?: () => void;
+  onBatchDiagnoseSelected?: () => void;
+  windowLayoutSupported?: boolean;
   onAssignExtensionGroup?: (profileIds: string[]) => void;
   onOpenProfileSyncDialog?: (profile: BrowserProfile) => void;
   onToggleProfileSync?: (profile: BrowserProfile) => void;
@@ -1080,6 +1087,12 @@ export function ProfilesDataTable({
   onBulkProxyAssignment,
   onBulkCopyCookies,
   onBulkExtensionGroupAssignment,
+  onOpenBatchOperations,
+  onBatchLaunchSelected,
+  onBatchStopSelected,
+  onBatchArrangeSelected,
+  onBatchDiagnoseSelected,
+  windowLayoutSupported = false,
   onAssignExtensionGroup,
   onOpenProfileSyncDialog,
   onToggleProfileSync,
@@ -3128,6 +3141,55 @@ export function ProfilesDataTable({
             size="icon"
           >
             <LuCookie />
+          </DataTableActionBarAction>
+        )}
+        {onOpenBatchOperations && (
+          <DataTableActionBarAction
+            tooltip={t("profiles.actionBar.batchOperations")}
+            onClick={onOpenBatchOperations}
+            size="icon"
+          >
+            <LuInfo />
+          </DataTableActionBarAction>
+        )}
+        {onBatchLaunchSelected && (
+          <DataTableActionBarAction
+            tooltip={t("profiles.actionBar.launchSelected")}
+            onClick={onBatchLaunchSelected}
+            size="icon"
+            disabled={selectedProfiles.length === 0}
+          >
+            <LuPlay />
+          </DataTableActionBarAction>
+        )}
+        {onBatchStopSelected && (
+          <DataTableActionBarAction
+            tooltip={t("profiles.actionBar.stopSelected")}
+            onClick={onBatchStopSelected}
+            size="icon"
+            disabled={selectedProfiles.length === 0}
+          >
+            <LuSquare />
+          </DataTableActionBarAction>
+        )}
+        {onBatchArrangeSelected && (
+          <DataTableActionBarAction
+            tooltip={t("profiles.actionBar.arrangeWindows")}
+            onClick={onBatchArrangeSelected}
+            size="icon"
+            disabled={selectedProfiles.length === 0 || !windowLayoutSupported}
+          >
+            <LuPanelTop />
+          </DataTableActionBarAction>
+        )}
+        {onBatchDiagnoseSelected && (
+          <DataTableActionBarAction
+            tooltip={t("profiles.actionBar.diagnoseProxies")}
+            onClick={onBatchDiagnoseSelected}
+            size="icon"
+            disabled={selectedProfiles.length === 0}
+          >
+            <FiWifi />
           </DataTableActionBarAction>
         )}
         {onBulkDelete && (

@@ -33,6 +33,14 @@ export type BackendErrorCode =
   | "PROXY_PAYMENT_REQUIRED"
   | "VPN_NOT_WORKING"
   | "CAMOUFOX_IMPORT_DEPRECATED"
+  | "BATCH_NO_PROFILES_SELECTED"
+  | "BATCH_PROFILE_NOT_FOUND"
+  | "BATCH_LAUNCH_FAILED"
+  | "BATCH_STOP_FAILED"
+  | "WINDOW_LAYOUT_UNSUPPORTED_PLATFORM"
+  | "WINDOW_LAYOUT_NO_RUNNING_WINDOWS"
+  | "PROXY_DIAGNOSTIC_TIMEOUT"
+  | "PROXY_DIAGNOSTIC_SOURCE_FAILED"
   | "INTERNAL_ERROR";
 
 export interface BackendError {
@@ -135,6 +143,22 @@ export function translateBackendError(t: TFunction, err: unknown): string {
       return t("backendErrors.vpnNotWorking");
     case "CAMOUFOX_IMPORT_DEPRECATED":
       return t("backendErrors.camoufoxImportDeprecated");
+    case "BATCH_NO_PROFILES_SELECTED":
+      return t("backendErrors.batchNoProfilesSelected");
+    case "BATCH_PROFILE_NOT_FOUND":
+      return t("backendErrors.batchProfileNotFound");
+    case "BATCH_LAUNCH_FAILED":
+      return t("backendErrors.batchLaunchFailed");
+    case "BATCH_STOP_FAILED":
+      return t("backendErrors.batchStopFailed");
+    case "WINDOW_LAYOUT_UNSUPPORTED_PLATFORM":
+      return t("backendErrors.windowLayoutUnsupportedPlatform");
+    case "WINDOW_LAYOUT_NO_RUNNING_WINDOWS":
+      return t("backendErrors.windowLayoutNoRunningWindows");
+    case "PROXY_DIAGNOSTIC_TIMEOUT":
+      return t("backendErrors.proxyDiagnosticTimeout");
+    case "PROXY_DIAGNOSTIC_SOURCE_FAILED":
+      return t("backendErrors.proxyDiagnosticSourceFailed");
     case "INTERNAL_ERROR":
       return t("backendErrors.internal", {
         detail: parsed.params?.detail ?? "",

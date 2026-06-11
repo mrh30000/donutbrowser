@@ -303,7 +303,12 @@
       "assignToGroup": "Gán vào nhóm",
       "assignProxy": "Gán Proxy",
       "assignExtensionGroup": "Gán nhóm tiện ích",
-      "copyCookies": "Sao chép Cookie"
+      "copyCookies": "Sao chép Cookie",
+      "launchSelected": "Launch selected",
+      "stopSelected": "Stop selected",
+      "arrangeWindows": "Arrange windows",
+      "diagnoseProxies": "Diagnose proxies",
+      "batchOperations": "Batch operations"
     },
     "passwordProtectedBadge": "Được bảo vệ bằng mật khẩu",
     "launchHook": {
@@ -1833,7 +1838,15 @@
     "proxyNotWorking": "Proxy đã chọn không hoạt động, nên profile chưa được tạo.",
     "proxyPaymentRequired": "Proxy đã chọn yêu cầu thanh toán (402) — gói đăng ký của nó có thể đã hết hạn — nên profile chưa được tạo.",
     "vpnNotWorking": "VPN đã chọn không hoạt động, nên profile chưa được tạo.",
-    "camoufoxImportDeprecated": "Không còn hỗ trợ nhập profile dựa trên Firefox (Camoufox). Camoufox đang bị ngừng hỗ trợ — vui lòng dùng Wayfern."
+    "camoufoxImportDeprecated": "Không còn hỗ trợ nhập profile dựa trên Firefox (Camoufox). Camoufox đang bị ngừng hỗ trợ — vui lòng dùng Wayfern.",
+    "batchNoProfilesSelected": "Select at least one profile.",
+    "batchProfileNotFound": "One of the selected profiles no longer exists.",
+    "batchLaunchFailed": "Failed to launch one or more profiles.",
+    "batchStopFailed": "Không thể dừng một hoặc nhiều hồ sơ.",
+    "windowLayoutUnsupportedPlatform": "Window arrangement is not supported on this platform yet.",
+    "windowLayoutNoRunningWindows": "No running profile windows were found.",
+    "proxyDiagnosticTimeout": "Proxy diagnostic timed out.",
+    "proxyDiagnosticSourceFailed": "Proxy diagnostic source failed."
   },
   "rail": {
     "profiles": "Profile",
@@ -2049,5 +2062,38 @@
     "title": "Hỗ trợ Camoufox sắp kết thúc",
     "description": "Hỗ trợ cho các profile Camoufox sẽ kết thúc vào ngày 8 tháng 7 năm 2026. Bạn có một hoặc nhiều profile Camoufox. Hãy chuyển chúng sang Wayfern trước thời điểm đó — sau ngày này, các profile Camoufox có thể ngừng hoạt động.",
     "acknowledge": "Đã hiểu"
+  },
+  "batchOperations": {
+    "title": "Batch Operations",
+    "description": "Run actions across selected profiles.",
+    "targetSelected": "Selected profiles",
+    "concurrency": "Concurrency",
+    "launchInterval": "Launch interval",
+    "failurePolicy": "Failure policy",
+    "continueOnError": "Continue on error",
+    "stopOnFirstError": "Stop on first error",
+    "postLaunchAction": "After launch",
+    "postLaunchNone": "Do nothing",
+    "postLaunchArrange": "Arrange windows",
+    "layoutMode": "Window layout",
+    "layoutGrid": "Grid",
+    "layoutHorizontal": "Horizontal",
+    "layoutVertical": "Vertical",
+    "gap": "Gap",
+    "preserveAspectRatio": "Preserve aspect ratio",
+    "launchSelected": "Launch selected",
+    "stopSelected": "Stop selected",
+    "arrangeWindows": "Arrange windows",
+    "diagnoseProxies": "Diagnose proxies",
+    "results": "Results",
+    "noResults": "No results yet",
+    "profile": "Profile",
+    "result": "Result",
+    "exitIp": "Exit IP",
+    "country": "Country",
+    "latency": "Latency",
+    "source": "Source",
+    "valid": "Valid",
+    "failed": "Failed"
   }
 }

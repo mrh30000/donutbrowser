@@ -19,6 +19,7 @@ mod api_server;
 mod app_auto_updater;
 pub mod app_dirs;
 mod auto_updater;
+mod batch_runner;
 mod browser;
 mod browser_runner;
 mod browser_version_manager;
@@ -38,6 +39,7 @@ mod ip_utils;
 mod platform_browser;
 mod profile;
 mod profile_importer;
+mod proxy_diagnostics;
 mod proxy_manager;
 pub mod proxy_runner;
 pub mod proxy_server;
@@ -48,6 +50,7 @@ mod synchronizer;
 pub mod traffic_stats;
 mod wayfern_manager;
 mod wayfern_terms;
+mod window_layout;
 // mod theme_detector; // removed: theme detection handled in webview via CSS prefers-color-scheme
 pub mod cloud_auth;
 mod commercial_license;
@@ -271,6 +274,49 @@ async fn check_proxy_validity(
   crate::proxy_manager::PROXY_MANAGER
     .check_proxy_validity(&proxy_id, &settings)
     .await
+}
+
+#[tauri::command]
+async fn batch_launch_profiles(
+  app_handle: tauri::AppHandle,
+  profile_ids: Vec<String>,
+  options: Option<crate::batch_runner::BatchLaunchOptions>,
+) -> Result<String, String> {
+  crate::batch_runner::batch_launch_profiles(
+    app_handle,
+    profile_ids,
+    options.unwrap_or_default(),
+  )
+  .await
+}
+
+#[tauri::command]
+async fn batch_stop_profiles(
+  app_handle: tauri::AppHandle,
+  profile_ids: Vec<String>,
+) -> Result<String, String> {
+  crate::batch_runner::batch_stop_profiles(app_handle, profile_ids).await
+}
+
+#[tauri::command]
+fn get_window_layout_capabilities() -> crate::window_layout::WindowLayoutCapabilities {
+  crate::window_layout::get_window_layout_capabilities()
+}
+
+#[tauri::command]
+async fn arrange_running_profile_windows(
+  profile_ids: Vec<String>,
+  options: crate::window_layout::WindowLayoutOptions,
+) -> Result<(), String> {
+  crate::window_layout::arrange_running_profile_windows(profile_ids, options).await
+}
+
+#[tauri::command]
+async fn diagnose_profile_proxies(
+  profile_ids: Vec<String>,
+  options: Option<crate::proxy_diagnostics::ProxyDiagnosticOptions>,
+) -> Result<Vec<crate::proxy_diagnostics::ProfileProxyDiagnosticResult>, String> {
+  crate::proxy_diagnostics::diagnose_profile_proxies(profile_ids, options.unwrap_or_default()).await
 }
 
 #[tauri::command]
@@ -2217,6 +2263,11 @@ pub fn run() {
       update_stored_proxy,
       delete_stored_proxy,
       check_proxy_validity,
+      batch_launch_profiles,
+      batch_stop_profiles,
+      get_window_layout_capabilities,
+      arrange_running_profile_windows,
+      diagnose_profile_proxies,
       get_cached_proxy_check,
       export_proxies,
       import_proxies_json,

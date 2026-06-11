@@ -303,7 +303,12 @@
       "assignToGroup": "Asignar a grupo",
       "assignProxy": "Asignar proxy",
       "assignExtensionGroup": "Asignar grupo de extensiones",
-      "copyCookies": "Copiar cookies"
+      "copyCookies": "Copiar cookies",
+      "launchSelected": "Launch selected",
+      "stopSelected": "Stop selected",
+      "arrangeWindows": "Arrange windows",
+      "diagnoseProxies": "Diagnose proxies",
+      "batchOperations": "Batch operations"
     },
     "passwordProtectedBadge": "Protegido por Contraseña",
     "launchHook": {
@@ -1833,7 +1838,15 @@
     "proxyNotWorking": "El proxy seleccionado no funciona, por lo que no se creó el perfil.",
     "proxyPaymentRequired": "El proxy seleccionado requiere pago (402) —su suscripción puede haber vencido— por lo que no se creó el perfil.",
     "vpnNotWorking": "La VPN seleccionada no funciona, por lo que no se creó el perfil.",
-    "camoufoxImportDeprecated": "La importación de perfiles basados en Firefox (Camoufox) ya no es compatible. Camoufox está en desuso; usa Wayfern en su lugar."
+    "camoufoxImportDeprecated": "La importación de perfiles basados en Firefox (Camoufox) ya no es compatible. Camoufox está en desuso; usa Wayfern en su lugar.",
+    "batchNoProfilesSelected": "Select at least one profile.",
+    "batchProfileNotFound": "One of the selected profiles no longer exists.",
+    "batchLaunchFailed": "Failed to launch one or more profiles.",
+    "batchStopFailed": "No se pudieron detener uno o más perfiles.",
+    "windowLayoutUnsupportedPlatform": "Window arrangement is not supported on this platform yet.",
+    "windowLayoutNoRunningWindows": "No running profile windows were found.",
+    "proxyDiagnosticTimeout": "Proxy diagnostic timed out.",
+    "proxyDiagnosticSourceFailed": "Proxy diagnostic source failed."
   },
   "rail": {
     "profiles": "Perfiles",
@@ -2049,5 +2062,38 @@
     "title": "El soporte para Camoufox está terminando",
     "description": "El soporte para los perfiles de Camoufox terminará el 8 de julio de 2026. Tienes uno o más perfiles de Camoufox. Migra a Wayfern antes de esa fecha; después, los perfiles de Camoufox podrían dejar de funcionar.",
     "acknowledge": "Entendido"
+  },
+  "batchOperations": {
+    "title": "Batch Operations",
+    "description": "Run actions across selected profiles.",
+    "targetSelected": "Selected profiles",
+    "concurrency": "Concurrency",
+    "launchInterval": "Launch interval",
+    "failurePolicy": "Failure policy",
+    "continueOnError": "Continue on error",
+    "stopOnFirstError": "Stop on first error",
+    "postLaunchAction": "After launch",
+    "postLaunchNone": "Do nothing",
+    "postLaunchArrange": "Arrange windows",
+    "layoutMode": "Window layout",
+    "layoutGrid": "Grid",
+    "layoutHorizontal": "Horizontal",
+    "layoutVertical": "Vertical",
+    "gap": "Gap",
+    "preserveAspectRatio": "Preserve aspect ratio",
+    "launchSelected": "Launch selected",
+    "stopSelected": "Stop selected",
+    "arrangeWindows": "Arrange windows",
+    "diagnoseProxies": "Diagnose proxies",
+    "results": "Results",
+    "noResults": "No results yet",
+    "profile": "Profile",
+    "result": "Result",
+    "exitIp": "Exit IP",
+    "country": "Country",
+    "latency": "Latency",
+    "source": "Source",
+    "valid": "Valid",
+    "failed": "Failed"
   }
 }

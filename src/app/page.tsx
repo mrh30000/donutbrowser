@@ -7,6 +7,7 @@ import { useOnborda } from "onborda";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AccountPage } from "@/components/account-page";
+import { BatchOperationsDialog } from "@/components/batch-operations-dialog";
 import { CamoufoxConfigDialog } from "@/components/camoufox-config-dialog";
 import { CamoufoxDeprecationDialog } from "@/components/camoufox-deprecation-dialog";
 import { CloneProfileDialog } from "@/components/clone-profile-dialog";
@@ -47,6 +48,7 @@ import { WayfernTermsDialog } from "@/components/wayfern-terms-dialog";
 import { WelcomeDialog } from "@/components/welcome-dialog";
 import { WindowResizeWarningDialog } from "@/components/window-resize-warning-dialog";
 import { useAppUpdateNotifications } from "@/hooks/use-app-update-notifications";
+import { useBatchTaskEvents } from "@/hooks/use-batch-task-events";
 import { useCloudAuth } from "@/hooks/use-cloud-auth";
 import { useCommercialTrial } from "@/hooks/use-commercial-trial";
 import { useGroupEvents } from "@/hooks/use-group-events";
@@ -79,10 +81,14 @@ import {
   showToast,
 } from "@/lib/toast-utils";
 import type {
+  BatchLaunchOptions,
   BrowserProfile,
   CamoufoxConfig,
+  ProfileProxyDiagnosticResult,
   SyncSettings,
   WayfernConfig,
+  WindowLayoutCapabilities,
+  WindowLayoutOptions,
 } from "@/types";
 
 type BrowserTypeString = "camoufox" | "wayfern";
@@ -300,6 +306,45 @@ export default function Home() {
     string[]
   >([]);
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
+  const [batchOperationsDialogOpen, setBatchOperationsDialogOpen] =
+    useState(false);
+  const [activeBatchTaskId, setActiveBatchTaskId] = useState<string | null>(
+    null,
+  );
+  const [batchDiagnosticResults, setBatchDiagnosticResults] = useState<
+    ProfileProxyDiagnosticResult[]
+  >([]);
+  const [batchActionRunning, setBatchActionRunning] = useState(false);
+  const [windowLayoutCapabilities, setWindowLayoutCapabilities] = useState<
+    WindowLayoutCapabilities | undefined
+  >(undefined);
+  const { eventsByTask, clearTask } = useBatchTaskEvents();
+  const pendingClearsRef = useRef<Map<string, number>>(new Map());
+
+  useEffect(() => {
+    const TERMINAL = new Set(["completed", "failed", "stopped"]);
+    const pendingClears = pendingClearsRef.current;
+    for (const [taskId, profiles] of Object.entries(eventsByTask)) {
+      const values = Object.values(profiles);
+      if (
+        values.length > 0 &&
+        values.every((event) => TERMINAL.has(event.status)) &&
+        !pendingClears.has(taskId)
+      ) {
+        const timerId = window.setTimeout(() => {
+          clearTask(taskId);
+          pendingClears.delete(taskId);
+        }, 5000);
+        pendingClears.set(taskId, timerId);
+      }
+    }
+    return () => {
+      for (const timerId of pendingClears.values()) {
+        window.clearTimeout(timerId);
+      }
+      pendingClears.clear();
+    };
+  }, [eventsByTask, clearTask]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pendingUrls, setPendingUrls] = useState<PendingUrl[]>([]);
   const [currentProfileForCamoufoxConfig, setCurrentProfileForCamoufoxConfig] =
@@ -335,6 +380,36 @@ export default function Home() {
     useState<BrowserProfile | null>(null);
   const { isMicrophoneAccessGranted, isCameraAccessGranted, isInitialized } =
     usePermissions();
+  const defaultBatchLaunchOptions = useMemo<BatchLaunchOptions>(
+    () => ({
+      concurrency: 3,
+      launch_interval_ms: 1000,
+      failure_policy: "continue",
+      post_launch_action: "none",
+    }),
+    [],
+  );
+  const defaultWindowLayoutOptions = useMemo<WindowLayoutOptions>(
+    () => ({
+      mode: "grid",
+      gap: 8,
+      preserve_aspect_ratio: false,
+    }),
+    [],
+  );
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const capabilities = await invoke<WindowLayoutCapabilities>(
+          "get_window_layout_capabilities",
+        );
+        setWindowLayoutCapabilities(capabilities);
+      } catch (error) {
+        console.error("Failed to load window layout capabilities:", error);
+      }
+    })();
+  }, []);
 
   const handleSelectGroup = useCallback((groupId: string) => {
     setSelectedGroupId(groupId);
@@ -1128,6 +1203,87 @@ export default function Home() {
     setCookieCopyDialogOpen(true);
   }, [selectedProfiles, profiles, t]);
 
+  const handleOpenBatchOperations = useCallback(() => {
+    if (selectedProfiles.length === 0) return;
+    setBatchOperationsDialogOpen(true);
+  }, [selectedProfiles.length]);
+
+  const handleBatchLaunch = useCallback(
+    async (options: BatchLaunchOptions) => {
+      if (selectedProfiles.length === 0) return;
+      setBatchActionRunning(true);
+      setBatchDiagnosticResults([]);
+      try {
+        const taskId = await invoke<string>("batch_launch_profiles", {
+          profileIds: selectedProfiles,
+          options,
+        });
+        setActiveBatchTaskId(taskId);
+      } catch (error) {
+        console.error("Failed to batch launch profiles:", error);
+        showErrorToast(translateBackendError(t, error));
+      } finally {
+        setBatchActionRunning(false);
+      }
+    },
+    [selectedProfiles, t],
+  );
+
+  const handleBatchStop = useCallback(async () => {
+    if (selectedProfiles.length === 0) return;
+    setBatchActionRunning(true);
+    try {
+      const taskId = await invoke<string>("batch_stop_profiles", {
+        profileIds: selectedProfiles,
+      });
+      setActiveBatchTaskId(taskId);
+    } catch (error) {
+      console.error("Failed to batch stop profiles:", error);
+      showErrorToast(translateBackendError(t, error));
+    } finally {
+      setBatchActionRunning(false);
+    }
+  }, [selectedProfiles, t]);
+
+  const handleBatchArrange = useCallback(
+    async (options: WindowLayoutOptions) => {
+      if (selectedProfiles.length === 0) return;
+      setBatchActionRunning(true);
+      try {
+        await invoke("arrange_running_profile_windows", {
+          profileIds: selectedProfiles,
+          options,
+        });
+      } catch (error) {
+        console.error("Failed to arrange profile windows:", error);
+        showErrorToast(translateBackendError(t, error));
+      } finally {
+        setBatchActionRunning(false);
+      }
+    },
+    [selectedProfiles, t],
+  );
+
+  const handleBatchDiagnose = useCallback(async () => {
+    if (selectedProfiles.length === 0) return;
+    setBatchActionRunning(true);
+    try {
+      const results = await invoke<ProfileProxyDiagnosticResult[]>(
+        "diagnose_profile_proxies",
+        {
+          profileIds: selectedProfiles,
+          options: null,
+        },
+      );
+      setBatchDiagnosticResults(results);
+    } catch (error) {
+      console.error("Failed to diagnose profile proxies:", error);
+      showErrorToast(translateBackendError(t, error));
+    } finally {
+      setBatchActionRunning(false);
+    }
+  }, [selectedProfiles, t]);
+
   const handleCopyCookiesToProfile = useCallback((profile: BrowserProfile) => {
     setSelectedProfilesForCookies([profile.id]);
     setCookieCopyDialogOpen(true);
@@ -1526,6 +1682,23 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen bg-background font-(family-name:--font-geist-sans)">
       <CloseConfirmDialog />
+      <BatchOperationsDialog
+        open={batchOperationsDialogOpen}
+        onOpenChange={setBatchOperationsDialogOpen}
+        selectedCount={selectedProfiles.length}
+        activeTaskEvents={
+          activeBatchTaskId
+            ? Object.values(eventsByTask[activeBatchTaskId] ?? {})
+            : []
+        }
+        diagnosticResults={batchDiagnosticResults}
+        isRunning={batchActionRunning}
+        capabilities={windowLayoutCapabilities}
+        onLaunch={handleBatchLaunch}
+        onStop={handleBatchStop}
+        onArrange={handleBatchArrange}
+        onDiagnose={handleBatchDiagnose}
+      />
       <CamoufoxDeprecationDialog profiles={profiles} />
       <HomeHeader
         onCreateProfileDialogOpen={setCreateProfileDialogOpen}
@@ -1571,6 +1744,18 @@ export default function Home() {
                 onBulkCopyCookies={handleBulkCopyCookies}
                 onBulkExtensionGroupAssignment={
                   handleBulkExtensionGroupAssignment
+                }
+                onOpenBatchOperations={handleOpenBatchOperations}
+                onBatchLaunchSelected={() =>
+                  void handleBatchLaunch(defaultBatchLaunchOptions)
+                }
+                onBatchStopSelected={() => void handleBatchStop()}
+                onBatchArrangeSelected={() =>
+                  void handleBatchArrange(defaultWindowLayoutOptions)
+                }
+                onBatchDiagnoseSelected={() => void handleBatchDiagnose()}
+                windowLayoutSupported={
+                  windowLayoutCapabilities?.supported ?? false
                 }
                 onAssignExtensionGroup={handleAssignExtensionGroup}
                 onOpenProfileSyncDialog={handleOpenProfileSyncDialog}

@@ -190,7 +190,12 @@
       "copyLogs": "Copiar registros",
       "openLogDir": "Abrir carpeta de registros",
       "copyLogsSuccess": "Registros copiados al portapapeles",
-      "copyLogsDescription": "Une los archivos de registro más recientes (hasta 5 MB) en tu portapapeles para compartirlos en informes de error."
+      "copyLogsDescription": "Une los archivos de registro más recientes (hasta 5 MB) en tu portapapeles para compartirlos en informes de error.",
+      "externalBrowser": "Navegador externo",
+      "externalBrowserDescription": "Usa un navegador basado en Chromium personalizado en lugar del Wayfern integrado. La suplantación de huella digital no estará disponible.",
+      "externalBrowserPlaceholder": "Ruta al ejecutable del navegador",
+      "browseExecutable": "Examinar",
+      "clearExternalBrowser": "Borrar"
     },
     "disableAutoUpdates": "Desactivar Actualizaciones Automáticas de la App",
     "disableAutoUpdatesDescription": "Evita que la aplicación busque e instale actualizaciones de Donut Browser automáticamente. Las actualizaciones de navegadores no se ven afectadas.",

@@ -269,6 +269,14 @@ impl WayfernManager {
     profile: &BrowserProfile,
     config: &WayfernConfig,
   ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    if let Ok(settings) = crate::settings_manager::SettingsManager::instance().load_settings() {
+      if settings.external_browser_path.as_ref().is_some_and(|p| std::path::Path::new(p).exists())
+      {
+        log::info!("External browser configured, skipping Wayfern fingerprint generation");
+        return Ok("{}".to_string());
+      }
+    }
+
     let executable_path = BrowserRunner::instance()
       .get_browser_executable_path(profile)
       .map_err(|e| format!("Failed to get Wayfern executable path: {e}"))?;

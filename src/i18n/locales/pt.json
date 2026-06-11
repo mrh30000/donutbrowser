@@ -190,7 +190,12 @@
       "copyLogs": "Copiar logs",
       "openLogDir": "Abrir pasta de logs",
       "copyLogsSuccess": "Logs copiados para a área de transferência",
-      "copyLogsDescription": "Junta os arquivos de log mais recentes (até 5 MB) na sua área de transferência para compartilhar em relatórios de bug."
+      "copyLogsDescription": "Junta os arquivos de log mais recentes (até 5 MB) na sua área de transferência para compartilhar em relatórios de bug.",
+      "externalBrowser": "Navegador externo",
+      "externalBrowserDescription": "Use um navegador baseado em Chromium personalizado em vez do Wayfern integrado. A falsificação de impressão digital ficará indisponível.",
+      "externalBrowserPlaceholder": "Caminho para o executável do navegador",
+      "browseExecutable": "Procurar",
+      "clearExternalBrowser": "Limpar"
     },
     "disableAutoUpdates": "Desativar Atualizações Automáticas do App",
     "disableAutoUpdatesDescription": "Impede que o aplicativo verifique e instale atualizações do Donut Browser automaticamente. As atualizações de navegadores não são afetadas.",

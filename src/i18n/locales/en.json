@@ -190,7 +190,12 @@
       "copyLogs": "Copy logs",
       "openLogDir": "Open log folder",
       "copyLogsSuccess": "Logs copied to clipboard",
-      "copyLogsDescription": "Bundles the most recent log files (up to 5 MB) into your clipboard for sharing in bug reports."
+      "copyLogsDescription": "Bundles the most recent log files (up to 5 MB) into your clipboard for sharing in bug reports.",
+      "externalBrowser": "External Browser",
+      "externalBrowserDescription": "Use a custom Chromium-based browser instead of the built-in Wayfern. Fingerprint spoofing will be unavailable.",
+      "externalBrowserPlaceholder": "Path to browser executable",
+      "browseExecutable": "Browse",
+      "clearExternalBrowser": "Clear"
     },
     "disableAutoUpdates": "Disable App Auto Updates",
     "disableAutoUpdatesDescription": "Prevent the app from automatically checking and installing Donut Browser updates. Browser updates are not affected.",

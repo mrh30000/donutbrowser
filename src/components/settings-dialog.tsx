@@ -2,6 +2,7 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { writeText as writeClipboardText } from "@tauri-apps/plugin-clipboard-manager";
+import { open } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import Color from "color";
 import { useCallback, useEffect, useState } from "react";
@@ -68,6 +69,7 @@ interface AppSettings {
   api_token?: string;
   disable_auto_updates?: boolean;
   keep_decrypted_profiles_in_ram?: boolean;
+  external_browser_path?: string;
 }
 
 interface CustomThemeState {
@@ -628,7 +630,8 @@ export function SettingsDialog({
     (settings.theme !== "custom" &&
       JSON.stringify(settings.custom_theme ?? {}) !==
         JSON.stringify(originalSettings.custom_theme ?? {})) ||
-    settings.disable_auto_updates !== originalSettings.disable_auto_updates;
+    settings.disable_auto_updates !== originalSettings.disable_auto_updates ||
+    settings.external_browser_path !== originalSettings.external_browser_path;
 
   return (
     <>
@@ -1248,6 +1251,60 @@ export function SettingsDialog({
                   <p className="text-xs text-muted-foreground">
                     {t("settings.keepDecryptedProfilesInRamDescription")}
                   </p>
+                </div>
+              </div>
+
+              {/* External Browser Path */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">
+                  {t("settings.advanced.externalBrowser")}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {t("settings.advanced.externalBrowserDescription")}
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    className="flex-1"
+                    placeholder={t(
+                      "settings.advanced.externalBrowserPlaceholder",
+                    )}
+                    value={settings.external_browser_path ?? ""}
+                    readOnly
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const selected = await open({
+                          multiple: false,
+                          filters: navigator.platform
+                            .toLowerCase()
+                            .includes("win")
+                            ? [{ name: "Executables", extensions: ["exe"] }]
+                            : [{ name: "All Files", extensions: ["*"] }],
+                        });
+                        if (selected) {
+                          updateSetting("external_browser_path", selected);
+                        }
+                      } catch (err) {
+                        console.error("Failed to open file dialog:", err);
+                      }
+                    }}
+                  >
+                    {t("settings.advanced.browseExecutable")}
+                  </Button>
+                  {settings.external_browser_path && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        updateSetting("external_browser_path", undefined);
+                      }}
+                    >
+                      {t("settings.advanced.clearExternalBrowser")}
+                    </Button>
+                  )}
                 </div>
               </div>
 

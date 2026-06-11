@@ -190,7 +190,12 @@
       "copyLogs": "复制日志",
       "openLogDir": "打开日志文件夹",
       "copyLogsSuccess": "日志已复制到剪贴板",
-      "copyLogsDescription": "将最近的日志文件（最多 5 MB）合并到剪贴板，便于在反馈问题时分享。"
+      "copyLogsDescription": "将最近的日志文件（最多 5 MB）合并到剪贴板，便于在反馈问题时分享。",
+      "externalBrowser": "外部浏览器",
+      "externalBrowserDescription": "使用自定义 Chromium 浏览器替代内置 Wayfern。指纹伪装功能将不可用。",
+      "externalBrowserPlaceholder": "浏览器可执行文件路径",
+      "browseExecutable": "浏览",
+      "clearExternalBrowser": "清除"
     },
     "disableAutoUpdates": "禁用应用自动更新",
     "disableAutoUpdatesDescription": "阻止应用程序自动检查和安装 Donut Browser 更新。浏览器更新不受影响。",

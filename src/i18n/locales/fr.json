@@ -190,7 +190,12 @@
       "copyLogs": "Copier les journaux",
       "openLogDir": "Ouvrir le dossier des journaux",
       "copyLogsSuccess": "Journaux copiés dans le presse-papiers",
-      "copyLogsDescription": "Regroupe les derniers fichiers de journal (jusqu’à 5 Mo) dans votre presse-papiers pour les rapports de bug."
+      "copyLogsDescription": "Regroupe les derniers fichiers de journal (jusqu’à 5 Mo) dans votre presse-papiers pour les rapports de bug.",
+      "externalBrowser": "Navigateur externe",
+      "externalBrowserDescription": "Utilisez un navigateur Chromium personnalisé à la place du Wayfern intégré. L'usurpation d'empreinte numérique sera indisponible.",
+      "externalBrowserPlaceholder": "Chemin vers l'exécutable du navigateur",
+      "browseExecutable": "Parcourir",
+      "clearExternalBrowser": "Effacer"
     },
     "disableAutoUpdates": "Désactiver les mises à jour automatiques de l'app",
     "disableAutoUpdatesDescription": "Empêche l'application de vérifier et d'installer automatiquement les mises à jour de Donut Browser. Les mises à jour des navigateurs ne sont pas affectées.",

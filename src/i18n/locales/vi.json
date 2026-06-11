@@ -190,7 +190,12 @@
       "copyLogs": "Sao chép nhật ký",
       "openLogDir": "Mở thư mục nhật ký",
       "copyLogsSuccess": "Đã sao chép nhật ký vào clipboard",
-      "copyLogsDescription": "Đóng gói các file nhật ký gần nhất (tối đa 5 MB) vào clipboard để chia sẻ trong báo cáo lỗi."
+      "copyLogsDescription": "Đóng gói các file nhật ký gần nhất (tối đa 5 MB) vào clipboard để chia sẻ trong báo cáo lỗi.",
+      "externalBrowser": "Trình duyệt bên ngoài",
+      "externalBrowserDescription": "Sử dụng trình duyệt dựa trên Chromium tùy chỉnh thay vì Wayfern tích hợp. Tính năng giả mạo dấu vân tay sẽ không khả dụng.",
+      "externalBrowserPlaceholder": "Đường dẫn đến tệp thực thi trình duyệt",
+      "browseExecutable": "Duyệt",
+      "clearExternalBrowser": "Xóa"
     },
     "disableAutoUpdates": "Tắt tự động cập nhật ứng dụng",
     "disableAutoUpdatesDescription": "Ngăn ứng dụng tự động kiểm tra và cài đặt bản cập nhật Donut Browser. Cập nhật trình duyệt không bị ảnh hưởng.",

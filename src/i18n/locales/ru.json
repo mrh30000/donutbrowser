@@ -190,7 +190,12 @@
       "copyLogs": "Скопировать логи",
       "openLogDir": "Открыть папку логов",
       "copyLogsSuccess": "Логи скопированы в буфер обмена",
-      "copyLogsDescription": "Собирает последние файлы логов (до 5 МБ) в буфер обмена для прикрепления к багам."
+      "copyLogsDescription": "Собирает последние файлы логов (до 5 МБ) в буфер обмена для прикрепления к багам.",
+      "externalBrowser": "Внешний браузер",
+      "externalBrowserDescription": "Использовать пользовательский браузер на базе Chromium вместо встроенного Wayfern. Подделка отпечатка браузера будет недоступна.",
+      "externalBrowserPlaceholder": "Путь к исполняемому файлу браузера",
+      "browseExecutable": "Обзор",
+      "clearExternalBrowser": "Очистить"
     },
     "disableAutoUpdates": "Отключить автообновление приложения",
     "disableAutoUpdatesDescription": "Запретить автоматическую проверку и установку обновлений Donut Browser. Обновления браузеров не затрагиваются.",

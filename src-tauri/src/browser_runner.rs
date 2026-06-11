@@ -163,17 +163,27 @@ impl BrowserRunner {
     &self,
     profile: &BrowserProfile,
   ) -> Result<PathBuf, Box<dyn std::error::Error + Send + Sync>> {
-    // Create browser instance to get executable path
+    if profile.browser == "wayfern" {
+      if let Ok(settings) = crate::settings_manager::SettingsManager::instance().load_settings() {
+        if let Some(ref path) = settings.external_browser_path {
+          let p = PathBuf::from(path);
+          if p.exists() {
+            log::info!("Using external browser executable: {path}");
+            return Ok(p);
+          }
+          log::warn!("External browser path does not exist: {path}, falling back to internal");
+        }
+      }
+    }
+
     let browser_type = crate::browser::BrowserType::from_str(&profile.browser)
       .map_err(|e| format!("Invalid browser type: {e}"))?;
     let browser = crate::browser::create_browser(browser_type);
 
-    // Construct browser directory path: binaries/<browser>/<version>/
     let mut browser_dir = self.get_binaries_dir();
     browser_dir.push(&profile.browser);
     browser_dir.push(&profile.version);
 
-    // Get platform-specific executable path
     browser
       .get_executable_path(&browser_dir)
       .map_err(|e| format!("Failed to get executable path for {}: {e}", profile.browser).into())

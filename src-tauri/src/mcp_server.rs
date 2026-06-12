@@ -2134,6 +2134,7 @@ impl McpServer {
         None,
         None,
         None,
+        None,
         group_id,
         false,
         None,

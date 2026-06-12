@@ -744,6 +744,24 @@ impl WayfernManager {
       args.push("--dns-prefetch-disable".to_string());
     }
 
+    // Apply unified fingerprint profile if present (VirtualBrowser migration)
+    let unified_fp_engine_config = if let Some(ref fp_profile) = profile.fingerprint_profile {
+      use crate::fingerprint::FingerprintAdapter;
+      let adapter = crate::fingerprint::wayfern_adapter::WayfernAdapter::new(
+        profile.id.to_string(),
+      );
+      let mut engine_config = crate::fingerprint::EngineLaunchConfig::default();
+      if let Err(e) = adapter.apply(fp_profile, &mut engine_config) {
+        log::warn!("Failed to apply unified fingerprint profile: {}", e);
+        None
+      } else {
+        args.extend(engine_config.args.clone());
+        Some(engine_config)
+      }
+    } else {
+      None
+    };
+
     let mut command = TokioCommand::new(&executable_path);
     command
       .args(&args)
@@ -843,6 +861,20 @@ impl WayfernManager {
       if let Some(ref token) = wayfern_token {
         if let Some(obj) = fingerprint_params.as_object_mut() {
           obj.insert("wayfernToken".to_string(), json!(token));
+        }
+      }
+
+      // Merge unified fingerprint profile fields (VirtualBrowser migration)
+      if let Some(ref engine_config) = unified_fp_engine_config {
+        if let Some(ref fp_json) = engine_config.wayfern_fingerprint {
+          if let (Some(params_obj), Some(fp_obj)) = (
+            fingerprint_params.as_object_mut(),
+            fp_json.as_object(),
+          ) {
+            for (key, value) in fp_obj {
+              params_obj.entry(key.clone()).or_insert(value.clone());
+            }
+          }
         }
       }
 

@@ -195,7 +195,13 @@
       "externalBrowserDescription": "使用自定义 Chromium 浏览器替代内置 Wayfern。指纹伪装功能将不可用。",
       "externalBrowserPlaceholder": "浏览器可执行文件路径",
       "browseExecutable": "浏览",
-      "clearExternalBrowser": "清除"
+      "clearExternalBrowser": "清除",
+      "ipApiUrl": "IP 查询 API 地址",
+      "ipApiUrlDescription": "自定义 IP 地址查询接口。留空使用内置服务。",
+      "ipApiUrlPlaceholder": "https://api.example.com/ip",
+      "ipApiKey": "IP 查询 API 密钥",
+      "ipApiKeyDescription": "自定义 IP 查询服务的 API 密钥（可选）。以 Bearer token 发送。",
+      "ipApiKeyPlaceholder": "API 密钥"
     },
     "disableAutoUpdates": "禁用应用自动更新",
     "disableAutoUpdatesDescription": "阻止应用程序自动检查和安装 Donut Browser 更新。浏览器更新不受影响。",
@@ -219,7 +225,8 @@
     "newProfile": "新建",
     "donutLogo": "Donut Browser 标识",
     "scrollGroupsLeft": "向左滚动分组",
-    "scrollGroupsRight": "向右滚动分组"
+    "scrollGroupsRight": "向右滚动分组",
+    "batchCreate": "批量创建"
   },
   "profiles": {
     "title": "配置文件",
@@ -882,7 +889,8 @@
       "netscape": "Netscape TXT",
       "json": "JSON",
       "success": "Cookies 导出成功",
-      "error": "导出 Cookies 失败"
+      "error": "导出 Cookies 失败",
+      "profileConfig": "配置文件 (JSON)"
     }
   },
   "toasts": {
@@ -1229,7 +1237,11 @@
       "syncing": "同步中",
       "synced": "已同步",
       "error": "错误"
-    }
+    },
+    "exportConfigSuccess": "配置文件配置导出成功",
+    "importConfig": "导入配置",
+    "importConfigSuccess": "配置文件导入成功",
+    "importConfigError": "配置文件导入失败"
   },
   "extensions": {
     "title": "扩展程序",
@@ -2100,5 +2112,67 @@
     "source": "Source",
     "valid": "Valid",
     "failed": "Failed"
+  },
+  "fingerprintProfile": {
+    "identity": "身份",
+    "network": "网络与隐私",
+    "rendering": "渲染",
+    "hardware": "硬件",
+    "userAgent": "用户代理",
+    "auto": "自动",
+    "manual": "手动",
+    "uaPlaceholder": "Mozilla/5.0 ...",
+    "platform": "平台",
+    "language": "语言",
+    "timezone": "时区",
+    "offsetPlaceholder": "UTC 偏移",
+    "secChUa": "Sec-CH-UA 品牌",
+    "webRTC": "WebRTC",
+    "webrtcAllow": "允许",
+    "webrtcReplace": "替换",
+    "webrtcBlock": "阻止",
+    "geolocation": "地理位置",
+    "latitude": "纬度",
+    "longitude": "经度",
+    "permission": "权限",
+    "geoAsk": "询问",
+    "geoAllow": "允许",
+    "geoBlock": "阻止",
+    "dnt": "Do Not Track",
+    "dntDescription": "发送 Do Not Track 请求头",
+    "ssl": "SSL",
+    "sslEnabled": "已启用",
+    "canvas": "Canvas",
+    "canvasDescription": "Canvas 指纹噪声",
+    "audioContext": "AudioContext",
+    "audioContextDescription": "AudioContext 指纹噪声",
+    "clientRects": "ClientRects",
+    "clientRectsDescription": "ClientRects 指纹噪声",
+    "speechVoices": "语音合成",
+    "speechVoicesDescription": "语音合成声音指纹",
+    "noiseDefault": "默认",
+    "noiseRandom": "随机",
+    "webgl": "WebGL",
+    "webglVendor": "WebGL 厂商",
+    "webglRenderer": "WebGL 渲染器",
+    "cpu": "CPU 核心数",
+    "memory": "设备内存",
+    "screen": "屏幕",
+    "gpuAcceleration": "GPU 加速",
+    "gpuAccelerationDescription": "启用 GPU 硬件加速",
+    "advancedConfig": "高级指纹",
+    "advancedConfigDescription": "精细调整浏览器指纹参数，如用户代理、WebGL、Canvas、字体等。"
+  },
+  "batchCreate": {
+    "title": "批量创建配置文件",
+    "count": "配置文件数量",
+    "countDescription": "一次创建 1 到 {{max}} 个配置文件。",
+    "namePrefix": "名称前缀",
+    "namePrefixPlaceholder": "例如：account",
+    "namePrefixDescription": "配置文件将命名为：前缀-01、前缀-02...",
+    "sharedFingerprintDescription": "此批次所有配置文件将共享相同的指纹模板。",
+    "creating": "正在创建配置文件...",
+    "creatingButton": "正在创建 {{current}}/{{total}}...",
+    "createButton": "创建 {{count}} 个配置文件"
   }
 }

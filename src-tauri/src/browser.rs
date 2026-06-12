@@ -1221,6 +1221,7 @@ mod tests {
       password_protected: false,
       created_at: None,
       updated_at: None,
+    fingerprint_profile: None,
     };
 
     let path = profile.get_profile_data_path(&profiles_dir);

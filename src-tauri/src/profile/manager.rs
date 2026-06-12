@@ -82,6 +82,7 @@ impl ProfileManager {
     vpn_id: Option<String>,
     camoufox_config: Option<CamoufoxConfig>,
     wayfern_config: Option<WayfernConfig>,
+    fingerprint_profile: Option<crate::fingerprint::profile::FingerprintProfile>,
     group_id: Option<String>,
     ephemeral: bool,
     dns_blocklist: Option<String>,
@@ -201,6 +202,7 @@ impl ProfileManager {
           password_protected: false,
           created_at: None,
           updated_at: None,
+        fingerprint_profile: None,
         };
 
         match self
@@ -305,6 +307,7 @@ impl ProfileManager {
           password_protected: false,
           created_at: None,
           updated_at: None,
+        fingerprint_profile: None,
         };
 
         match self
@@ -368,6 +371,7 @@ impl ProfileManager {
           .unwrap_or(0),
       ),
       updated_at: Some(crate::proxy_manager::now_secs()),
+      fingerprint_profile,
     };
 
     // Save profile info
@@ -1069,6 +1073,7 @@ impl ProfileManager {
           .unwrap_or(0),
       ),
       updated_at: Some(crate::proxy_manager::now_secs()),
+      fingerprint_profile: None,
     };
 
     // Donut: a clone must NOT be linkable to its source. The source
@@ -2290,6 +2295,7 @@ pub async fn create_browser_profile_with_group(
   vpn_id: Option<String>,
   camoufox_config: Option<CamoufoxConfig>,
   wayfern_config: Option<WayfernConfig>,
+  fingerprint_profile: Option<crate::fingerprint::profile::FingerprintProfile>,
   group_id: Option<String>,
   ephemeral: bool,
   dns_blocklist: Option<String>,
@@ -2307,6 +2313,7 @@ pub async fn create_browser_profile_with_group(
       vpn_id,
       camoufox_config,
       wayfern_config,
+      fingerprint_profile,
       group_id,
       ephemeral,
       dns_blocklist,
@@ -2467,6 +2474,7 @@ pub async fn create_browser_profile_new(
   vpn_id: Option<String>,
   camoufox_config: Option<CamoufoxConfig>,
   wayfern_config: Option<WayfernConfig>,
+  fingerprint_profile: Option<crate::fingerprint::profile::FingerprintProfile>,
   group_id: Option<String>,
   ephemeral: Option<bool>,
   dns_blocklist: Option<String>,
@@ -2500,6 +2508,7 @@ pub async fn create_browser_profile_new(
     vpn_id,
     camoufox_config,
     wayfern_config,
+    fingerprint_profile,
     group_id,
     ephemeral.unwrap_or(false),
     dns_blocklist,
@@ -2576,6 +2585,36 @@ pub fn delete_profile(app_handle: tauri::AppHandle, profile_id: String) -> Resul
   ProfileManager::instance()
     .delete_profile(&app_handle, &profile_id)
     .map_err(|e| format!("Failed to delete profile: {e}"))
+}
+
+#[tauri::command]
+pub fn export_profile_json(profile_id: String) -> Result<String, String> {
+  let profiles = ProfileManager::instance()
+    .list_profiles()
+    .map_err(|e| format!("Failed to list profiles: {e}"))?;
+  let profile = profiles
+    .iter()
+    .find(|p| p.id.to_string() == profile_id)
+    .ok_or_else(|| "Profile not found".to_string())?;
+  serde_json::to_string_pretty(profile).map_err(|e| format!("Serialization error: {e}"))
+}
+
+#[tauri::command]
+pub async fn import_profile_json(
+  _app_handle: tauri::AppHandle,
+  json_content: String,
+) -> Result<BrowserProfile, String> {
+  let mut profile: BrowserProfile =
+    serde_json::from_str(&json_content).map_err(|e| format!("Invalid JSON: {e}"))?;
+  profile.id = uuid::Uuid::new_v4();
+  profile.name = format!("{} (imported)", profile.name);
+  profile.process_id = None;
+  profile.last_sync = None;
+  ProfileManager::instance()
+    .save_profile(&profile)
+    .map_err(|e| format!("Failed to save imported profile: {e}"))?;
+  let _ = crate::events::emit_empty("profiles-changed");
+  Ok(profile)
 }
 
 lazy_static::lazy_static! {

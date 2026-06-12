@@ -70,6 +70,8 @@ interface AppSettings {
   disable_auto_updates?: boolean;
   keep_decrypted_profiles_in_ram?: boolean;
   external_browser_path?: string;
+  ip_api_url?: string;
+  ip_api_key?: string;
 }
 
 interface CustomThemeState {
@@ -631,7 +633,9 @@ export function SettingsDialog({
       JSON.stringify(settings.custom_theme ?? {}) !==
         JSON.stringify(originalSettings.custom_theme ?? {})) ||
     settings.disable_auto_updates !== originalSettings.disable_auto_updates ||
-    settings.external_browser_path !== originalSettings.external_browser_path;
+    settings.external_browser_path !== originalSettings.external_browser_path ||
+    settings.ip_api_url !== originalSettings.ip_api_url ||
+    settings.ip_api_key !== originalSettings.ip_api_key;
 
   return (
     <>
@@ -1306,6 +1310,40 @@ export function SettingsDialog({
                     </Button>
                   )}
                 </div>
+              </div>
+
+              {/* IP Query API Settings */}
+              <div className="space-y-3 p-4 border rounded-lg">
+                <Label className="font-medium">
+                  {t("settings.advanced.ipApiUrl")}
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {t("settings.advanced.ipApiUrlDescription")}
+                </p>
+                <Input
+                  value={settings.ip_api_url ?? ""}
+                  onChange={(e) => {
+                    updateSetting("ip_api_url", e.target.value || undefined);
+                  }}
+                  placeholder={t("settings.advanced.ipApiUrlPlaceholder")}
+                />
+              </div>
+
+              <div className="space-y-3 p-4 border rounded-lg">
+                <Label className="font-medium">
+                  {t("settings.advanced.ipApiKey")}
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {t("settings.advanced.ipApiKeyDescription")}
+                </p>
+                <Input
+                  type="password"
+                  value={settings.ip_api_key ?? ""}
+                  onChange={(e) => {
+                    updateSetting("ip_api_key", e.target.value || undefined);
+                  }}
+                  placeholder={t("settings.advanced.ipApiKeyPlaceholder")}
+                />
               </div>
 
               <LoadingButton

@@ -48,13 +48,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { FingerprintConfigForm } from "@/components/fingerprint-config-form";
 import { WayfernConfigForm } from "@/components/wayfern-config-form";
 import { useBrowserDownload } from "@/hooks/use-browser-download";
 import { useProxyEvents } from "@/hooks/use-proxy-events";
 import { useVpnEvents } from "@/hooks/use-vpn-events";
 import { getBrowserIcon } from "@/lib/browser-utils";
 import { cn } from "@/lib/utils";
-import type { BrowserReleaseTypes, WayfernConfig, WayfernOS } from "@/types";
+import type { BrowserReleaseTypes, FingerprintProfile, WayfernConfig, WayfernOS } from "@/types";
 
 const getCurrentOS = (): WayfernOS => {
   if (typeof navigator === "undefined") return "linux";
@@ -79,6 +80,7 @@ interface CreateProfileDialogProps {
     proxyId?: string;
     vpnId?: string;
     wayfernConfig?: WayfernConfig;
+    fingerprintProfile?: FingerprintProfile;
     groupId?: string;
     extensionGroupId?: string;
     ephemeral?: boolean;
@@ -133,6 +135,10 @@ export function CreateProfileDialog({
     os: getCurrentOS(), // Default to current OS
   }));
 
+  // Fingerprint profile state (advanced config)
+  const [enableFingerprint, setEnableFingerprint] = useState(false);
+  const [fingerprintProfile, setFingerprintProfile] = useState<FingerprintProfile>({});
+
   // Handle browser selection from the initial screen
   const handleBrowserSelect = (browser: BrowserTypeString) => {
     setSelectedBrowser(browser);
@@ -146,6 +152,8 @@ export function CreateProfileDialog({
     setProfileName("");
     setSelectedProxyId(undefined);
     setLaunchHook("");
+    setEnableFingerprint(false);
+    setFingerprintProfile({});
   };
 
   // Handle back button
@@ -418,6 +426,7 @@ export function CreateProfileDialog({
           proxyId: resolvedProxyId,
           vpnId: resolvedVpnId,
           wayfernConfig: finalWayfernConfig,
+          fingerprintProfile: enableFingerprint ? fingerprintProfile : undefined,
           groupId:
             selectedGroupId && selectedGroupId !== "__all__"
               ? selectedGroupId
@@ -484,6 +493,8 @@ export function CreateProfileDialog({
     setWayfernConfig({
       os: getCurrentOS(), // Reset to current OS
     });
+    setEnableFingerprint(false);
+    setFingerprintProfile({});
     setEphemeral(false);
     setEnablePassword(false);
     setPassword("");
@@ -534,7 +545,7 @@ export function CreateProfileDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[380px] max-w-[380px] max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[480px] max-w-[480px] max-h-[90vh] flex flex-col">
         <DialogHeader className="shrink-0">
           <DialogTitle>
             {currentStep === "browser-selection"
@@ -907,6 +918,36 @@ export function CreateProfileDialog({
                               }
                               profileBrowser="wayfern"
                             />
+
+                            {/* Advanced Fingerprint Configuration */}
+                            <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                              <div className="flex items-center gap-x-2">
+                                <Checkbox
+                                  id="enable-fingerprint"
+                                  checked={enableFingerprint}
+                                  onCheckedChange={(checked) => {
+                                    setEnableFingerprint(checked === true);
+                                    if (checked !== true) {
+                                      setFingerprintProfile({});
+                                    }
+                                  }}
+                                />
+                                <Label htmlFor="enable-fingerprint" className="font-medium">
+                                  {t("fingerprintProfile.advancedConfig")}
+                                </Label>
+                              </div>
+                              <p className="text-sm text-muted-foreground ml-6">
+                                {t("fingerprintProfile.advancedConfigDescription")}
+                              </p>
+                            </div>
+                            {enableFingerprint && (
+                              <FingerprintConfigForm
+                                profile={fingerprintProfile}
+                                onChange={(updates) => {
+                                  setFingerprintProfile((prev) => ({ ...prev, ...updates }));
+                                }}
+                              />
+                            )}
                           </div>
                         ) : (
                           // Regular Browser Configuration (should not happen in

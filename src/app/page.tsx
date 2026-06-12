@@ -16,6 +16,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { CommercialTrialModal } from "@/components/commercial-trial-modal";
 import { CookieCopyDialog } from "@/components/cookie-copy-dialog";
 import { CookieManagementDialog } from "@/components/cookie-management-dialog";
+import { BatchCreateDialog } from "@/components/batch-create-dialog";
 import { CreateProfileDialog } from "@/components/create-profile-dialog";
 import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 import { DeviceCodeVerifyDialog } from "@/components/device-code-verify-dialog";
@@ -84,6 +85,7 @@ import type {
   BatchLaunchOptions,
   BrowserProfile,
   CamoufoxConfig,
+  FingerprintProfile,
   ProfileProxyDiagnosticResult,
   SyncSettings,
   WayfernConfig,
@@ -265,6 +267,7 @@ export default function Home() {
     "api" | "mcp"
   >("api");
   const [createProfileDialogOpen, setCreateProfileDialogOpen] = useState(false);
+  const [batchCreateDialogOpen, setBatchCreateDialogOpen] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const [integrationsDialogOpen, setIntegrationsDialogOpen] = useState(false);
   const [importProfileDialogOpen, setImportProfileDialogOpen] = useState(false);
@@ -886,6 +889,7 @@ export default function Home() {
       vpnId?: string;
       camoufoxConfig?: CamoufoxConfig;
       wayfernConfig?: WayfernConfig;
+      fingerprintProfile?: FingerprintProfile;
       groupId?: string;
       extensionGroupId?: string;
       ephemeral?: boolean;
@@ -905,6 +909,7 @@ export default function Home() {
             vpnId: profileData.vpnId,
             camoufoxConfig: profileData.camoufoxConfig,
             wayfernConfig: profileData.wayfernConfig,
+            fingerprintProfile: profileData.fingerprintProfile,
             groupId:
               profileData.groupId ??
               (selectedGroupId && selectedGroupId !== "__all__"
@@ -1702,6 +1707,7 @@ export default function Home() {
       <CamoufoxDeprecationDialog profiles={profiles} />
       <HomeHeader
         onCreateProfileDialogOpen={setCreateProfileDialogOpen}
+        onBatchCreateDialogOpen={setBatchCreateDialogOpen}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         groups={groupsData}
@@ -1875,6 +1881,16 @@ export default function Home() {
           setCreateProfileDialogOpen(false);
         }}
         onCreateProfile={handleCreateProfile}
+        selectedGroupId={selectedGroupId}
+        crossOsUnlocked={crossOsUnlocked}
+      />
+
+      <BatchCreateDialog
+        isOpen={batchCreateDialogOpen}
+        onClose={() => {
+          setBatchCreateDialogOpen(false);
+        }}
+        onCreated={() => {}}
         selectedGroupId={selectedGroupId}
         crossOsUnlocked={crossOsUnlocked}
       />

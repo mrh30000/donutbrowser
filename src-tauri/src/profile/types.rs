@@ -1,4 +1,5 @@
 use crate::camoufox_manager::CamoufoxConfig;
+use crate::fingerprint::profile::FingerprintProfile;
 use crate::wayfern_manager::WayfernConfig;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -84,6 +85,8 @@ pub struct BrowserProfile {
   /// NOT bumped by browser-file changes, which sync via the file manifest.
   #[serde(default)]
   pub updated_at: Option<u64>,
+  #[serde(default)]
+  pub fingerprint_profile: Option<FingerprintProfile>,
 }
 
 pub fn default_release_type() -> String {

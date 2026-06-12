@@ -64,6 +64,10 @@ pub struct AppSettings {
   pub keep_decrypted_profiles_in_ram: bool,
   #[serde(default)]
   pub external_browser_path: Option<String>,
+  #[serde(default)]
+  pub ip_api_url: Option<String>,
+  #[serde(default)]
+  pub ip_api_key: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -101,6 +105,8 @@ impl Default for AppSettings {
       disable_auto_updates: false,
       keep_decrypted_profiles_in_ram: false,
       external_browser_path: None,
+      ip_api_url: None,
+      ip_api_key: None,
     }
   }
 }

@@ -64,6 +64,7 @@ mod version_updater;
 pub mod vpn;
 pub mod vpn_worker_runner;
 pub mod vpn_worker_storage;
+pub mod fingerprint;
 
 use browser_runner::{
   check_browser_exists, kill_browser_profile, launch_browser_profile, open_url_with_profile,
@@ -71,6 +72,7 @@ use browser_runner::{
 
 use profile::manager::{
   check_browser_status, clone_profile, create_browser_profile_new, delete_profile,
+  export_profile_json, import_profile_json,
   list_browser_profiles, rename_profile, update_camoufox_config, update_profile_dns_blocklist,
   update_profile_launch_hook, update_profile_note, update_profile_proxy,
   update_profile_proxy_bypass_rules, update_profile_tags, update_profile_vpn,
@@ -218,6 +220,32 @@ async fn handle_url_open(app: tauri::AppHandle, url: String) -> Result<(), Strin
   }
 
   Ok(())
+}
+
+#[tauri::command]
+async fn resolve_fingerprint_auto_fields(
+  profile_id: String,
+  proxy_url: Option<String>,
+) -> Result<fingerprint::profile::FingerprintProfile, String> {
+  let pm = profile::manager::ProfileManager::instance();
+  let profiles = pm
+    .list_profiles()
+    .map_err(|e| format!("Failed to list profiles: {}", e))?;
+  let mut profile = profiles
+    .into_iter()
+    .find(|p| p.id.to_string() == profile_id)
+    .ok_or_else(|| "Profile not found".to_string())?;
+
+  let mut fp = profile.fingerprint_profile.unwrap_or_default();
+  fingerprint::auto_match::resolve_auto_fields(&mut fp, proxy_url.as_deref())
+    .await
+    .map_err(|e| format!("Auto-match failed: {}", e))?;
+
+  profile.fingerprint_profile = Some(fp.clone());
+  pm.save_profile(&profile)
+    .map_err(|e| format!("Failed to save profile: {}", e))?;
+
+  Ok(fp)
 }
 
 #[tauri::command]
@@ -1222,6 +1250,7 @@ async fn generate_sample_fingerprint(
     password_protected: false,
     created_at: None,
     updated_at: None,
+  fingerprint_profile: None,
   };
 
   if browser == "camoufox" {
@@ -2207,9 +2236,12 @@ pub fn run() {
       cancel_download,
       delete_profile,
       clone_profile,
+      export_profile_json,
+      import_profile_json,
       check_browser_exists,
       create_browser_profile_new,
       list_browser_profiles,
+      resolve_fingerprint_auto_fields,
       launch_browser_profile,
       fetch_browser_versions_with_count,
       fetch_browser_versions_cached_first,

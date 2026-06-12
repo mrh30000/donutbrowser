@@ -186,6 +186,24 @@ impl CamoufoxManager {
       }
     }
 
+    // Apply unified fingerprint profile if present (VirtualBrowser migration)
+    if let Some(ref fp_profile) = profile.fingerprint_profile {
+      use crate::fingerprint::FingerprintAdapter;
+      let adapter = crate::fingerprint::camoufox_adapter::CamoufoxAdapter::new(
+        profile.id.to_string(),
+      );
+      let mut engine_config = crate::fingerprint::EngineLaunchConfig::default();
+      if let Err(e) = adapter.apply(fp_profile, &mut engine_config) {
+        log::warn!("Failed to apply unified fingerprint profile: {}", e);
+      }
+      for (key, value) in engine_config.fingerprint_config {
+        builder = builder.extra_config(&key, value);
+      }
+      for (key, value) in engine_config.firefox_prefs {
+        builder = builder.firefox_pref(&key, value);
+      }
+    }
+
     // Build the config (async to handle geoip)
     let launch_config = builder
       .build_async()

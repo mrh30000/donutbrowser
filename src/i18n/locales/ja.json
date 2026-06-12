@@ -195,7 +195,13 @@
       "externalBrowserDescription": "内蔵Wayfernの代わりにカスタムChromiumベースのブラウザを使用します。フィンガープリント偽装は利用できなくなります。",
       "externalBrowserPlaceholder": "ブラウザ実行ファイルのパス",
       "browseExecutable": "参照",
-      "clearExternalBrowser": "クリア"
+      "clearExternalBrowser": "クリア",
+      "ipApiUrl": "IP Query API URL",
+      "ipApiUrlDescription": "Custom API endpoint for IP address lookup. Leave empty to use the built-in service.",
+      "ipApiUrlPlaceholder": "https://api.example.com/ip",
+      "ipApiKey": "IP Query API Key",
+      "ipApiKeyDescription": "API key for the custom IP query service (optional). Sent as Bearer token.",
+      "ipApiKeyPlaceholder": "API key"
     },
     "disableAutoUpdates": "アプリの自動更新を無効にする",
     "disableAutoUpdatesDescription": "Donut Browserの自動更新確認・インストールを無効にします。ブラウザの更新には影響しません。",
@@ -219,7 +225,8 @@
     "newProfile": "新規",
     "donutLogo": "Donut Browser ロゴ",
     "scrollGroupsLeft": "グループを左へスクロール",
-    "scrollGroupsRight": "グループを右へスクロール"
+    "scrollGroupsRight": "グループを右へスクロール",
+    "batchCreate": "一括作成"
   },
   "profiles": {
     "title": "プロファイル",
@@ -882,7 +889,8 @@
       "netscape": "Netscape TXT",
       "json": "JSON",
       "success": "Cookieのエクスポートに成功しました",
-      "error": "Cookieのエクスポートに失敗しました"
+      "error": "Cookieのエクスポートに失敗しました",
+      "profileConfig": "Profile Config (JSON)"
     }
   },
   "toasts": {
@@ -1229,7 +1237,11 @@
       "syncing": "同期中",
       "synced": "同期済み",
       "error": "エラー"
-    }
+    },
+    "exportConfigSuccess": "Profile configuration exported successfully",
+    "importConfig": "Import Config",
+    "importConfigSuccess": "Profile configuration imported successfully",
+    "importConfigError": "Failed to import profile configuration"
   },
   "extensions": {
     "title": "拡張機能",
@@ -2100,5 +2112,67 @@
     "source": "Source",
     "valid": "Valid",
     "failed": "Failed"
+  },
+  "fingerprintProfile": {
+    "identity": "身份",
+    "network": "ネットワークとプライバシー",
+    "rendering": "レンダリング",
+    "hardware": "ハードウェア",
+    "userAgent": "ユーザーエージェント",
+    "auto": "自動",
+    "manual": "手動",
+    "uaPlaceholder": "Mozilla/5.0 ...",
+    "platform": "プラットフォーム",
+    "language": "言語",
+    "timezone": "タイムゾーン",
+    "offsetPlaceholder": "UTC offset",
+    "secChUa": "Sec-CH-UA Brands",
+    "webRTC": "WebRTC",
+    "webrtcAllow": "許可",
+    "webrtcReplace": "置換",
+    "webrtcBlock": "ブロック",
+    "geolocation": "位置情報",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "permission": "権限",
+    "geoAsk": "確認",
+    "geoAllow": "許可",
+    "geoBlock": "ブロック",
+    "dnt": "Do Not Track",
+    "dntDescription": "Send a DNT header with requests",
+    "ssl": "SSL",
+    "sslEnabled": "Enable version filtering",
+    "canvas": "Canvas",
+    "canvasDescription": "Canvas フィンガープリントノイズ",
+    "audioContext": "AudioContext Noise",
+    "audioContextDescription": "Add random noise to AudioContext fingerprint",
+    "clientRects": "ClientRects Noise",
+    "clientRectsDescription": "Add random noise to DOM rect measurements",
+    "speechVoices": "Speech Voices Noise",
+    "speechVoicesDescription": "Randomize available speech synthesis voices",
+    "noiseDefault": "デフォルト",
+    "noiseRandom": "ランダム",
+    "webgl": "WebGL Metadata",
+    "webglVendor": "Vendor",
+    "webglRenderer": "Renderer",
+    "cpu": "CPUコア数",
+    "memory": "デバイスメモリ",
+    "screen": "画面",
+    "gpuAcceleration": "GPUアクセラレーション",
+    "gpuAccelerationDescription": "Disable to force software rendering",
+    "advancedConfig": "高度なフィンガープリント",
+    "advancedConfigDescription": "ユーザーエージェント、WebGL、Canvas、フォントなどのブラウザフィンガープリントパラメータを細かく調整します。"
+  },
+  "batchCreate": {
+    "title": "プロファイル一括作成",
+    "count": "プロファイル数",
+    "countDescription": "一度に1〜{{max}}個のプロファイルを作成します。",
+    "namePrefix": "名前プレフィックス",
+    "namePrefixPlaceholder": "例：account",
+    "namePrefixDescription": "プロファイル名：プレフィックス-01、プレフィックス-02...",
+    "sharedFingerprintDescription": "このバッチのすべてのプロファイルは同じフィンガープリントテンプレートを共有します。",
+    "creating": "プロファイル作成中...",
+    "creatingButton": "作成中 {{current}}/{{total}}...",
+    "createButton": "{{count}}個のプロファイルを作成"
   }
 }

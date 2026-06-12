@@ -38,6 +38,101 @@ export interface BrowserProfile {
   created_by_email?: string;
   dns_blocklist?: string;
   password_protected?: boolean;
+  fingerprint_profile?: FingerprintProfile;
+}
+
+// -- Fingerprint Profile (VirtualBrowser migration) --
+
+export type NoiseMode = "Default" | "Random";
+export type AutoOrManual = "Auto" | "Manual";
+export type WebRtcMode = "Replace" | "Allow" | "Block";
+export type GeoPermission = "Ask" | "Allow" | "Block";
+export type FontMode = "SystemDefault" | "RandomMatch";
+
+export interface UaConfig {
+  mode: AutoOrManual;
+  value?: string;
+}
+
+export interface SecChUaBrand {
+  brand: string;
+  version: string;
+}
+
+export interface SecChUaConfig {
+  mode: AutoOrManual;
+  brands: SecChUaBrand[];
+}
+
+export interface LanguageConfig {
+  mode: AutoOrManual;
+  language?: string;
+  languages?: string[];
+}
+
+export interface TimezoneConfig {
+  mode: AutoOrManual;
+  name?: string;
+  offset?: number;
+}
+
+export interface WebRtcConfig {
+  mode: WebRtcMode;
+}
+
+export interface SslConfig {
+  enabled: boolean;
+  disabled_versions: string[];
+}
+
+export interface GeoConfig {
+  mode: AutoOrManual;
+  longitude?: number;
+  latitude?: number;
+  precision?: number;
+  permission: GeoPermission;
+}
+
+export interface ScreenConfig {
+  mode: AutoOrManual;
+  width?: number;
+  height?: number;
+}
+
+export interface FontConfig {
+  mode: FontMode;
+}
+
+export interface WebGlConfig {
+  mode: AutoOrManual;
+  vendor?: string;
+  renderer?: string;
+}
+
+export interface FingerprintProfile {
+  os?: string;
+  user_agent?: UaConfig;
+  sec_ch_ua?: SecChUaConfig;
+  platform?: string;
+  language?: LanguageConfig;
+  timezone?: TimezoneConfig;
+  webrtc?: WebRtcConfig;
+  ssl?: SslConfig;
+  geolocation?: GeoConfig;
+  screen?: ScreenConfig;
+  fonts?: FontConfig;
+  canvas?: NoiseMode;
+  webgl_img?: NoiseMode;
+  webgl?: WebGlConfig;
+  audio_context?: NoiseMode;
+  client_rects?: NoiseMode;
+  speech_voices?: NoiseMode;
+  cpu?: number;
+  memory?: number;
+  gpu_acceleration?: boolean;
+  dnt?: boolean;
+  homepage?: string;
+  cookie_json?: string;
 }
 
 export interface Extension {

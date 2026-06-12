@@ -195,7 +195,13 @@
       "externalBrowserDescription": "내장 Wayfern 대신 사용자 지정 Chromium 기반 브라우저를 사용합니다. 지문 위조 기능을 사용할 수 없습니다.",
       "externalBrowserPlaceholder": "브라우저 실행 파일 경로",
       "browseExecutable": "찾아보기",
-      "clearExternalBrowser": "지우기"
+      "clearExternalBrowser": "지우기",
+      "ipApiUrl": "IP Query API URL",
+      "ipApiUrlDescription": "Custom API endpoint for IP address lookup. Leave empty to use the built-in service.",
+      "ipApiUrlPlaceholder": "https://api.example.com/ip",
+      "ipApiKey": "IP Query API Key",
+      "ipApiKeyDescription": "API key for the custom IP query service (optional). Sent as Bearer token.",
+      "ipApiKeyPlaceholder": "API key"
     },
     "disableAutoUpdates": "앱 자동 업데이트 사용 안 함",
     "disableAutoUpdatesDescription": "Donut Browser 업데이트를 앱이 자동으로 확인하고 설치하지 않도록 합니다. 브라우저 업데이트는 영향을 받지 않습니다.",
@@ -219,7 +225,8 @@
     "newProfile": "새로 만들기",
     "donutLogo": "Donut Browser 로고",
     "scrollGroupsLeft": "그룹 왼쪽으로 스크롤",
-    "scrollGroupsRight": "그룹 오른쪽으로 스크롤"
+    "scrollGroupsRight": "그룹 오른쪽으로 스크롤",
+    "batchCreate": "일괄 생성"
   },
   "profiles": {
     "title": "프로필",
@@ -882,7 +889,8 @@
       "netscape": "Netscape TXT",
       "json": "JSON",
       "success": "쿠키를 내보냈습니다",
-      "error": "쿠키 내보내기 실패"
+      "error": "쿠키 내보내기 실패",
+      "profileConfig": "Profile Config (JSON)"
     }
   },
   "toasts": {
@@ -1229,7 +1237,11 @@
       "syncing": "동기화 중",
       "synced": "동기화됨",
       "error": "오류"
-    }
+    },
+    "exportConfigSuccess": "Profile configuration exported successfully",
+    "importConfig": "Import Config",
+    "importConfigSuccess": "Profile configuration imported successfully",
+    "importConfigError": "Failed to import profile configuration"
   },
   "extensions": {
     "title": "확장 프로그램",
@@ -2100,5 +2112,67 @@
     "source": "Source",
     "valid": "Valid",
     "failed": "Failed"
+  },
+  "fingerprintProfile": {
+    "identity": "신원",
+    "network": "네트워크 및 개인정보",
+    "rendering": "렌더링",
+    "hardware": "하드웨어",
+    "userAgent": "사용자 에이전트",
+    "auto": "자동",
+    "manual": "수동",
+    "uaPlaceholder": "Mozilla/5.0 ...",
+    "platform": "플랫폼",
+    "language": "언어",
+    "timezone": "시간대",
+    "offsetPlaceholder": "UTC offset",
+    "secChUa": "Sec-CH-UA Brands",
+    "webRTC": "WebRTC",
+    "webrtcAllow": "허용",
+    "webrtcReplace": "대체",
+    "webrtcBlock": "차단",
+    "geolocation": "위치 정보",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "permission": "권한",
+    "geoAsk": "확인",
+    "geoAllow": "허용",
+    "geoBlock": "차단",
+    "dnt": "Do Not Track",
+    "dntDescription": "Send a DNT header with requests",
+    "ssl": "SSL",
+    "sslEnabled": "Enable version filtering",
+    "canvas": "Canvas",
+    "canvasDescription": "Canvas 지문 노이즈",
+    "audioContext": "AudioContext Noise",
+    "audioContextDescription": "Add random noise to AudioContext fingerprint",
+    "clientRects": "ClientRects Noise",
+    "clientRectsDescription": "Add random noise to DOM rect measurements",
+    "speechVoices": "Speech Voices Noise",
+    "speechVoicesDescription": "Randomize available speech synthesis voices",
+    "noiseDefault": "기본",
+    "noiseRandom": "랜덤",
+    "webgl": "WebGL Metadata",
+    "webglVendor": "Vendor",
+    "webglRenderer": "Renderer",
+    "cpu": "CPU 코어 수",
+    "memory": "장치 메모리",
+    "screen": "화면",
+    "gpuAcceleration": "GPU 가속",
+    "gpuAccelerationDescription": "Disable to force software rendering",
+    "advancedConfig": "고급 지문",
+    "advancedConfigDescription": "사용자 에이전트, WebGL, Canvas, 글꼴 등 브라우저 지문 매개변수를 세밀하게 조정합니다."
+  },
+  "batchCreate": {
+    "title": "프로필 일괄 생성",
+    "count": "프로필 수",
+    "countDescription": "한 번에 1~{{max}}개의 프로필을 생성합니다.",
+    "namePrefix": "이름 접두사",
+    "namePrefixPlaceholder": "예: account",
+    "namePrefixDescription": "프로필 이름: 접두사-01, 접두사-02...",
+    "sharedFingerprintDescription": "이 배치의 모든 프로필은 동일한 지문 템플릿을 공유합니다.",
+    "creating": "프로필 생성 중...",
+    "creatingButton": "생성 중 {{current}}/{{total}}...",
+    "createButton": "{{count}}개 프로필 생성"
   }
 }

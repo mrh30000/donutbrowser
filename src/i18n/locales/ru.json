@@ -195,7 +195,13 @@
       "externalBrowserDescription": "Использовать пользовательский браузер на базе Chromium вместо встроенного Wayfern. Подделка отпечатка браузера будет недоступна.",
       "externalBrowserPlaceholder": "Путь к исполняемому файлу браузера",
       "browseExecutable": "Обзор",
-      "clearExternalBrowser": "Очистить"
+      "clearExternalBrowser": "Очистить",
+      "ipApiUrl": "IP Query API URL",
+      "ipApiUrlDescription": "Custom API endpoint for IP address lookup. Leave empty to use the built-in service.",
+      "ipApiUrlPlaceholder": "https://api.example.com/ip",
+      "ipApiKey": "IP Query API Key",
+      "ipApiKeyDescription": "API key for the custom IP query service (optional). Sent as Bearer token.",
+      "ipApiKeyPlaceholder": "API key"
     },
     "disableAutoUpdates": "Отключить автообновление приложения",
     "disableAutoUpdatesDescription": "Запретить автоматическую проверку и установку обновлений Donut Browser. Обновления браузеров не затрагиваются.",
@@ -219,7 +225,8 @@
     "newProfile": "Новый",
     "donutLogo": "Логотип Donut Browser",
     "scrollGroupsLeft": "Прокрутить группы влево",
-    "scrollGroupsRight": "Прокрутить группы вправо"
+    "scrollGroupsRight": "Прокрутить группы вправо",
+    "batchCreate": "Batch Create"
   },
   "profiles": {
     "title": "Профили",
@@ -882,7 +889,8 @@
       "netscape": "Netscape TXT",
       "json": "JSON",
       "success": "Cookies успешно экспортированы",
-      "error": "Ошибка экспорта cookies"
+      "error": "Ошибка экспорта cookies",
+      "profileConfig": "Profile Config (JSON)"
     }
   },
   "toasts": {
@@ -1229,7 +1237,11 @@
       "syncing": "Синхронизация",
       "synced": "Синхронизировано",
       "error": "Ошибка"
-    }
+    },
+    "exportConfigSuccess": "Profile configuration exported successfully",
+    "importConfig": "Import Config",
+    "importConfigSuccess": "Profile configuration imported successfully",
+    "importConfigError": "Failed to import profile configuration"
   },
   "extensions": {
     "title": "Расширения",
@@ -2100,5 +2112,67 @@
     "source": "Source",
     "valid": "Valid",
     "failed": "Failed"
+  },
+  "fingerprintProfile": {
+    "identity": "Identity",
+    "network": "Network & Privacy",
+    "rendering": "Rendering",
+    "hardware": "Hardware",
+    "userAgent": "User Agent",
+    "auto": "Auto",
+    "manual": "Manual",
+    "uaPlaceholder": "Mozilla/5.0 ...",
+    "platform": "Platform",
+    "language": "Language",
+    "timezone": "Timezone",
+    "offsetPlaceholder": "UTC offset",
+    "secChUa": "Sec-CH-UA Brands",
+    "webRTC": "WebRTC",
+    "webrtcAllow": "Allow",
+    "webrtcReplace": "Replace (spoof local IP)",
+    "webrtcBlock": "Block",
+    "geolocation": "Geolocation",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "permission": "Permission",
+    "geoAsk": "Ask",
+    "geoAllow": "Allow",
+    "geoBlock": "Block",
+    "dnt": "Do Not Track",
+    "dntDescription": "Send a DNT header with requests",
+    "ssl": "SSL/TLS Version Control",
+    "sslEnabled": "Enable version filtering",
+    "canvas": "Canvas Noise",
+    "canvasDescription": "Add random noise to Canvas fingerprint",
+    "audioContext": "AudioContext Noise",
+    "audioContextDescription": "Add random noise to AudioContext fingerprint",
+    "clientRects": "ClientRects Noise",
+    "clientRectsDescription": "Add random noise to DOM rect measurements",
+    "speechVoices": "Speech Voices Noise",
+    "speechVoicesDescription": "Randomize available speech synthesis voices",
+    "noiseDefault": "Default",
+    "noiseRandom": "Random",
+    "webgl": "WebGL Metadata",
+    "webglVendor": "Vendor",
+    "webglRenderer": "Renderer",
+    "cpu": "CPU Cores",
+    "memory": "Memory (GB)",
+    "screen": "Screen Resolution",
+    "gpuAcceleration": "GPU Acceleration",
+    "gpuAccelerationDescription": "Disable to force software rendering",
+    "advancedConfig": "Advanced Fingerprint",
+    "advancedConfigDescription": "Fine-tune browser fingerprint parameters such as user agent, WebGL, canvas, fonts, and more."
+  },
+  "batchCreate": {
+    "title": "Batch Create Profiles",
+    "count": "Number of Profiles",
+    "countDescription": "Create between 1 and {{max}} profiles at once.",
+    "namePrefix": "Name Prefix",
+    "namePrefixPlaceholder": "e.g. account",
+    "namePrefixDescription": "Profiles will be named: prefix-01, prefix-02, ...",
+    "sharedFingerprintDescription": "All profiles in this batch will share the same fingerprint template.",
+    "creating": "Creating profiles...",
+    "creatingButton": "Creating {{current}}/{{total}}...",
+    "createButton": "Create {{count}} Profiles"
   }
 }

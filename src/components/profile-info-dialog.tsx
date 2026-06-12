@@ -1555,6 +1555,27 @@ function CookiesSectionInline({
     [profile.id, profile.name, t],
   );
 
+  const handleExportConfig = React.useCallback(async () => {
+    setIsExporting(true);
+    try {
+      const content = await invoke<string>("export_profile_json", {
+        profileId: profile.id,
+      });
+      const filePath = await save({
+        defaultPath: `${profile.name}_config.json`,
+        filters: [{ name: "JSON", extensions: ["json"] }],
+      });
+      if (!filePath) return;
+      await writeTextFile(filePath, content);
+      showSuccessToast(t("profileInfo.exportConfigSuccess"));
+    } catch (e) {
+      console.error("Failed to export profile config:", e);
+      showErrorToast(String(e));
+    } finally {
+      setIsExporting(false);
+    }
+  }, [profile.id, profile.name, t]);
+
   const domains = stats?.domains ?? [];
 
   return (
@@ -1597,6 +1618,13 @@ function CookiesSectionInline({
                 }}
               >
                 {t("cookies.export.netscape")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  void handleExportConfig();
+                }}
+              >
+                {t("cookies.export.profileConfig")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

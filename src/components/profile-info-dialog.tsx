@@ -19,7 +19,6 @@ import {
   LuGroup,
   LuKey,
   LuLink,
-  LuLock,
   LuLockOpen,
   LuPlus,
   LuPuzzle,
@@ -57,7 +56,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { WayfernConfigForm } from "@/components/wayfern-config-form";
 import { translateBackendError } from "@/lib/backend-errors";
 import { getProfileIcon } from "@/lib/browser-utils";
 import { formatRelativeTime } from "@/lib/flag-utils";
@@ -69,7 +67,6 @@ import type {
   ProfileGroup,
   StoredProxy,
   VpnConfig,
-  WayfernConfig,
 } from "@/types";
 
 interface ProfileInfoDialogProps {
@@ -79,7 +76,6 @@ interface ProfileInfoDialogProps {
   storedProxies: StoredProxy[];
   vpnConfigs: VpnConfig[];
   onOpenTrafficDialog?: (profileId: string) => void;
-  onOpenProfileSyncDialog?: (profile: BrowserProfile) => void;
   onAssignProfilesToGroup?: (profileIds: string[]) => void;
   onConfigureCamoufox?: (profile: BrowserProfile) => void;
   onCopyCookiesToProfile?: (profile: BrowserProfile) => void;
@@ -90,12 +86,10 @@ interface ProfileInfoDialogProps {
   onOpenLaunchHook?: (profile: BrowserProfile) => void;
   onCloneProfile?: (profile: BrowserProfile) => void;
   onDeleteProfile?: (profile: BrowserProfile) => void;
-  onLaunchWithSync?: (profile: BrowserProfile) => void;
   onSetPassword?: (profile: BrowserProfile) => void;
   onChangePassword?: (profile: BrowserProfile) => void;
   onRemovePassword?: (profile: BrowserProfile) => void;
-  crossOsUnlocked?: boolean;
-  isRunning?: boolean;
+    isRunning?: boolean;
   isDisabled?: boolean;
   isCrossOs?: boolean;
   syncStatuses: Record<string, { status: string; error?: string }>;
@@ -190,7 +184,6 @@ export function ProfileInfoDialog({
   storedProxies,
   vpnConfigs,
   onOpenTrafficDialog,
-  onOpenProfileSyncDialog,
   onAssignProfilesToGroup,
   onConfigureCamoufox,
   onCopyCookiesToProfile,
@@ -201,11 +194,9 @@ export function ProfileInfoDialog({
   onOpenLaunchHook,
   onCloneProfile,
   onDeleteProfile,
-  onLaunchWithSync,
   onSetPassword,
   onChangePassword,
   onRemovePassword,
-  crossOsUnlocked = false,
   isRunning = false,
   isDisabled = false,
   isCrossOs = false,
@@ -261,8 +252,8 @@ export function ProfileInfoDialog({
   if (!profile) return null;
 
   const ProfileIcon = getProfileIcon(profile);
-  const isCamoufoxOrWayfern =
-    profile.browser === "camoufox" || profile.browser === "wayfern";
+  const isCamoufox =
+    profile.browser === "camoufox";
   const isDeleteDisabled = isRunning;
 
   const proxyName = profile.proxy_id
@@ -278,7 +269,7 @@ export function ProfileInfoDialog({
       : t("profileInfo.values.none");
 
   const syncStatus = syncStatuses[profile.id];
-  const syncMode = profile.sync_mode ?? "Disabled";
+  const syncMode = "Disabled";
 
   const handleCopyId = async () => {
     try {
@@ -317,7 +308,6 @@ export function ProfileInfoDialog({
     onClick: () => void;
     disabled?: boolean;
     destructive?: boolean;
-    proBadge?: boolean;
     runningBadge?: boolean;
     hidden?: boolean;
   }
@@ -331,16 +321,6 @@ export function ProfileInfoDialog({
         handleAction(() => onOpenTrafficDialog?.(profile.id));
       },
       disabled: isCrossOs,
-    },
-    {
-      id: "sync",
-      icon: <LuRefreshCw className="size-4" />,
-      label: t("profiles.actions.syncSettings"),
-      onClick: () => {
-        handleAction(() => onOpenProfileSyncDialog?.(profile));
-      },
-      disabled: isCrossOs,
-      hidden: profile.ephemeral === true,
     },
     {
       icon: <LuGroup className="size-4" />,
@@ -358,21 +338,9 @@ export function ProfileInfoDialog({
       onClick: () => {
         handleAction(() => onConfigureCamoufox?.(profile));
       },
-      // Viewing and editing fingerprints both require an active paid plan.
-      disabled: isDisabled || !crossOsUnlocked,
-      proBadge: !crossOsUnlocked,
+      disabled: isDisabled,
       runningBadge: isRunning,
-      hidden: !isCamoufoxOrWayfern || !onConfigureCamoufox,
-    },
-    {
-      icon: <LuUsers className="size-4" />,
-      label: t("profiles.synchronizer.launchWithSync"),
-      onClick: () => {
-        handleAction(() => onLaunchWithSync?.(profile));
-      },
-      disabled: isDisabled || isRunning || !crossOsUnlocked,
-      proBadge: !crossOsUnlocked,
-      hidden: profile.browser !== "wayfern" || !onLaunchWithSync,
+      hidden: !isCamoufox || !onConfigureCamoufox,
     },
     {
       id: "cookiesCopy",
@@ -384,7 +352,7 @@ export function ProfileInfoDialog({
       disabled: isDisabled,
       runningBadge: isRunning,
       hidden:
-        !isCamoufoxOrWayfern ||
+        !isCamoufox ||
         profile.ephemeral === true ||
         !onCopyCookiesToProfile,
     },
@@ -398,7 +366,7 @@ export function ProfileInfoDialog({
       disabled: isDisabled,
       runningBadge: isRunning,
       hidden:
-        !isCamoufoxOrWayfern ||
+        !isCamoufox ||
         profile.ephemeral === true ||
         !onOpenCookieManagement,
     },
@@ -561,7 +529,6 @@ interface ProfileInfoLayoutProps {
     onClick: () => void;
     disabled?: boolean;
     destructive?: boolean;
-    proBadge?: boolean;
     runningBadge?: boolean;
   }[];
   t: (key: string, options?: Record<string, unknown>) => string;
@@ -892,18 +859,6 @@ function ProfileInfoLayout({
                 </div>
               </div>
 
-              {profile.created_by_email && (
-                <div className="rounded-md bg-muted/40 border border-border px-3 py-2">
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                    {t("sync.team.title")}
-                  </p>
-                  <p className="text-sm mt-0.5">
-                    {t("sync.team.createdBy", {
-                      email: profile.created_by_email,
-                    })}
-                  </p>
-                </div>
-              )}
             </div>
           )}
 
@@ -911,12 +866,6 @@ function ProfileInfoLayout({
             <FingerprintSectionInline
               profile={profile}
               isDisabled={isDisabled}
-              crossOsUnlocked={Boolean(
-                // Re-derive: parent passes crossOsUnlocked but the layout
-                // doesn't get it; we get it implicitly via fingerprintAction's
-                // proBadge state. Default to false if action missing.
-                fingerprintAction && !fingerprintAction.proBadge,
-              )}
               onSaved={onClose}
               t={t}
             />
@@ -1706,30 +1655,21 @@ function CookiesSectionInline({
   );
 }
 
-// Inline password set / change / remove form. Replaces three separate
-// nested modal dialogs with one in-page form that branches on the current
-// `password_protected` state of the profile.
-// Inline fingerprint editor. Reuses SharedCamoufoxConfigForm (Camoufox/Firefox
-// engine) and WayfernConfigForm (Chromium engine) so the same field set as
-// the standalone dialog is available without opening a nested modal.
+// Inline fingerprint editor. Reuses SharedCamoufoxConfigForm so the same
+// field set as the standalone dialog is available without opening a nested modal.
 function FingerprintSectionInline({
   profile,
   isDisabled,
-  crossOsUnlocked,
   onSaved,
   t,
 }: {
   profile: BrowserProfile;
   isDisabled: boolean;
-  crossOsUnlocked: boolean;
   onSaved: () => void;
   t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [camoufoxConfig, setCamoufoxConfig] = React.useState<CamoufoxConfig>(
     () => profile.camoufox_config ?? {},
-  );
-  const [wayfernConfig, setWayfernConfig] = React.useState<WayfernConfig>(
-    () => profile.wayfern_config ?? {},
   );
   const [isSaving, setIsSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -1739,15 +1679,13 @@ function FingerprintSectionInline({
   // in the dialog) reset the local form state to match.
   React.useEffect(() => {
     setCamoufoxConfig(profile.camoufox_config ?? {});
-    setWayfernConfig(profile.wayfern_config ?? {});
     setError(null);
     setSuccess(null);
-  }, [profile.camoufox_config, profile.wayfern_config]);
+  }, [profile.camoufox_config]);
 
   const isCamoufox = profile.browser === "camoufox";
-  const isWayfern = profile.browser === "wayfern";
 
-  if (!isCamoufox && !isWayfern) {
+  if (!isCamoufox) {
     return (
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold">
@@ -1761,29 +1699,8 @@ function FingerprintSectionInline({
     );
   }
 
-  // Viewing and editing fingerprints both require an active paid plan
-  // (`crossOsUnlocked` is that paid flag here). Render a locked state instead of
-  // the editor so free users can neither see nor change the fingerprint.
-  if (!crossOsUnlocked) {
-    return (
-      <div className="flex flex-col items-center gap-3 rounded-lg border p-6 text-center">
-        <LuLock className="size-4 shrink-0 text-muted-foreground" />
-        <h3 className="text-sm font-medium text-foreground">
-          {t("profileInfo.fingerprint.lockedTitle")}
-        </h3>
-        <p className="max-w-[48ch] text-sm text-pretty text-muted-foreground">
-          {t("profileInfo.fingerprint.lockedDescription")}
-        </p>
-      </div>
-    );
-  }
-
   const onCamoufoxChange = (key: keyof CamoufoxConfig, value: unknown) => {
     setCamoufoxConfig((prev) => ({ ...prev, [key]: value }));
-    setSuccess(null);
-  };
-  const onWayfernChange = (key: keyof WayfernConfig, value: unknown) => {
-    setWayfernConfig((prev) => ({ ...prev, [key]: value }));
     setSuccess(null);
   };
 
@@ -1792,17 +1709,10 @@ function FingerprintSectionInline({
     setError(null);
     setSuccess(null);
     try {
-      if (isCamoufox) {
-        await invoke("update_camoufox_config", {
-          profileId: profile.id,
-          config: camoufoxConfig,
-        });
-      } else {
-        await invoke("update_wayfern_config", {
-          profileId: profile.id,
-          config: wayfernConfig,
-        });
-      }
+      await invoke("update_camoufox_config", {
+        profileId: profile.id,
+        config: camoufoxConfig,
+      });
       setSuccess(t("common.buttons.saved"));
       // Close the dialog once the fingerprint is saved.
       onSaved();
@@ -1813,12 +1723,8 @@ function FingerprintSectionInline({
     }
   };
 
-  const initial = isCamoufox
-    ? JSON.stringify(profile.camoufox_config ?? {})
-    : JSON.stringify(profile.wayfern_config ?? {});
-  const current = isCamoufox
-    ? JSON.stringify(camoufoxConfig)
-    : JSON.stringify(wayfernConfig);
+  const initial = JSON.stringify(profile.camoufox_config ?? {});
+  const current = JSON.stringify(camoufoxConfig);
   const dirty = current !== initial;
 
   return (
@@ -1831,30 +1737,15 @@ function FingerprintSectionInline({
         {t("profileInfo.sectionDesc.fingerprint")}
       </p>
 
-      {isCamoufox && (
-        <SharedCamoufoxConfigForm
-          config={camoufoxConfig}
-          onConfigChange={onCamoufoxChange}
-          forceAdvanced={true}
-          readOnly={isDisabled}
-          browserType="camoufox"
-          crossOsUnlocked={crossOsUnlocked}
-          limitedMode={false}
-          profileVersion={profile.version}
-          profileBrowser={profile.browser}
-        />
-      )}
-      {isWayfern && (
-        <WayfernConfigForm
-          config={wayfernConfig}
-          onConfigChange={onWayfernChange}
-          forceAdvanced={true}
-          readOnly={isDisabled}
-          crossOsUnlocked={crossOsUnlocked}
-          profileVersion={profile.version}
-          profileBrowser={profile.browser}
-        />
-      )}
+      <SharedCamoufoxConfigForm
+        config={camoufoxConfig}
+        onConfigChange={onCamoufoxChange}
+        forceAdvanced={true}
+        readOnly={isDisabled}
+        browserType="camoufox"
+        profileVersion={profile.version}
+        profileBrowser={profile.browser}
+      />
 
       {error && <p className="text-xs text-destructive">{error}</p>}
       {success && !error && <p className="text-xs text-success">{success}</p>}
@@ -1877,7 +1768,6 @@ function FingerprintSectionInline({
             className="h-7 text-xs"
             onClick={() => {
               setCamoufoxConfig(profile.camoufox_config ?? {});
-              setWayfernConfig(profile.wayfern_config ?? {});
               setError(null);
               setSuccess(null);
             }}

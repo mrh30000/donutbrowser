@@ -266,7 +266,6 @@
       "configure": "Configurer",
       "clone": "Cloner le profil",
       "viewNetwork": "Voir le Réseau",
-      "syncSettings": "Paramètres de Synchronisation",
       "assignToGroup": "Assigner au Groupe",
       "changeFingerprint": "Changer l'Empreinte",
       "copyCookiesToProfile": "Copier les Cookies vers le Profil",
@@ -1105,20 +1104,6 @@
     "continue": "Continuer",
     "cancel": "Annuler"
   },
-  "syncAll": {
-    "title": "Activer la synchronisation pour les éléments existants",
-    "description": "Vous avez des éléments qui ne sont pas synchronisés. Voulez-vous activer la synchronisation pour tous ?",
-    "enableAll": "Tout activer",
-    "skip": "Ignorer",
-    "success": "Synchronisation activée pour tous les éléments",
-    "labels": {
-      "proxies": "Proxies",
-      "vpns": "VPN",
-      "groups": "Groupes",
-      "extensions": "Extensions",
-      "extensionGroups": "Groupes d'extensions"
-    }
-  },
   "crossOs": {
     "viewOnly": "Ce profil a été créé sur {{os}} et n'est pas pris en charge sur ce système",
     "cannotLaunch": "Ce profil a été créé sur {{os}} et n'est pas pris en charge sur ce système",
@@ -1251,7 +1236,6 @@
     "extensionsTab": "Extensions",
     "groupsTab": "Groupes",
     "managedNotice": "Les extensions gérées ici remplaceront toutes les extensions installées manuellement dans les profils lors du lancement.",
-    "proRequired": "La gestion des extensions est une fonctionnalité Pro",
     "empty": "Aucune extension téléchargée pour l'instant.",
     "noGroups": "Aucun groupe d'extensions créé pour l'instant.",
     "createGroup": "Créer un Groupe",
@@ -1534,65 +1518,6 @@
     "badgeRunning": "En cours",
     "badgeUnavailable": "Indisponible",
     "openButton": "Ouvrir"
-  },
-  "locationProxy": {
-    "title": "Proxy rapide par lieu",
-    "description": "Choisissez un pays pour router ce profil. Un proxy sera créé automatiquement.",
-    "country": "Pays",
-    "selectCountry": "Sélectionnez un pays",
-    "searchCountry": "Rechercher un pays...",
-    "noCountriesFound": "Aucun pays trouvé.",
-    "apply": "Appliquer",
-    "creating": "Création du proxy...",
-    "success": "Proxy de localisation appliqué",
-    "failed": "Échec de l'application du proxy de localisation",
-    "titleCreate": "Créer un proxy de localisation",
-    "descriptionCreate": "Créez un proxy géolocalisé avec une session persistante de 24 heures",
-    "countryLabel": "Pays (obligatoire)",
-    "regionLabel": "Région (optionnel)",
-    "cityLabel": "Ville (optionnel)",
-    "ispLabel": "FAI (optionnel)",
-    "nameLabel": "Nom",
-    "namePlaceholder": "Nom du proxy",
-    "loadingCountries": "Chargement des pays...",
-    "selectCountryPh": "Sélectionnez un pays",
-    "searchCountries": "Rechercher des pays...",
-    "loadFailed": "Échec du chargement des pays",
-    "selectCountryFirst": "Sélectionnez d'abord un pays",
-    "loadingRegions": "Chargement des régions...",
-    "noRegions": "Aucune région disponible",
-    "selectRegion": "Sélectionnez une région",
-    "searchRegions": "Rechercher des régions...",
-    "loadingCities": "Chargement des villes...",
-    "noCities": "Aucune ville disponible",
-    "selectCity": "Sélectionnez une ville",
-    "searchCities": "Rechercher des villes...",
-    "loadingIsps": "Chargement des FAI...",
-    "noIsps": "Aucun FAI disponible",
-    "selectIsp": "Sélectionnez un FAI",
-    "searchIsps": "Rechercher des FAI...",
-    "createSuccess": "Proxy de localisation créé",
-    "createFailed": "Échec de la création du proxy de localisation",
-    "creatingButton": "Création...",
-    "createButton": "Créer"
-  },
-  "wayfernTerms": {
-    "title": "Conditions générales de Wayfern",
-    "description": "Avant d'utiliser Donut Browser, vous devez lire et accepter les Conditions Générales de Wayfern.",
-    "reviewLabel": "Veuillez consulter les Conditions Générales sur :",
-    "agreeNotice": "En cliquant sur « J'accepte », vous acceptez ces conditions.",
-    "acceptButton": "J'accepte",
-    "acceptSuccess": "Conditions acceptées avec succès",
-    "acceptFailed": "Échec de l'acceptation des conditions",
-    "tryAgain": "Veuillez réessayer"
-  },
-  "commercialTrial": {
-    "title": "Période d'essai commerciale expirée",
-    "description": "Votre période d'essai commercial de 2 semaines est terminée.",
-    "body": "Si vous utilisez Donut Browser à des fins professionnelles, vous devez acheter une licence commerciale pour continuer. Vous pouvez toujours l'utiliser gratuitement à des fins personnelles.",
-    "understandButton": "J'ai compris",
-    "failed": "Échec de l'enregistrement de la confirmation",
-    "tryAgain": "Veuillez réessayer"
   },
   "permissionDialog": {
     "titleMicrophone": "Accès au microphone requis",
@@ -1916,39 +1841,6 @@
       }
     }
   },
-  "account": {
-    "refreshed": "Compte actualisé",
-    "loggedOut": "Déconnecté",
-    "signedOut": "Déconnecté",
-    "signedOutDescription": "Connectez-vous pour activer la synchronisation cloud, les profils chiffrés et les fonctionnalités d’équipe.",
-    "plan": "Plan : {{plan}} · {{period}}",
-    "refresh": "Actualiser",
-    "logout": "Se déconnecter",
-    "signIn": "Se connecter",
-    "fields": {
-      "plan": "Plan",
-      "status": "Statut",
-      "teamRole": "Rôle d’équipe",
-      "period": "Période",
-      "device": "Appareil"
-    },
-    "tabs": {
-      "account": "Compte",
-      "selfHosted": "Auto-hébergé"
-    },
-    "selfHosted": {
-      "title": "Serveur de synchronisation auto-hébergé",
-      "description": "Connectez Donut à votre propre serveur donut-sync pour synchroniser profils, proxys, groupes et extensions sans utiliser le cloud hébergé.",
-      "disabledWhileLoggedIn": "La synchronisation auto-hébergée n'est pas disponible lorsque vous êtes connecté à votre compte Donut. Déconnectez-vous pour utiliser un serveur personnalisé.",
-      "connectionStatus": "Connexion :",
-      "statusUnknown": "Non testé",
-      "testConnection": "Tester la connexion",
-      "disconnect": "Déconnecter"
-    },
-    "deviceOrdinal": "{{ordinal}} sur {{count}}",
-    "automationPrimaryOnly": "L'automatisation du navigateur ne fonctionne que sur votre appareil principal (Appareil 1). Déconnectez-vous là-bas pour l'utiliser ici.",
-    "automationActiveHere": "L'automatisation du navigateur est active sur cet appareil."
-  },
   "shortcutsPage": {
     "title": "Raccourcis clavier",
     "description": "Accélérez votre flux de travail avec ces raccourcis."
@@ -2070,10 +1962,6 @@
       "trialBadge": "2 semaines gratuites",
       "commercialDesc": "Gratuit pendant une évaluation de 2 semaines. Ensuite, un forfait payant permet de maintenir et de faire prospérer le projet."
     }
-  },
-  "wayfernBlocked": {
-    "title": "Automatisation du navigateur en pause",
-    "description": "Votre compte a été temporairement privé des fonctionnalités Pro du navigateur, généralement à cause d'une connexion sur plusieurs appareils à la fois. Déconnectez-vous des autres appareils, puis relancez le profil pour la rétablir."
   },
   "camoufoxDeprecation": {
     "title": "La prise en charge de Camoufox prend fin",

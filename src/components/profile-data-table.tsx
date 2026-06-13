@@ -29,7 +29,6 @@ import {
   LuPuzzle,
   LuSquare,
   LuTrash2,
-  LuTriangleAlert,
   LuUsers,
 } from "react-icons/lu";
 import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
@@ -69,11 +68,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useBrowserState } from "@/hooks/use-browser-state";
-import { useCloudAuth } from "@/hooks/use-cloud-auth";
 import { useProxyEvents } from "@/hooks/use-proxy-events";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useTableSorting } from "@/hooks/use-table-sorting";
-import { useTeamLocks } from "@/hooks/use-team-locks";
 import { useVpnEvents } from "@/hooks/use-vpn-events";
 import {
   getBrowserDisplayName,
@@ -87,10 +84,8 @@ import { cn } from "@/lib/utils";
 import type {
   BrowserProfile,
   ExtensionGroup,
-  LocationItem,
   ProxyCheckResult,
   StoredProxy,
-  SyncSessionInfo,
   TrafficSnapshot,
   VpnConfig,
 } from "@/types";
@@ -204,33 +199,20 @@ interface TableMeta {
 
   // Sync
   syncStatuses: Record<string, { status: string; error?: string }>;
-  onOpenProfileSyncDialog?: (profile: BrowserProfile) => void;
-  onToggleProfileSync?: (profile: BrowserProfile) => void;
-  crossOsUnlocked?: boolean;
   syncUnlocked?: boolean;
 
   // Country proxy creation (inline in proxy dropdown)
-  countries: LocationItem[];
+  countries: { code: string; name: string }[];
   canCreateLocationProxy: boolean;
   loadCountries: () => Promise<void>;
   handleCreateCountryProxy: (
     profileId: string,
-    country: LocationItem,
+    country: { code: string; name: string },
   ) => Promise<void>;
 
   // Team locks
   isProfileLockedByAnother: (profileId: string) => boolean;
   getProfileLockEmail: (profileId: string) => string | undefined;
-
-  // Synchronizer
-  getProfileSyncInfo: (profileId: string) =>
-    | {
-        session: SyncSessionInfo;
-        isLeader: boolean;
-        failedAtUrl: string | null;
-      }
-    | undefined;
-  onLaunchWithSync: (profile: BrowserProfile) => void;
 }
 
 interface SyncStatusDot {
@@ -252,12 +234,8 @@ function getProfileSyncStatusDot(
   t: (key: string, options?: Record<string, unknown>) => string,
   errorMessage?: string,
 ): SyncStatusDot | null {
-  const encrypted = profile.sync_mode === "Encrypted";
-  const status =
-    liveStatus ??
-    (profile.sync_mode && profile.sync_mode !== "Disabled"
-      ? "synced"
-      : "disabled");
+  const encrypted = false;
+  const status = liveStatus ?? "disabled";
 
   switch (status) {
     case "syncing":
@@ -1043,18 +1021,7 @@ interface ProfilesDataTableProps {
   onBatchDiagnoseSelected?: () => void;
   windowLayoutSupported?: boolean;
   onAssignExtensionGroup?: (profileIds: string[]) => void;
-  onOpenProfileSyncDialog?: (profile: BrowserProfile) => void;
-  onToggleProfileSync?: (profile: BrowserProfile) => void;
-  crossOsUnlocked?: boolean;
   syncUnlocked?: boolean;
-  getProfileSyncInfo?: (profileId: string) =>
-    | {
-        session: SyncSessionInfo;
-        isLeader: boolean;
-        failedAtUrl: string | null;
-      }
-    | undefined;
-  onLaunchWithSync?: (profile: BrowserProfile) => void;
   onSetPassword?: (profile: BrowserProfile) => void;
   onChangePassword?: (profile: BrowserProfile) => void;
   onRemovePassword?: (profile: BrowserProfile) => void;
@@ -1094,12 +1061,7 @@ export function ProfilesDataTable({
   onBatchDiagnoseSelected,
   windowLayoutSupported = false,
   onAssignExtensionGroup,
-  onOpenProfileSyncDialog,
-  onToggleProfileSync,
-  crossOsUnlocked = false,
   syncUnlocked = false,
-  getProfileSyncInfo,
-  onLaunchWithSync,
   onSetPassword,
   onChangePassword,
   onRemovePassword,
@@ -1207,8 +1169,8 @@ export function ProfilesDataTable({
 
   const { storedProxies } = useProxyEvents();
   const { vpnConfigs } = useVpnEvents();
-  const { user } = useCloudAuth();
-  const { isProfileLocked, getLockInfo } = useTeamLocks(user?.id);
+  const isProfileLocked = React.useCallback((_profileId: string) => false, []);
+  const getLockInfo = React.useCallback((_profileId: string): { lockedByEmail?: string } | null => null, []);
 
   const [proxyOverrides, setProxyOverrides] = React.useState<
     Record<string, string | null>
@@ -1251,7 +1213,7 @@ export function ProfilesDataTable({
   >({});
 
   // Country proxy creation state (for inline proxy creation in dropdown)
-  const [countries, setCountries] = React.useState<LocationItem[]>([]);
+  const [countries, setCountries] = React.useState<{ code: string; name: string }[]>([]);
   const [countriesLoaded, setCountriesLoaded] = React.useState(false);
 
   // Extension groups for the Ext column lookup. Refreshed when the
@@ -1288,7 +1250,7 @@ export function ProfilesDataTable({
   const loadCountries = React.useCallback(async () => {
     if (countriesLoaded || !canCreateLocationProxy) return;
     try {
-      const data = await invoke<LocationItem[]>("cloud_get_countries");
+      const data = await invoke<{ code: string; name: string }[]>("cloud_get_countries");
       setCountries(data);
       setCountriesLoaded(true);
     } catch (e) {
@@ -1374,15 +1336,9 @@ export function ProfilesDataTable({
   );
 
   const handleCreateCountryProxy = React.useCallback(
-    async (profileId: string, country: LocationItem) => {
+    async (profileId: string, country: { code: string; name: string }) => {
       try {
-        await invoke("create_cloud_location_proxy", {
-          name: country.name,
-          country: country.code,
-          region: null,
-          city: null,
-          isp: null,
-        });
+        await Promise.resolve(null);
         await emit("stored-proxies-changed");
         // Wait briefly for proxy list to update, then find and assign the new proxy
         await new Promise((r) => setTimeout(r, 200));
@@ -1859,9 +1815,6 @@ export function ProfilesDataTable({
 
       // Sync
       syncStatuses,
-      onOpenProfileSyncDialog,
-      onToggleProfileSync,
-      crossOsUnlocked,
       syncUnlocked,
 
       // Country proxy creation
@@ -1874,14 +1827,6 @@ export function ProfilesDataTable({
       isProfileLockedByAnother: isProfileLocked,
       getProfileLockEmail: (profileId: string) =>
         getLockInfo(profileId)?.lockedByEmail,
-
-      // Synchronizer
-      getProfileSyncInfo: getProfileSyncInfo ?? (() => undefined),
-      onLaunchWithSync:
-        onLaunchWithSync ??
-        (() => {
-          /* empty */
-        }),
     }),
     [
       t,
@@ -1928,17 +1873,12 @@ export function ProfilesDataTable({
       onCopyCookiesToProfile,
       onOpenCookieManagement,
       syncStatuses,
-      onOpenProfileSyncDialog,
-      onToggleProfileSync,
-      crossOsUnlocked,
       syncUnlocked,
       countries,
       loadCountries,
       handleCreateCountryProxy,
       isProfileLocked,
       getLockInfo,
-      getProfileSyncInfo,
-      onLaunchWithSync,
     ],
   );
 
@@ -1982,8 +1922,7 @@ export function ProfilesDataTable({
           if (isCrossOs && !meta.showCheckboxes && !isSelected) {
             const resolvedOs =
               profile.host_os ||
-              profile.camoufox_config?.os ||
-              profile.wayfern_config?.os;
+              profile.camoufox_config?.os;
             const osName = resolvedOs
               ? getOSDisplayName(resolvedOs)
               : "another OS";
@@ -2024,8 +1963,7 @@ export function ProfilesDataTable({
           if (isCrossOs && (meta.showCheckboxes || isSelected)) {
             const resolvedOs =
               profile.host_os ||
-              profile.camoufox_config?.os ||
-              profile.wayfern_config?.os;
+              profile.camoufox_config?.os;
             const osName = resolvedOs
               ? getOSDisplayName(resolvedOs)
               : "another OS";
@@ -2182,65 +2120,16 @@ export function ProfilesDataTable({
             }
           };
 
-          const syncInfo = meta.getProfileSyncInfo(profile.id);
-          const isLeader = syncInfo?.isLeader === true;
-          const isFollower = syncInfo?.isLeader === false;
-          const isDesynced = isFollower && syncInfo.failedAtUrl != null;
-          const stopTooltip = isLeader
-            ? meta.t("profiles.synchronizer.stopLeader")
-            : isFollower
-              ? meta.t("profiles.synchronizer.stopFollower", {
-                  leaderName: syncInfo.session.leader_profile_name ?? "",
-                })
-              : tooltipContent;
-
           const handleStop = async () => {
-            if (isLeader && syncInfo) {
-              // Stop leader: invoke stop_sync_session which kills leader + all followers
-              try {
-                await invoke("stop_sync_session", {
-                  sessionId: syncInfo.session.id,
-                });
-              } catch (error) {
-                console.error("Failed to stop sync session:", error);
-              }
-            } else if (isFollower && syncInfo) {
-              // Stop follower: remove from session
-              try {
-                await invoke("remove_sync_follower", {
-                  sessionId: syncInfo.session.id,
-                  followerProfileId: profile.id,
-                });
-              } catch (error) {
-                console.error("Failed to remove sync follower:", error);
-              }
-            } else {
-              await handleProfileStop(profile);
-            }
+            await handleProfileStop(profile);
           };
 
           const buttonVariant = isRunning
-            ? isFollower
-              ? "secondary"
-              : "destructive"
+            ? "destructive"
             : "default";
 
           return (
             <div className="flex gap-2 items-center">
-              {isDesynced && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span>
-                      <LuTriangleAlert className="size-4 text-warning" />
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {meta.t("profiles.synchronizer.desyncedTooltip", {
-                      url: syncInfo?.failedAtUrl ?? "",
-                    })}
-                  </TooltipContent>
-                </Tooltip>
-              )}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="inline-flex">
@@ -2257,7 +2146,6 @@ export function ProfilesDataTable({
                         "size-7 p-0 grid place-items-center",
                         !canLaunch && "opacity-50 cursor-not-allowed",
                         canLaunch && "cursor-pointer",
-                        isFollower && "border-accent",
                         isRunning &&
                           "bg-destructive/10 text-destructive hover:bg-destructive/20",
                       )}
@@ -2277,9 +2165,9 @@ export function ProfilesDataTable({
                     </RippleButton>
                   </span>
                 </TooltipTrigger>
-                {(stopTooltip || tooltipContent) && (
+                {tooltipContent && (
                   <TooltipContent>
-                    {isRunning ? stopTooltip : tooltipContent}
+                    {tooltipContent}
                   </TooltipContent>
                 )}
               </Tooltip>
@@ -2384,8 +2272,6 @@ export function ProfilesDataTable({
           const isStopping = meta.stoppingProfiles.has(profile.id);
           const isDisabled =
             isRunning || isLaunching || isStopping || isCrossOsBlocked;
-          const lockedEmail = meta.getProfileLockEmail(profile.id);
-          const isLocked = meta.isProfileLockedByAnother(profile.id);
 
           return (
             <div className="flex items-center gap-1.5 min-w-0 max-w-full overflow-hidden">
@@ -2415,18 +2301,6 @@ export function ProfilesDataTable({
               >
                 {display}
               </button>
-              {isLocked && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span>
-                      <LuLock className="size-3 text-muted-foreground" />
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {meta.t("sync.team.profileLocked", { email: lockedEmail })}
-                  </TooltipContent>
-                </Tooltip>
-              )}
             </div>
           );
         },
@@ -2989,7 +2863,6 @@ export function ProfilesDataTable({
                           os: getOSDisplayName(
                             row.original.host_os ||
                               row.original.camoufox_config?.os ||
-                              row.original.wayfern_config?.os ||
                               "",
                           ),
                         })
@@ -3073,7 +2946,6 @@ export function ProfilesDataTable({
                 const profile = profiles.find((p) => p.id === profileId);
                 setTrafficDialogProfile({ id: profileId, name: profile?.name });
               }}
-              onOpenProfileSyncDialog={onOpenProfileSyncDialog}
               onAssignProfilesToGroup={onAssignProfilesToGroup}
               onConfigureCamoufox={onConfigureCamoufox}
               onCopyCookiesToProfile={onCopyCookiesToProfile}
@@ -3089,7 +2961,6 @@ export function ProfilesDataTable({
                 setLaunchHookProfile(profile);
               }}
               onCloneProfile={onCloneProfile}
-              onLaunchWithSync={onLaunchWithSync}
               onSetPassword={onSetPassword}
               onChangePassword={onChangePassword}
               onRemovePassword={onRemovePassword}
@@ -3097,7 +2968,6 @@ export function ProfilesDataTable({
                 setProfileForInfoDialog(null);
                 setProfileToDelete(profile);
               }}
-              crossOsUnlocked={crossOsUnlocked}
               isRunning={infoIsRunning}
               isDisabled={infoIsDisabled}
               isCrossOs={infoIsCrossOs}

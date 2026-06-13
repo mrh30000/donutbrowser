@@ -793,7 +793,7 @@ impl CamoufoxManager {
       // proxies and goes direct UDP to the remote host. With an upstream
       // proxy that's the only allowed egress, that traffic silently fails
       // and pages won't load. (Chromium suppresses QUIC under a proxy on
-      // its own, so Wayfern doesn't need the equivalent toggle.) Both
+      // its own.) Both
       // pref names are emitted because they've been renamed across FF
       // versions and either could be the active one at runtime.
       prefs.push_str(

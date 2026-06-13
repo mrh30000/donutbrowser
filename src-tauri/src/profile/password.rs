@@ -12,13 +12,38 @@ use crate::profile::encryption::{
   has_cached_key, rekey_profile_dir, unlock as unlock_dir, verify_key_against_dir,
 };
 use crate::profile::ProfileManager;
-use crate::sync::encryption::derive_profile_key;
-use crate::sync::manifest::DEFAULT_EXCLUDE_PATTERNS;
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::SystemTime;
+
+/// Derive a 32-byte encryption key from a password and salt using Argon2id.
+/// Replaces the deleted `sync::encryption::derive_profile_key`.
+fn derive_profile_key(password: &str, salt: &str) -> Result<[u8; 32], String> {
+  use argon2::{Algorithm, Argon2, Params, Version};
+  let params = Params::new(65536, 3, 1, Some(32)).map_err(|e| e.to_string())?;
+  let argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
+  let mut key = [0u8; 32];
+  argon
+    .hash_password_into(password.as_bytes(), salt.as_bytes(), &mut key)
+    .map_err(|e| e.to_string())?;
+  Ok(key)
+}
+
+/// Glob patterns for files that should be excluded from profile encryption
+/// (browser caches that are cheap to regenerate). Replaces the deleted
+/// `sync::manifest::DEFAULT_EXCLUDE_PATTERNS`.
+const DEFAULT_EXCLUDE_PATTERNS: &[&str] = &[
+  "**/Cache/**",
+  "**/Code Cache/**",
+  "**/Service Worker/CacheStorage/**",
+  "**/GPUCache/**",
+  "**/blob_storage/**",
+  "**/DawnCache/**",
+  "**/GrShaderCache/**",
+  "**/ShaderCache/**",
+];
 
 /// Build a JSON error payload with just a code.
 fn err_code(code: &'static str) -> String {
@@ -292,7 +317,6 @@ pub async fn set_profile_password(profile_id: String, password: String) -> Resul
     .map_err(err_internal)?;
 
   cache_key(id, key);
-  crate::sync::queue_profile_sync_if_eligible(&profile);
   emit_profiles_changed();
   Ok(())
 }
@@ -431,7 +455,6 @@ pub async fn change_profile_password(
 
   drop_cached_key(&id);
   cache_key(id, new_key);
-  crate::sync::queue_profile_sync_if_eligible(&profile);
   emit_profiles_changed();
   Ok(())
 }
@@ -500,7 +523,6 @@ pub async fn remove_profile_password(profile_id: String, password: String) -> Re
     .map_err(err_internal)?;
 
   drop_cached_key(&id);
-  crate::sync::queue_profile_sync_if_eligible(&profile);
   emit_profiles_changed();
   Ok(())
 }
@@ -711,7 +733,7 @@ mod tests {
     BrowserProfile {
       id: uuid::Uuid::new_v4(),
       name: name.to_string(),
-      browser: "wayfern".to_string(),
+      browser: "chrome".to_string(),
       version: "1.0".to_string(),
       release_type: "stable".to_string(),
       ..Default::default()

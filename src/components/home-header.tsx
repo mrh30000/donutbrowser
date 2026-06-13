@@ -338,6 +338,7 @@ const HomeHeader = ({
       )}
 
       {showProfileToolbar && (
+        <>
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="shrink-0">
@@ -392,6 +393,7 @@ const HomeHeader = ({
           </TooltipTrigger>
           <TooltipContent>{t("profileInfo.importConfig")}</TooltipContent>
         </Tooltip>
+        </>
       )}
     </div>
   );

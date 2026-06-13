@@ -45,8 +45,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCloudAuth } from "@/hooks/use-cloud-auth";
-import { useCommercialTrial } from "@/hooks/use-commercial-trial";
 import { useLanguage } from "@/hooks/use-language";
 import type { PermissionType } from "@/hooks/use-permissions";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -131,7 +129,7 @@ export function SettingsDialog({
     useState<PermissionType | null>(null);
   const [isMacOS, setIsMacOS] = useState(false);
   const [dnsBlocklistDialogOpen, setDnsBlocklistDialogOpen] = useState(false);
-  const [isLinux, setIsLinux] = useState(false);
+  const [, setIsLinux] = useState(false);
   const [hasE2ePassword, setHasE2ePassword] = useState(false);
   const [e2ePassword, setE2ePassword] = useState("");
   const [e2ePasswordConfirm, setE2ePasswordConfirm] = useState("");
@@ -155,13 +153,7 @@ export function SettingsDialog({
     isMicrophoneAccessGranted,
     isCameraAccessGranted,
   } = usePermissions();
-  const { trialStatus } = useCommercialTrial();
-  const { user: cloudUser } = useCloudAuth();
-  // Encryption is available to everyone except team members who aren't owners
-  const canUseEncryption =
-    cloudUser == null ||
-    cloudUser.plan !== "team" ||
-    cloudUser.teamRole === "owner";
+  const canUseEncryption = true;
   const {
     currentLanguage,
     changeLanguage,
@@ -1157,68 +1149,15 @@ export function SettingsDialog({
               )}
             </div>
 
-            {/* Commercial License Section */}
+            {/* Update Settings */}
             <div className="space-y-4">
-              <Label className="text-base font-medium">
-                {t("settings.commercial.title")}
-              </Label>
-
               <div className="flex items-center justify-between p-3 rounded-md border bg-muted/40">
-                {cloudUser != null && cloudUser.plan !== "free" ? (
-                  // Paid Donut plan supersedes the local commercial trial —
-                  // the trial only exists to gate commercial use until the
-                  // user subscribes. Showing "Trial expired" to a paying
-                  // customer reads like a billing error, so swap in a
-                  // subscription-active badge instead.
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-success">
-                      {t("settings.commercial.subscriptionActive", {
-                        plan: cloudUser.plan,
-                      })}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.commercial.subscriptionActiveDescription")}
-                    </p>
-                  </div>
-                ) : trialStatus?.type === "Active" ? (
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">
-                      {t("settings.commercial.trialActive", {
-                        days: trialStatus.days_remaining,
-                        hours: trialStatus.hours_remaining,
-                      })}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.commercial.trialActiveDescription")}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-warning">
-                      {t("settings.commercial.trialExpired")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.commercial.trialExpiredDescription")}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Advanced Section */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">
-                {t("settings.advanced.title")}
-              </Label>
-
-              {!isLinux && (
-                <div className="flex items-start gap-x-3 p-3 rounded-lg border">
-                  <Checkbox
-                    id="disable-auto-updates"
-                    checked={settings.disable_auto_updates ?? false}
-                    onCheckedChange={(checked) => {
-                      updateSetting("disable_auto_updates", checked as boolean);
-                    }}
+                <Checkbox
+                  id="disable-auto-updates"
+                  checked={settings.disable_auto_updates ?? false}
+                  onCheckedChange={(checked) => {
+                    updateSetting("disable_auto_updates", checked as boolean);
+                  }}
                   />
                   <div className="space-y-1">
                     <Label
@@ -1232,7 +1171,6 @@ export function SettingsDialog({
                     </p>
                   </div>
                 </div>
-              )}
 
               <div className="flex items-start gap-x-3 p-3 rounded-lg border">
                 <Checkbox

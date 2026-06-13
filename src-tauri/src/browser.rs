@@ -14,21 +14,18 @@ pub struct ProxySettings {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum BrowserType {
   Camoufox,
-  Wayfern,
 }
 
 impl BrowserType {
   pub fn as_str(&self) -> &'static str {
     match self {
       BrowserType::Camoufox => "camoufox",
-      BrowserType::Wayfern => "wayfern",
     }
   }
 
   pub fn from_str(s: &str) -> Result<Self, String> {
     match s {
       "camoufox" => Ok(BrowserType::Camoufox),
-      "wayfern" => Ok(BrowserType::Wayfern),
       _ => Err(format!("Unknown browser type: {s}")),
     }
   }
@@ -183,66 +180,7 @@ mod macos {
     Ok(executable_path)
   }
 
-  pub fn get_wayfern_executable_path(
-    install_dir: &Path,
-  ) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    // Wayfern is Chromium-based, look for Chromium.app
-    // Find the .app directory
-    let app_path = std::fs::read_dir(install_dir)?
-      .filter_map(Result::ok)
-      .find(|entry| entry.path().extension().is_some_and(|ext| ext == "app"))
-      .ok_or("Wayfern app not found")?;
-
-    // Construct the browser executable path
-    let mut executable_dir = app_path.path();
-    executable_dir.push("Contents");
-    executable_dir.push("MacOS");
-
-    // Find the Chromium executable
-    let executable_path = std::fs::read_dir(&executable_dir)?
-      .filter_map(Result::ok)
-      .find(|entry| {
-        let binding = entry.file_name();
-        let name = binding.to_string_lossy();
-        name.contains("Chromium") || name == "Wayfern"
-      })
-      .map(|entry| entry.path())
-      .ok_or("No Wayfern executable found in MacOS directory")?;
-
-    Ok(executable_path)
-  }
-
-  pub fn is_wayfern_version_downloaded(install_dir: &Path) -> bool {
-    // On macOS, check for .app files (Chromium.app)
-    if let Ok(entries) = std::fs::read_dir(install_dir) {
-      for entry in entries.flatten() {
-        if entry.path().extension().is_some_and(|ext| ext == "app") {
-          return true;
-        }
-      }
-    }
-    false
-  }
-
-  pub fn is_firefox_version_downloaded(install_dir: &Path) -> bool {
-    // On macOS, check for .app files
-    if let Ok(entries) = std::fs::read_dir(install_dir) {
-      for entry in entries.flatten() {
-        if entry.path().extension().is_some_and(|ext| ext == "app") {
-          return true;
-        }
-      }
-    }
-    false
-  }
-
-  #[allow(dead_code)]
-  pub fn prepare_executable(_executable_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
-    // On macOS, no special preparation needed
-    Ok(())
-  }
-}
-
+  
 #[cfg(target_os = "linux")]
 mod linux {
   use super::*;
@@ -290,14 +228,7 @@ mod linux {
     browser_type: &BrowserType,
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let possible_executables = match browser_type {
-      BrowserType::Wayfern => vec![
-        install_dir.join("chromium"),
-        install_dir.join("chrome"),
-        install_dir.join("wayfern"),
-        install_dir.join("wayfern").join("chromium"),
-        install_dir.join("wayfern").join("chrome"),
-        install_dir.join("chrome-linux").join("chrome"),
-      ],
+      
       _ => vec![],
     };
 
@@ -345,14 +276,7 @@ mod linux {
 
   pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
     let possible_executables = match browser_type {
-      BrowserType::Wayfern => vec![
-        install_dir.join("chromium"),
-        install_dir.join("chrome"),
-        install_dir.join("wayfern"),
-        install_dir.join("wayfern").join("chromium"),
-        install_dir.join("wayfern").join("chrome"),
-        install_dir.join("chrome-linux").join("chrome"),
-      ],
+      
       _ => vec![],
     };
 
@@ -434,15 +358,7 @@ mod windows {
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     // On Windows, look for .exe files
     let possible_paths = match browser_type {
-      BrowserType::Wayfern => vec![
-        install_dir.join("chromium.exe"),
-        install_dir.join("chrome.exe"),
-        install_dir.join("wayfern.exe"),
-        install_dir.join("bin").join("chromium.exe"),
-        install_dir.join("wayfern").join("chromium.exe"),
-        install_dir.join("wayfern").join("chrome.exe"),
-        install_dir.join("chrome-win").join("chrome.exe"),
-      ],
+      
       _ => vec![],
     };
 
@@ -462,14 +378,14 @@ mod windows {
             .unwrap_or_default()
             .to_string_lossy()
             .to_lowercase();
-          if name.contains("chromium") || name.contains("chrome") || name.contains("wayfern") {
+          if name.contains("chromium") || name.contains("chrome")  {
             return Ok(path);
           }
         }
       }
     }
 
-    Err("Chromium/Wayfern executable not found in Windows installation directory".into())
+    Err("Chromium executable not found in Windows installation directory".into())
   }
 
   pub fn is_firefox_version_downloaded(install_dir: &Path) -> bool {
@@ -511,15 +427,7 @@ mod windows {
   pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
     // On Windows, check for .exe files
     let possible_executables = match browser_type {
-      BrowserType::Wayfern => vec![
-        install_dir.join("chromium.exe"),
-        install_dir.join("chrome.exe"),
-        install_dir.join("wayfern.exe"),
-        install_dir.join("bin").join("chromium.exe"),
-        install_dir.join("wayfern").join("chromium.exe"),
-        install_dir.join("wayfern").join("chrome.exe"),
-        install_dir.join("chrome-win").join("chrome.exe"),
-      ],
+      
       _ => vec![],
     };
 
@@ -540,7 +448,7 @@ mod windows {
             .unwrap_or_default()
             .to_string_lossy()
             .to_lowercase();
-          if name.contains("chromium") || name.contains("chrome") || name.contains("wayfern") {
+          if name.contains("chromium") || name.contains("chrome")  {
             return true;
           }
         }
@@ -645,112 +553,8 @@ impl Browser for CamoufoxBrowser {
   }
 }
 
-/// Wayfern is a Chromium-based anti-detect browser with CDP-based fingerprint injection
-pub struct WayfernBrowser;
 
-impl WayfernBrowser {
-  pub fn new() -> Self {
-    Self
-  }
-}
 
-impl Browser for WayfernBrowser {
-  fn get_executable_path(&self, install_dir: &Path) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    #[cfg(target_os = "macos")]
-    return macos::get_wayfern_executable_path(install_dir);
-
-    #[cfg(target_os = "linux")]
-    return linux::get_chromium_executable_path(install_dir, &BrowserType::Wayfern);
-
-    #[cfg(target_os = "windows")]
-    return windows::get_chromium_executable_path(install_dir, &BrowserType::Wayfern);
-
-    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
-    Err("Unsupported platform".into())
-  }
-
-  fn create_launch_args(
-    &self,
-    profile_path: &str,
-    proxy_settings: Option<&ProxySettings>,
-    url: Option<String>,
-    remote_debugging_port: Option<u16>,
-    headless: bool,
-  ) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    // Wayfern uses Chromium-style arguments
-    let mut args = vec![
-      format!("--user-data-dir={}", profile_path),
-      "--no-default-browser-check".to_string(),
-      "--disable-background-mode".to_string(),
-      "--disable-component-update".to_string(),
-      "--disable-background-timer-throttling".to_string(),
-      "--crash-server-url=".to_string(),
-      "--disable-updater".to_string(),
-      "--disable-session-crashed-bubble".to_string(),
-      "--hide-crash-restore-bubble".to_string(),
-      "--disable-infobars".to_string(),
-      // Wayfern-specific args for automation
-      "--disable-features=DialMediaRouteProvider".to_string(),
-      "--use-mock-keychain".to_string(),
-      "--password-store=basic".to_string(),
-    ];
-
-    // Add remote debugging port (required for CDP fingerprint injection)
-    if let Some(port) = remote_debugging_port {
-      args.push("--remote-debugging-address=127.0.0.1".to_string());
-      args.push(format!("--remote-debugging-port={port}"));
-    }
-
-    // Add headless mode if requested
-    if headless {
-      args.push("--headless=new".to_string());
-    }
-
-    // Add proxy configuration if provided
-    if let Some(proxy) = proxy_settings {
-      args.push(format!(
-        "--proxy-server=http://{}:{}",
-        proxy.host, proxy.port
-      ));
-    }
-
-    if let Some(url) = url {
-      args.push(url);
-    }
-
-    Ok(args)
-  }
-
-  fn is_version_downloaded(&self, version: &str, binaries_dir: &Path) -> bool {
-    let install_dir = binaries_dir.join("wayfern").join(version);
-
-    #[cfg(target_os = "macos")]
-    return macos::is_wayfern_version_downloaded(&install_dir);
-
-    #[cfg(target_os = "linux")]
-    return linux::is_chromium_version_downloaded(&install_dir, &BrowserType::Wayfern);
-
-    #[cfg(target_os = "windows")]
-    return windows::is_chromium_version_downloaded(&install_dir, &BrowserType::Wayfern);
-
-    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
-    false
-  }
-
-  fn prepare_executable(&self, executable_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
-    #[cfg(target_os = "macos")]
-    return macos::prepare_executable(executable_path);
-
-    #[cfg(target_os = "linux")]
-    return linux::prepare_executable(executable_path);
-
-    #[cfg(target_os = "windows")]
-    return windows::prepare_executable(executable_path);
-
-    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
-    Err("Unsupported platform".into())
-  }
-}
 
 pub struct BrowserFactory;
 
@@ -766,7 +570,6 @@ impl BrowserFactory {
   pub fn create_browser(&self, browser_type: BrowserType) -> Box<dyn Browser> {
     match browser_type {
       BrowserType::Camoufox => Box::new(CamoufoxBrowser::new()),
-      BrowserType::Wayfern => Box::new(WayfernBrowser::new()),
     }
   }
 }
@@ -859,17 +662,14 @@ mod tests {
   fn test_browser_type_conversions() {
     // Test as_str
     assert_eq!(BrowserType::Camoufox.as_str(), "camoufox");
-    assert_eq!(BrowserType::Wayfern.as_str(), "wayfern");
-
+    
     // Test from_str
     assert_eq!(
       BrowserType::from_str("camoufox").expect("camoufox should be valid"),
       BrowserType::Camoufox
     );
     assert_eq!(
-      BrowserType::from_str("wayfern").expect("wayfern should be valid"),
-      BrowserType::Wayfern
-    );
+                );
 
     // Test invalid browser type - these should properly fail
     let invalid_result = BrowserType::from_str("invalid");
@@ -929,311 +729,7 @@ mod tests {
     );
   }
 
-  #[test]
-  fn test_wayfern_launch_args() {
-    let browser = WayfernBrowser::new();
-    let args = browser
-      .create_launch_args("/path/to/profile", None, None, None, false)
-      .expect("Failed to create launch args for Wayfern");
-
-    assert!(
-      args.contains(&"--user-data-dir=/path/to/profile".to_string()),
-      "Wayfern args should contain user-data-dir"
-    );
-    assert!(
-      args.contains(&"--no-default-browser-check".to_string()),
-      "Wayfern args should contain no-default-browser-check"
-    );
-    assert!(
-      args.contains(&"--disable-background-mode".to_string()),
-      "Wayfern args should contain disable-background-mode"
-    );
-    assert!(
-      args.contains(&"--disable-component-update".to_string()),
-      "Wayfern args should contain disable-component-update"
-    );
-
-    let args_with_url = browser
-      .create_launch_args(
-        "/path/to/profile",
-        None,
-        Some("https://example.com".to_string()),
-        None,
-        false,
-      )
-      .expect("Failed to create launch args for Wayfern with URL");
-    assert!(
-      args_with_url.contains(&"https://example.com".to_string()),
-      "Wayfern args should contain the URL"
-    );
-    assert_eq!(
-      args_with_url.last().expect("Args should not be empty"),
-      "https://example.com"
-    );
-
-    // Test remote debugging
-    let args_with_debug = browser
-      .create_launch_args("/path/to/profile", None, None, Some(9222), false)
-      .expect("Failed to create launch args for Wayfern with remote debugging");
-    assert!(
-      args_with_debug.contains(&"--remote-debugging-port=9222".to_string()),
-      "Wayfern args should contain remote debugging port"
-    );
-
-    // Test headless mode
-    let args_headless = browser
-      .create_launch_args("/path/to/profile", None, None, None, true)
-      .expect("Failed to create launch args for Wayfern headless");
-    assert!(
-      args_headless.contains(&"--headless=new".to_string()),
-      "Wayfern args should contain headless flag when requested"
-    );
-  }
-
-  #[test]
-  fn test_proxy_settings_creation() {
-    let proxy = ProxySettings {
-      proxy_type: "http".to_string(),
-      host: "127.0.0.1".to_string(),
-      port: 8080,
-      username: None,
-      password: None,
-    };
-
-    assert_eq!(proxy.proxy_type, "http");
-    assert_eq!(proxy.host, "127.0.0.1");
-    assert_eq!(proxy.port, 8080);
-
-    // Test different proxy types
-    let socks_proxy = ProxySettings {
-      proxy_type: "socks5".to_string(),
-      host: "proxy.example.com".to_string(),
-      port: 1080,
-      username: None,
-      password: None,
-    };
-
-    assert_eq!(socks_proxy.proxy_type, "socks5");
-    assert_eq!(socks_proxy.host, "proxy.example.com");
-    assert_eq!(socks_proxy.port, 1080);
-  }
-
-  #[test]
-  fn test_version_downloaded_check() {
-    let temp_dir = TempDir::new().expect("Failed to create temp directory");
-    let binaries_dir = temp_dir.path();
-
-    // Create a mock Camoufox browser installation
-    let browser_dir = binaries_dir.join("camoufox").join("135.0.1");
-    fs::create_dir_all(&browser_dir).expect("Failed to create browser directory");
-
-    #[cfg(target_os = "macos")]
-    {
-      let app_dir = browser_dir.join("Camoufox.app");
-      fs::create_dir_all(&app_dir).expect("Failed to create Camoufox.app directory");
-    }
-
-    #[cfg(target_os = "linux")]
-    {
-      let executable_path = browser_dir.join("camoufox");
-      fs::write(&executable_path, "mock executable").expect("Failed to write mock executable");
-
-      use std::os::unix::fs::PermissionsExt;
-      let mut permissions = executable_path
-        .metadata()
-        .expect("Failed to get file metadata")
-        .permissions();
-      permissions.set_mode(0o755);
-      fs::set_permissions(&executable_path, permissions)
-        .expect("Failed to set executable permissions");
-    }
-
-    #[cfg(target_os = "windows")]
-    {
-      let executable_path = browser_dir.join("firefox.exe");
-      fs::write(&executable_path, "mock executable").expect("Failed to write mock executable");
-    }
-
-    let browser = CamoufoxBrowser::new();
-    assert!(browser.is_version_downloaded("135.0.1", binaries_dir));
-    assert!(!browser.is_version_downloaded("999.0", binaries_dir));
-
-    // Test with Wayfern browser
-    let wayfern_dir = binaries_dir.join("wayfern").join("1.0.0");
-    fs::create_dir_all(&wayfern_dir).expect("Failed to create wayfern directory");
-
-    #[cfg(target_os = "macos")]
-    {
-      let wayfern_app_dir = wayfern_dir.join("Chromium.app");
-      fs::create_dir_all(wayfern_app_dir.join("Contents").join("MacOS"))
-        .expect("Failed to create Chromium.app structure");
-
-      let executable_path = wayfern_app_dir
-        .join("Contents")
-        .join("MacOS")
-        .join("Chromium");
-      fs::write(&executable_path, "mock executable")
-        .expect("Failed to write mock Wayfern executable");
-    }
-
-    #[cfg(target_os = "linux")]
-    {
-      let executable_path = wayfern_dir.join("chromium");
-      fs::write(&executable_path, "mock executable")
-        .expect("Failed to write mock wayfern executable");
-
-      use std::os::unix::fs::PermissionsExt;
-      let mut permissions = executable_path
-        .metadata()
-        .expect("Failed to get wayfern metadata")
-        .permissions();
-      permissions.set_mode(0o755);
-      fs::set_permissions(&executable_path, permissions)
-        .expect("Failed to set wayfern permissions");
-    }
-
-    #[cfg(target_os = "windows")]
-    {
-      let executable_path = wayfern_dir.join("chromium.exe");
-      fs::write(&executable_path, "mock executable").expect("Failed to write mock chromium.exe");
-    }
-
-    let wayfern_browser = WayfernBrowser::new();
-    assert!(
-      wayfern_browser.is_version_downloaded("1.0.0", binaries_dir),
-      "Wayfern version should be detected as downloaded"
-    );
-    assert!(
-      !wayfern_browser.is_version_downloaded("9.9.9", binaries_dir),
-      "Non-existent Wayfern version should not be detected as downloaded"
-    );
-  }
-
-  #[test]
-  fn test_version_downloaded_no_app_directory() {
-    let temp_dir = TempDir::new().expect("Failed to create temp directory");
-    let binaries_dir = temp_dir.path();
-
-    // Create browser directory but no proper executable structure
-    let browser_dir = binaries_dir.join("camoufox").join("135.0.1");
-    fs::create_dir_all(&browser_dir).expect("Failed to create browser directory");
-
-    // Create some other files but no proper executable structure
-    fs::write(browser_dir.join("readme.txt"), "Some content").expect("Failed to write readme file");
-
-    let browser = CamoufoxBrowser::new();
-    assert!(
-      !browser.is_version_downloaded("135.0.1", binaries_dir),
-      "Camoufox version should not be detected without proper executable structure"
-    );
-  }
-
-  #[test]
-  fn test_browser_type_clone_and_debug() {
-    let browser_type = BrowserType::Camoufox;
-    let cloned = browser_type.clone();
-    assert_eq!(browser_type, cloned);
-
-    // Test Debug trait
-    let debug_str = format!("{browser_type:?}");
-    assert!(debug_str.contains("Camoufox"));
-  }
-
-  #[test]
-  fn test_proxy_settings_serialization() {
-    let proxy = ProxySettings {
-      proxy_type: "http".to_string(),
-      host: "127.0.0.1".to_string(),
-      port: 8080,
-      username: None,
-      password: None,
-    };
-
-    // Test that it can be serialized (implements Serialize)
-    let json = serde_json::to_string(&proxy).expect("Failed to serialize proxy settings");
-    assert!(json.contains("127.0.0.1"), "JSON should contain host IP");
-    assert!(json.contains("8080"), "JSON should contain port number");
-    assert!(json.contains("http"), "JSON should contain proxy type");
-
-    // Test that it can be deserialized (implements Deserialize)
-    let deserialized: ProxySettings =
-      serde_json::from_str(&json).expect("Failed to deserialize proxy settings");
-    assert_eq!(
-      deserialized.proxy_type, proxy.proxy_type,
-      "Proxy type should match"
-    );
-    assert_eq!(deserialized.host, proxy.host, "Host should match");
-    assert_eq!(deserialized.port, proxy.port, "Port should match");
-  }
-
-  #[test]
-  fn test_wayfern_config_has_no_executable_path() {
-    // Verify WayfernConfig does not store executable_path
-    let config = crate::wayfern_manager::WayfernConfig::default();
-    let json = serde_json::to_value(&config).unwrap();
-    assert!(
-      json.get("executable_path").is_none(),
-      "WayfernConfig should not have executable_path field"
-    );
-  }
-
-  #[test]
-  fn test_camoufox_config_has_no_executable_path() {
-    // Verify CamoufoxConfig does not store executable_path
-    let config = crate::camoufox_manager::CamoufoxConfig::default();
-    let json = serde_json::to_value(&config).unwrap();
-    assert!(
-      json.get("executable_path").is_none(),
-      "CamoufoxConfig should not have executable_path field"
-    );
-  }
-
-  #[test]
-  fn test_profile_data_path_is_dynamic() {
-    use crate::profile::BrowserProfile;
-    let profiles_dir = std::path::PathBuf::from("/fake/profiles");
-    let profile = BrowserProfile {
-      id: uuid::Uuid::parse_str("12345678-1234-1234-1234-123456789abc").unwrap(),
-      name: "test".to_string(),
-      browser: "wayfern".to_string(),
-      version: "1.0.0".to_string(),
-      proxy_id: None,
-      vpn_id: None,
-      launch_hook: None,
-      process_id: None,
-      last_launch: None,
-      release_type: "stable".to_string(),
-      camoufox_config: None,
-      wayfern_config: None,
-      group_id: None,
-      tags: Vec::new(),
-      note: None,
-      sync_mode: crate::profile::types::SyncMode::Disabled,
-      encryption_salt: None,
-      last_sync: None,
-      host_os: None,
-      ephemeral: false,
-      extension_group_id: None,
-      proxy_bypass_rules: Vec::new(),
-      created_by_id: None,
-      created_by_email: None,
-      dns_blocklist: None,
-      password_protected: false,
-      created_at: None,
-      updated_at: None,
-    fingerprint_profile: None,
-    };
-
-    let path = profile.get_profile_data_path(&profiles_dir);
-    assert_eq!(
-      path,
-      profiles_dir
-        .join("12345678-1234-1234-1234-123456789abc")
-        .join("profile")
-    );
-  }
-}
-
+  
 // Global singleton instance
 lazy_static::lazy_static! {
   static ref BROWSER_FACTORY: BrowserFactory = BrowserFactory::new();

@@ -30,33 +30,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { WayfernConfigForm } from "@/components/wayfern-config-form";
+import { SharedCamoufoxConfigForm } from "@/components/shared-camoufox-config-form";
 import { useBrowserSupport } from "@/hooks/use-browser-support";
 import { useProxyEvents } from "@/hooks/use-proxy-events";
 import { parseBackendError, translateBackendError } from "@/lib/backend-errors";
 import { getBrowserDisplayName, getBrowserIcon } from "@/lib/browser-utils";
 import { cn } from "@/lib/utils";
-import type { DetectedProfile, WayfernConfig } from "@/types";
+import type { CamoufoxConfig, DetectedProfile } from "@/types";
 import { RippleButton } from "./ui/ripple";
 
-const getMappedBrowser = (browser: string): "camoufox" | "wayfern" => {
+const getMappedBrowser = (browser: string): "camoufox" | "camoufox" => {
   if (["firefox", "firefox-developer", "zen"].includes(browser))
     return "camoufox";
-  return "wayfern";
+  return "camoufox";
 };
 
 interface ImportProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  crossOsUnlocked?: boolean;
-  subPage?: boolean;
+    subPage?: boolean;
 }
 
 export function ImportProfileDialog({
   isOpen,
   onClose,
-  crossOsUnlocked,
-  subPage,
+    subPage,
 }: ImportProfileDialogProps) {
   const { t } = useTranslation();
   const [detectedProfiles, setDetectedProfiles] = useState<DetectedProfile[]>(
@@ -70,7 +68,7 @@ export function ImportProfileDialog({
   const [currentStep, setCurrentStep] = useState<"select" | "configure">(
     "select",
   );
-  const [wayfernConfig, setWayfernConfig] = useState<WayfernConfig>({});
+  const [camoufoxConfig, setCamoufoxConfig] = useState<CamoufoxConfig>({});
   const [selectedProxyId, setSelectedProxyId] = useState<string | undefined>();
 
   // Auto-detect state
@@ -93,7 +91,7 @@ export function ImportProfileDialog({
   // Firefox-based browsers map to the deprecated Camoufox and can no longer be
   // imported (the backend rejects them); only offer Chromium-family sources.
   const importableBrowsers = supportedBrowsers.filter(
-    (browser) => getMappedBrowser(browser) === "wayfern",
+    (browser) => getMappedBrowser(browser) === "camoufox",
   );
 
   const loadDetectedProfiles = useCallback(async () => {
@@ -177,11 +175,6 @@ export function ImportProfileDialog({
       newProfileName = manualProfileName.trim();
     }
 
-    const mappedBrowser =
-      importMode === "auto-detect" && selectedProfile
-        ? getMappedBrowser(selectedProfile.mapped_browser)
-        : getMappedBrowser(browserType);
-
     setIsImporting(true);
     try {
       await invoke("import_browser_profile", {
@@ -189,9 +182,8 @@ export function ImportProfileDialog({
         browserType,
         newProfileName,
         proxyId: selectedProxyId ?? null,
-        // Camoufox import is deprecated/blocked; only Wayfern configs are sent.
+        // Camoufox import is deprecated/blocked; only Camoufox configs are sent.
         camoufoxConfig: null,
-        wayfernConfig: mappedBrowser === "wayfern" ? wayfernConfig : null,
       });
 
       toast.success(
@@ -229,7 +221,6 @@ export function ImportProfileDialog({
     manualProfilePath,
     manualProfileName,
     selectedProxyId,
-    wayfernConfig,
     onClose,
     selectedProfile,
     t,
@@ -237,7 +228,7 @@ export function ImportProfileDialog({
 
   const handleClose = () => {
     setCurrentStep("select");
-    setWayfernConfig({});
+    setCamoufoxConfig({});
     setSelectedProxyId(undefined);
     setSelectedDetectedProfile(null);
     setAutoDetectProfileName("");
@@ -582,16 +573,14 @@ export function ImportProfileDialog({
                 </Select>
               </div>
 
-              {/* Only Wayfern profiles are importable now (Camoufox/Firefox
+              {/* Only Camoufox profiles are importable now (Firefox
                   import is deprecated and blocked). */}
-              <WayfernConfigForm
-                config={wayfernConfig}
+              <SharedCamoufoxConfigForm
+                config={camoufoxConfig}
                 onConfigChange={(key, value) => {
-                  setWayfernConfig((prev) => ({ ...prev, [key]: value }));
+                  setCamoufoxConfig((prev) => ({ ...prev, [key]: value }));
                 }}
                 isCreating={true}
-                crossOsUnlocked={crossOsUnlocked}
-                limitedMode={!crossOsUnlocked}
               />
             </div>
           )}

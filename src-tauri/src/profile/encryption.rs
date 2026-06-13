@@ -20,8 +20,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::SystemTime;
 
-use crate::sync::encryption::{decrypt_bytes, derive_profile_key, encrypt_bytes, generate_salt};
-
 /// Length of the on-disk HMAC filename in chars.
 const HMAC_FILENAME_LEN: usize = 32;
 

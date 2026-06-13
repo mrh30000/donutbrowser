@@ -1,6 +1,5 @@
 use crate::camoufox_manager::CamoufoxConfig;
 use crate::fingerprint::profile::FingerprintProfile;
-use crate::wayfern_manager::WayfernConfig;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
@@ -12,14 +11,6 @@ pub enum SyncStatus {
   Syncing,
   Synced,
   Error,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Default)]
-pub enum SyncMode {
-  #[default]
-  Disabled,
-  Regular,
-  Encrypted,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -43,7 +34,6 @@ pub struct BrowserProfile {
   #[serde(default)]
   pub camoufox_config: Option<CamoufoxConfig>, // Camoufox configuration
   #[serde(default)]
-  pub wayfern_config: Option<WayfernConfig>, // Wayfern configuration
   #[serde(default)]
   pub group_id: Option<String>, // Reference to profile group
   #[serde(default)]
@@ -51,7 +41,6 @@ pub struct BrowserProfile {
   #[serde(default)]
   pub note: Option<String>, // User note
   #[serde(default)]
-  pub sync_mode: SyncMode,
   #[serde(default)]
   pub encryption_salt: Option<String>,
   #[serde(default)]
@@ -117,7 +106,7 @@ impl BrowserProfile {
       .host_os
       .as_deref()
       .or_else(|| self.camoufox_config.as_ref().and_then(|c| c.os.as_deref()))
-      .or_else(|| self.wayfern_config.as_ref().and_then(|c| c.os.as_deref()))
+      
   }
 
   /// Returns true when the profile was created on a different OS than the current host.
@@ -127,15 +116,5 @@ impl BrowserProfile {
       Some(os) => os != get_host_os(),
       None => false,
     }
-  }
-
-  /// Returns true if sync is enabled (either Regular or Encrypted mode).
-  pub fn is_sync_enabled(&self) -> bool {
-    self.sync_mode != SyncMode::Disabled
-  }
-
-  /// Returns true if sync uses E2E encryption.
-  pub fn is_encrypted_sync(&self) -> bool {
-    self.sync_mode == SyncMode::Encrypted
   }
 }

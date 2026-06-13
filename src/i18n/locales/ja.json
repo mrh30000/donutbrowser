@@ -266,7 +266,6 @@
       "configure": "設定",
       "clone": "プロファイルを複製",
       "viewNetwork": "ネットワークを表示",
-      "syncSettings": "同期設定",
       "assignToGroup": "グループに割り当て",
       "changeFingerprint": "フィンガープリントを変更",
       "copyCookiesToProfile": "Cookieをプロファイルにコピー",
@@ -1105,20 +1104,6 @@
     "continue": "続行",
     "cancel": "キャンセル"
   },
-  "syncAll": {
-    "title": "既存アイテムの同期を有効にする",
-    "description": "同期されていないアイテムがあります。すべての同期を有効にしますか？",
-    "enableAll": "すべて有効にする",
-    "skip": "スキップ",
-    "success": "すべてのアイテムの同期が有効になりました",
-    "labels": {
-      "proxies": "プロキシ",
-      "vpns": "VPN",
-      "groups": "グループ",
-      "extensions": "拡張機能",
-      "extensionGroups": "拡張機能グループ"
-    }
-  },
   "crossOs": {
     "viewOnly": "このプロファイルは{{os}}で作成されたもので、このシステムではサポートされていません",
     "cannotLaunch": "このプロファイルは{{os}}で作成されたもので、このシステムではサポートされていません",
@@ -1251,7 +1236,6 @@
     "extensionsTab": "拡張機能",
     "groupsTab": "グループ",
     "managedNotice": "ここで管理される拡張機能は、起動時にプロファイルに手動でインストールされた拡張機能を置き換えます。",
-    "proRequired": "拡張機能管理はプロ機能です",
     "empty": "まだ拡張機能がアップロードされていません。",
     "noGroups": "まだ拡張機能グループが作成されていません。",
     "createGroup": "グループを作成",
@@ -1534,65 +1518,6 @@
     "badgeRunning": "実行中",
     "badgeUnavailable": "利用不可",
     "openButton": "開く"
-  },
-  "locationProxy": {
-    "title": "クイックロケーションプロキシ",
-    "description": "このプロファイルを経由する国を選択してください。プロキシが自動的に作成されます。",
-    "country": "国",
-    "selectCountry": "国を選択",
-    "searchCountry": "国を検索...",
-    "noCountriesFound": "国が見つかりません。",
-    "apply": "適用",
-    "creating": "プロキシを作成中...",
-    "success": "ロケーションプロキシを適用しました",
-    "failed": "ロケーションプロキシの適用に失敗しました",
-    "titleCreate": "位置プロキシを作成",
-    "descriptionCreate": "24 時間スティッキーセッションのジオターゲットプロキシを作成します",
-    "countryLabel": "国 (必須)",
-    "regionLabel": "地域 (任意)",
-    "cityLabel": "都市 (任意)",
-    "ispLabel": "ISP (任意)",
-    "nameLabel": "名前",
-    "namePlaceholder": "プロキシ名",
-    "loadingCountries": "国を読み込み中...",
-    "selectCountryPh": "国を選択",
-    "searchCountries": "国を検索...",
-    "loadFailed": "国の読み込みに失敗しました",
-    "selectCountryFirst": "まず国を選択してください",
-    "loadingRegions": "地域を読み込み中...",
-    "noRegions": "利用可能な地域がありません",
-    "selectRegion": "地域を選択",
-    "searchRegions": "地域を検索...",
-    "loadingCities": "都市を読み込み中...",
-    "noCities": "利用可能な都市がありません",
-    "selectCity": "都市を選択",
-    "searchCities": "都市を検索...",
-    "loadingIsps": "ISP を読み込み中...",
-    "noIsps": "利用可能な ISP がありません",
-    "selectIsp": "ISP を選択",
-    "searchIsps": "ISP を検索...",
-    "createSuccess": "位置プロキシを作成しました",
-    "createFailed": "位置プロキシの作成に失敗しました",
-    "creatingButton": "作成中...",
-    "createButton": "作成"
-  },
-  "wayfernTerms": {
-    "title": "Wayfern 利用規約",
-    "description": "Donut Browser を使用する前に、Wayfern の利用規約を読み、同意する必要があります。",
-    "reviewLabel": "次の URL で利用規約をご確認ください:",
-    "agreeNotice": "「同意します」をクリックすると、これらの条項に拘束されることに同意します。",
-    "acceptButton": "同意します",
-    "acceptSuccess": "規約に同意しました",
-    "acceptFailed": "規約への同意に失敗しました",
-    "tryAgain": "もう一度お試しください"
-  },
-  "commercialTrial": {
-    "title": "商用試用期間が終了しました",
-    "description": "2 週間の商用試用期間が終了しました。",
-    "body": "商用目的で Donut Browser を使用する場合は、続行するために商用ライセンスを購入する必要があります。個人利用は引き続き無料でお使いいただけます。",
-    "understandButton": "了解しました",
-    "failed": "確認の保存に失敗しました",
-    "tryAgain": "もう一度お試しください"
   },
   "permissionDialog": {
     "titleMicrophone": "マイクへのアクセスが必要です",
@@ -1916,39 +1841,6 @@
       }
     }
   },
-  "account": {
-    "refreshed": "アカウントを更新しました",
-    "loggedOut": "ログアウトしました",
-    "signedOut": "未ログイン",
-    "signedOutDescription": "クラウド同期、暗号化プロファイル、チーム機能を有効にするにはサインインしてください。",
-    "plan": "プラン: {{plan}} · {{period}}",
-    "refresh": "更新",
-    "logout": "サインアウト",
-    "signIn": "サインイン",
-    "fields": {
-      "plan": "プラン",
-      "status": "ステータス",
-      "teamRole": "チームロール",
-      "period": "請求周期",
-      "device": "デバイス"
-    },
-    "tabs": {
-      "account": "アカウント",
-      "selfHosted": "セルフホスト"
-    },
-    "selfHosted": {
-      "title": "セルフホスト同期サーバー",
-      "description": "Donut を独自の donut-sync サーバーに接続して、ホスト型クラウドを使わずにプロファイル、プロキシ、グループ、拡張機能を同期します。",
-      "disabledWhileLoggedIn": "Donut アカウントにサインインしている間はセルフホスト同期を利用できません。カスタムサーバーを使うにはサインアウトしてください。",
-      "connectionStatus": "接続:",
-      "statusUnknown": "未テスト",
-      "testConnection": "接続をテスト",
-      "disconnect": "切断"
-    },
-    "deviceOrdinal": "{{count}} 台中 {{ordinal}} 台目",
-    "automationPrimaryOnly": "ブラウザの自動化はプライマリデバイス（デバイス1）でのみ実行できます。ここで使用するには、そのデバイスでサインアウトしてください。",
-    "automationActiveHere": "ブラウザの自動化はこのデバイスで有効です。"
-  },
   "shortcutsPage": {
     "title": "キーボードショートカット",
     "description": "これらのショートカットでワークフローを高速化できます。"
@@ -2070,10 +1962,6 @@
       "trialBadge": "2週間無料",
       "commercialDesc": "2週間の評価期間は無料です。その後は有料プランが必要で、これによりプロジェクトの維持と発展が支えられます。"
     }
-  },
-  "wayfernBlocked": {
-    "title": "ブラウザの自動化が一時停止しました",
-    "description": "通常は複数のデバイスで同時にサインインしたことが原因で、アカウントのProブラウザ機能が一時的に制限されました。他のデバイスからサインアウトし、プロファイルを再起動すると復元されます。"
   },
   "camoufoxDeprecation": {
     "title": "Camoufox のサポートが終了します",

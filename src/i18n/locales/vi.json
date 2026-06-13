@@ -266,7 +266,6 @@
       "configure": "Cấu hình",
       "clone": "Nhân bản hồ sơ",
       "viewNetwork": "Xem mạng",
-      "syncSettings": "Cài đặt đồng bộ",
       "assignToGroup": "Gán vào nhóm",
       "changeFingerprint": "Đổi vân tay",
       "copyCookiesToProfile": "Sao chép Cookie sang hồ sơ",
@@ -1105,20 +1104,6 @@
     "continue": "Tiếp tục",
     "cancel": "Hủy"
   },
-  "syncAll": {
-    "title": "Bật đồng bộ cho các mục hiện có",
-    "description": "Bạn có các mục chưa được đồng bộ. Bạn có muốn bật đồng bộ cho tất cả không?",
-    "enableAll": "Bật tất cả",
-    "skip": "Bỏ qua",
-    "success": "Đã bật đồng bộ cho tất cả mục",
-    "labels": {
-      "proxies": "Proxy",
-      "vpns": "VPN",
-      "groups": "Nhóm",
-      "extensions": "Tiện ích",
-      "extensionGroups": "Nhóm tiện ích"
-    }
-  },
   "crossOs": {
     "viewOnly": "Profile này được tạo trên {{os}} và không được hỗ trợ trên hệ thống này",
     "cannotLaunch": "Profile này được tạo trên {{os}} và không được hỗ trợ trên hệ thống này",
@@ -1251,7 +1236,6 @@
     "extensionsTab": "Tiện ích",
     "groupsTab": "Nhóm",
     "managedNotice": "Tiện ích được quản lý tại đây sẽ thay thế bất kỳ tiện ích nào được cài đặt thủ công trong profile khi khởi chạy.",
-    "proRequired": "Quản lý tiện ích là tính năng Pro",
     "empty": "Chưa tải lên tiện ích nào.",
     "noGroups": "Chưa tạo nhóm tiện ích nào.",
     "createGroup": "Tạo nhóm",
@@ -1534,65 +1518,6 @@
     "badgeRunning": "Đang chạy",
     "badgeUnavailable": "Không khả dụng",
     "openButton": "Mở"
-  },
-  "locationProxy": {
-    "title": "Proxy vị trí nhanh",
-    "description": "Chọn một quốc gia để định tuyến profile này qua đó. Proxy sẽ được tạo tự động.",
-    "country": "Quốc gia",
-    "selectCountry": "Chọn quốc gia",
-    "searchCountry": "Tìm kiếm quốc gia...",
-    "noCountriesFound": "Không tìm thấy quốc gia nào.",
-    "apply": "Áp dụng",
-    "creating": "Đang tạo proxy...",
-    "success": "Đã áp dụng proxy vị trí",
-    "failed": "Áp dụng proxy vị trí thất bại",
-    "titleCreate": "Tạo proxy vị trí",
-    "descriptionCreate": "Tạo proxy nhắm mục tiêu địa lý với phiên bản cố định 24 giờ",
-    "countryLabel": "Quốc gia (bắt buộc)",
-    "regionLabel": "Khu vực (tùy chọn)",
-    "cityLabel": "Thành phố (tùy chọn)",
-    "ispLabel": "Nhà mạng (tùy chọn)",
-    "nameLabel": "Tên",
-    "namePlaceholder": "Tên proxy",
-    "loadingCountries": "Đang tải quốc gia...",
-    "selectCountryPh": "Chọn quốc gia",
-    "searchCountries": "Tìm kiếm quốc gia...",
-    "loadFailed": "Tải quốc gia thất bại",
-    "selectCountryFirst": "Hãy chọn quốc gia trước",
-    "loadingRegions": "Đang tải khu vực...",
-    "noRegions": "Không có khu vực nào",
-    "selectRegion": "Chọn khu vực",
-    "searchRegions": "Tìm kiếm khu vực...",
-    "loadingCities": "Đang tải thành phố...",
-    "noCities": "Không có thành phố nào",
-    "selectCity": "Chọn thành phố",
-    "searchCities": "Tìm kiếm thành phố...",
-    "loadingIsps": "Đang tải nhà mạng...",
-    "noIsps": "Không có nhà mạng nào",
-    "selectIsp": "Chọn nhà mạng",
-    "searchIsps": "Tìm kiếm nhà mạng...",
-    "createSuccess": "Tạo proxy vị trí thành công",
-    "createFailed": "Tạo proxy vị trí thất bại",
-    "creatingButton": "Đang tạo...",
-    "createButton": "Tạo"
-  },
-  "wayfernTerms": {
-    "title": "Điều khoản và điều kiện Wayfern",
-    "description": "Trước khi sử dụng Donut Browser, bạn phải đọc và đồng ý với Điều khoản và Điều kiện của Wayfern.",
-    "reviewLabel": "Vui lòng xem lại Điều khoản và Điều kiện tại:",
-    "agreeNotice": "Bằng cách nhấn \"Tôi chấp nhận\", bạn đồng ý bị ràng buộc bởi các điều khoản này.",
-    "acceptButton": "Tôi chấp nhận",
-    "acceptSuccess": "Chấp nhận điều khoản thành công",
-    "acceptFailed": "Chấp nhận điều khoản thất bại",
-    "tryAgain": "Vui lòng thử lại"
-  },
-  "commercialTrial": {
-    "title": "Thời gian dùng thử thương mại đã hết",
-    "description": "Thời gian dùng thử thương mại 2 tuần của bạn đã kết thúc.",
-    "body": "Nếu bạn sử dụng Donut Browser cho mục đích thương mại, bạn cần mua giấy phép thương mại để tiếp tục. Bạn vẫn có thể sử dụng miễn phí cho mục đích cá nhân.",
-    "understandButton": "Tôi hiểu",
-    "failed": "Lưu xác nhận thất bại",
-    "tryAgain": "Vui lòng thử lại"
   },
   "permissionDialog": {
     "titleMicrophone": "Yêu cầu quyền truy cập micro",
@@ -1916,39 +1841,6 @@
       }
     }
   },
-  "account": {
-    "refreshed": "Đã làm mới tài khoản",
-    "loggedOut": "Đã đăng xuất",
-    "signedOut": "Đã đăng xuất",
-    "signedOutDescription": "Đăng nhập để bật đồng bộ đám mây, profile mã hóa và tính năng nhóm.",
-    "plan": "Gói: {{plan}} · {{period}}",
-    "refresh": "Làm mới",
-    "logout": "Đăng xuất",
-    "signIn": "Đăng nhập",
-    "fields": {
-      "plan": "Gói",
-      "status": "Trạng thái",
-      "teamRole": "Vai trò nhóm",
-      "period": "Chu kỳ thanh toán",
-      "device": "Thiết bị"
-    },
-    "tabs": {
-      "account": "Tài khoản",
-      "selfHosted": "Tự lưu trữ"
-    },
-    "selfHosted": {
-      "title": "Máy chủ đồng bộ tự lưu trữ",
-      "description": "Trỏ Donut đến máy chủ donut-sync của riêng bạn để đồng bộ profile, proxy, nhóm và tiện ích mà không cần sử dụng đám mây.",
-      "disabledWhileLoggedIn": "Đồng bộ tự lưu trữ không khả dụng khi bạn đã đăng nhập vào tài khoản Donut. Đăng xuất để sử dụng máy chủ tùy chỉnh.",
-      "connectionStatus": "Kết nối:",
-      "statusUnknown": "Chưa kiểm tra",
-      "testConnection": "Kiểm tra kết nối",
-      "disconnect": "Ngắt kết nối"
-    },
-    "deviceOrdinal": "{{ordinal}} trên {{count}}",
-    "automationPrimaryOnly": "Tự động hóa trình duyệt chỉ chạy trên thiết bị chính của bạn (Thiết bị 1). Đăng xuất ở đó để sử dụng tại đây.",
-    "automationActiveHere": "Tự động hóa trình duyệt đang hoạt động trên thiết bị này."
-  },
   "shortcutsPage": {
     "title": "Phím tắt",
     "description": "Tăng tốc quy trình làm việc với các phím tắt này."
@@ -2070,10 +1962,6 @@
       "trialBadge": "2 tuần miễn phí",
       "commercialDesc": "Miễn phí dùng thử 2 tuần. Sau đó, gói trả phí giúp dự án được duy trì và phát triển."
     }
-  },
-  "wayfernBlocked": {
-    "title": "Tự động hóa trình duyệt đã tạm dừng",
-    "description": "Tài khoản của bạn tạm thời bị hạn chế các tính năng Pro của trình duyệt, thường do đăng nhập trên nhiều thiết bị cùng lúc. Hãy đăng xuất khỏi các thiết bị khác rồi khởi chạy lại profile để khôi phục."
   },
   "camoufoxDeprecation": {
     "title": "Hỗ trợ Camoufox sắp kết thúc",

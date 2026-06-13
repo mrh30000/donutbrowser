@@ -266,7 +266,6 @@
       "configure": "Configure",
       "clone": "Clone Profile",
       "viewNetwork": "View Network",
-      "syncSettings": "Sync Settings",
       "assignToGroup": "Assign to Group",
       "changeFingerprint": "Change Fingerprint",
       "copyCookiesToProfile": "Copy Cookies to Profile",
@@ -1105,20 +1104,6 @@
     "continue": "Continue",
     "cancel": "Cancel"
   },
-  "syncAll": {
-    "title": "Enable Sync for Existing Items",
-    "description": "You have items that are not being synced. Would you like to enable sync for all of them?",
-    "enableAll": "Enable All",
-    "skip": "Skip",
-    "success": "Sync enabled for all items",
-    "labels": {
-      "proxies": "Proxies",
-      "vpns": "VPNs",
-      "groups": "Groups",
-      "extensions": "Extensions",
-      "extensionGroups": "Extension Groups"
-    }
-  },
   "crossOs": {
     "viewOnly": "This profile was created on {{os}} and is not supported on this system",
     "cannotLaunch": "This profile was created on {{os}} and is not supported on this system",
@@ -1251,7 +1236,6 @@
     "extensionsTab": "Extensions",
     "groupsTab": "Groups",
     "managedNotice": "Extensions managed here will replace any manually installed extensions in profiles when launched.",
-    "proRequired": "Extension management is a Pro feature",
     "empty": "No extensions uploaded yet.",
     "noGroups": "No extension groups created yet.",
     "createGroup": "Create Group",
@@ -1534,65 +1518,6 @@
     "badgeRunning": "Running",
     "badgeUnavailable": "Unavailable",
     "openButton": "Open"
-  },
-  "locationProxy": {
-    "title": "Quick Location Proxy",
-    "description": "Choose a country to route this profile through. A proxy will be created automatically.",
-    "country": "Country",
-    "selectCountry": "Select a country",
-    "searchCountry": "Search country...",
-    "noCountriesFound": "No countries found.",
-    "apply": "Apply",
-    "creating": "Creating proxy...",
-    "success": "Location proxy applied",
-    "failed": "Failed to apply location proxy",
-    "titleCreate": "Create Location Proxy",
-    "descriptionCreate": "Create a geo-targeted proxy with a 24-hour sticky session",
-    "countryLabel": "Country (required)",
-    "regionLabel": "Region (optional)",
-    "cityLabel": "City (optional)",
-    "ispLabel": "ISP (optional)",
-    "nameLabel": "Name",
-    "namePlaceholder": "Proxy name",
-    "loadingCountries": "Loading countries...",
-    "selectCountryPh": "Select country",
-    "searchCountries": "Search countries...",
-    "loadFailed": "Failed to load countries",
-    "selectCountryFirst": "Select a country first",
-    "loadingRegions": "Loading regions...",
-    "noRegions": "No regions available",
-    "selectRegion": "Select region",
-    "searchRegions": "Search regions...",
-    "loadingCities": "Loading cities...",
-    "noCities": "No cities available",
-    "selectCity": "Select city",
-    "searchCities": "Search cities...",
-    "loadingIsps": "Loading ISPs...",
-    "noIsps": "No ISPs available",
-    "selectIsp": "Select ISP",
-    "searchIsps": "Search ISPs...",
-    "createSuccess": "Location proxy created",
-    "createFailed": "Failed to create location proxy",
-    "creatingButton": "Creating...",
-    "createButton": "Create"
-  },
-  "wayfernTerms": {
-    "title": "Wayfern Terms and Conditions",
-    "description": "Before using Donut Browser, you must read and agree to Wayfern's Terms and Conditions.",
-    "reviewLabel": "Please review the Terms and Conditions at:",
-    "agreeNotice": "By clicking \"I Accept\", you agree to be bound by these terms.",
-    "acceptButton": "I Accept",
-    "acceptSuccess": "Terms accepted successfully",
-    "acceptFailed": "Failed to accept terms",
-    "tryAgain": "Please try again"
-  },
-  "commercialTrial": {
-    "title": "Commercial Trial Expired",
-    "description": "Your 2-week commercial trial period has ended.",
-    "body": "If you are using Donut Browser for business purposes, you need to purchase a commercial license to continue. You can still use it for personal use for free.",
-    "understandButton": "I Understand",
-    "failed": "Failed to save acknowledgment",
-    "tryAgain": "Please try again"
   },
   "permissionDialog": {
     "titleMicrophone": "Microphone Access Required",
@@ -1916,39 +1841,6 @@
       }
     }
   },
-  "account": {
-    "refreshed": "Account refreshed",
-    "loggedOut": "Logged out",
-    "signedOut": "Signed out",
-    "signedOutDescription": "Sign in to enable cloud sync, encrypted profiles, and team features.",
-    "plan": "Plan: {{plan}} · {{period}}",
-    "refresh": "Refresh",
-    "logout": "Sign out",
-    "signIn": "Sign in",
-    "fields": {
-      "plan": "Plan",
-      "status": "Status",
-      "teamRole": "Team role",
-      "period": "Billing period",
-      "device": "Device"
-    },
-    "tabs": {
-      "account": "Account",
-      "selfHosted": "Self-hosted"
-    },
-    "selfHosted": {
-      "title": "Self-hosted sync server",
-      "description": "Point Donut at your own donut-sync server to sync profiles, proxies, groups, and extensions without using the hosted cloud.",
-      "disabledWhileLoggedIn": "Self-hosted sync is unavailable while you're signed into your Donut account. Sign out to use a custom server.",
-      "connectionStatus": "Connection:",
-      "statusUnknown": "Untested",
-      "testConnection": "Test connection",
-      "disconnect": "Disconnect"
-    },
-    "deviceOrdinal": "{{ordinal}} of {{count}}",
-    "automationPrimaryOnly": "Browser automation runs only on your primary device (Device 1). Sign out there to use it here.",
-    "automationActiveHere": "Browser automation is active on this device."
-  },
   "shortcutsPage": {
     "title": "Keyboard shortcuts",
     "description": "Speed up your workflow with these shortcuts."
@@ -2070,10 +1962,6 @@
       "trialBadge": "2 weeks free",
       "commercialDesc": "Free for a 2-week evaluation. After that, a paid plan keeps the project maintained and thriving."
     }
-  },
-  "wayfernBlocked": {
-    "title": "Browser automation paused",
-    "description": "Your account was temporarily restricted from Pro browser features, usually from signing in on multiple devices at once. Sign out of other devices, then relaunch the profile to restore it."
   },
   "camoufoxDeprecation": {
     "title": "Camoufox support is ending",

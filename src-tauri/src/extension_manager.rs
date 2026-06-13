@@ -325,7 +325,6 @@ impl ExtensionManager {
       browser_compatibility,
       created_at: now,
       updated_at: now,
-      sync_enabled: crate::sync::is_sync_configured(),
       last_sync: None,
       version,
       description,
@@ -351,15 +350,6 @@ impl ExtensionManager {
 
     if let Err(e) = events::emit_empty("extensions-changed") {
       log::error!("Failed to emit extensions-changed event: {e}");
-    }
-
-    if ext.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let id = ext.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_extension_sync(id).await;
-        });
-      }
     }
 
     Ok(ext)
@@ -466,21 +456,12 @@ impl ExtensionManager {
       log::error!("Failed to emit extensions-changed event: {e}");
     }
 
-    if ext.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let eid = ext.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_extension_sync(eid).await;
-        });
-      }
-    }
-
     Ok(ext)
   }
 
   pub fn delete_extension(
     &self,
-    app_handle: &tauri::AppHandle,
+    _app_handle: &tauri::AppHandle,
     id: &str,
   ) -> Result<(), Box<dyn std::error::Error>> {
     let ext = self.get_extension(id)?;
@@ -498,23 +479,6 @@ impl ExtensionManager {
 
     if let Err(e) = events::emit_empty("extensions-changed") {
       log::error!("Failed to emit extensions-changed event: {e}");
-    }
-
-    if ext.sync_enabled {
-      let ext_id = id.to_string();
-      let app_handle_clone = app_handle.clone();
-      tauri::async_runtime::spawn(async move {
-        match crate::sync::SyncEngine::create_from_settings(&app_handle_clone).await {
-          Ok(engine) => {
-            if let Err(e) = engine.delete_extension(&ext_id).await {
-              log::warn!("Failed to delete extension {} from sync: {}", ext_id, e);
-            }
-          }
-          Err(e) => {
-            log::debug!("Sync not configured, skipping remote deletion: {}", e);
-          }
-        }
-      });
     }
 
     Ok(())
@@ -556,7 +520,6 @@ impl ExtensionManager {
       extension_ids: Vec::new(),
       created_at: now,
       updated_at: now,
-      sync_enabled: crate::sync::is_sync_configured(),
       last_sync: None,
     };
 
@@ -565,15 +528,6 @@ impl ExtensionManager {
 
     if let Err(e) = events::emit_empty("extensions-changed") {
       log::error!("Failed to emit extensions-changed event: {e}");
-    }
-
-    if group.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let id = group.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_extension_group_sync(id).await;
-        });
-      }
     }
 
     Ok(group)
@@ -632,31 +586,15 @@ impl ExtensionManager {
       log::error!("Failed to emit extensions-changed event: {e}");
     }
 
-    if updated.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let gid = updated.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_extension_group_sync(gid).await;
-        });
-      }
-    }
-
     Ok(updated)
   }
 
   pub fn delete_group(
     &self,
-    app_handle: &tauri::AppHandle,
+    _app_handle: &tauri::AppHandle,
     id: &str,
   ) -> Result<(), Box<dyn std::error::Error>> {
     let mut data = self.load_groups_data()?;
-
-    let was_sync_enabled = data
-      .groups
-      .iter()
-      .find(|g| g.id == id)
-      .map(|g| g.sync_enabled)
-      .unwrap_or(false);
 
     let initial_len = data.groups.len();
     data.groups.retain(|g| g.id != id);
@@ -674,27 +612,6 @@ impl ExtensionManager {
           let _ = profile_manager.save_profile(&p);
         }
       }
-    }
-
-    if was_sync_enabled {
-      let group_id_owned = id.to_string();
-      let app_handle_clone = app_handle.clone();
-      tauri::async_runtime::spawn(async move {
-        match crate::sync::SyncEngine::create_from_settings(&app_handle_clone).await {
-          Ok(engine) => {
-            if let Err(e) = engine.delete_extension_group(&group_id_owned).await {
-              log::warn!(
-                "Failed to delete extension group {} from sync: {}",
-                group_id_owned,
-                e
-              );
-            }
-          }
-          Err(e) => {
-            log::debug!("Sync not configured, skipping remote deletion: {}", e);
-          }
-        }
-      });
     }
 
     if let Err(e) = events::emit_empty("extensions-changed") {
@@ -731,15 +648,6 @@ impl ExtensionManager {
       log::error!("Failed to emit extensions-changed event: {e}");
     }
 
-    if updated.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let gid = updated.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_extension_group_sync(gid).await;
-        });
-      }
-    }
-
     Ok(updated)
   }
 
@@ -763,15 +671,6 @@ impl ExtensionManager {
 
     if let Err(e) = events::emit_empty("extensions-changed") {
       log::error!("Failed to emit extensions-changed event: {e}");
-    }
-
-    if updated.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let gid = updated.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_extension_group_sync(gid).await;
-        });
-      }
     }
 
     Ok(updated)
@@ -864,7 +763,6 @@ impl ExtensionManager {
     let group = self.get_group(group_id)?;
     let browser_type = match browser {
       "camoufox" => "firefox",
-      "wayfern" => "chromium",
       _ => return Err(format!("Extensions are not supported for browser '{browser}'").into()),
     };
 
@@ -906,7 +804,6 @@ impl ExtensionManager {
 
     let browser_type = match profile.browser.as_str() {
       "camoufox" => "firefox",
-      "wayfern" => "chromium",
       _ => return Ok(Vec::new()),
     };
 
@@ -1448,10 +1345,8 @@ mod tests {
       .validate_group_compatibility(&group.id, "camoufox")
       .is_ok());
 
-    // Incompatible with wayfern (chromium-based)
-    assert!(mgr
-      .validate_group_compatibility(&group.id, "wayfern")
-      .is_err());
+        assert!(mgr
+            .is_err());
   }
 
   #[test]

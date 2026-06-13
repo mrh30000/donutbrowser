@@ -159,8 +159,7 @@ export function useBrowserState(
       if (isCrossOsProfile(profile)) {
         const profileOs =
           profile.host_os ||
-          profile.camoufox_config?.os ||
-          profile.wayfern_config?.os;
+          profile.camoufox_config?.os;
         if (profileOs) {
           const osName = getOSDisplayName(profileOs);
           return `This profile was created on ${osName} and cannot be launched on a different operating system.`;

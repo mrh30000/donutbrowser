@@ -23,20 +23,16 @@ export interface BrowserProfile {
   last_launch?: number;
   release_type: string; // "stable" or "nightly"
   camoufox_config?: CamoufoxConfig; // Camoufox configuration
-  wayfern_config?: WayfernConfig; // Wayfern configuration
   group_id?: string; // Reference to profile group
   tags?: string[];
   note?: string; // User note
-  sync_mode?: SyncMode;
-  encryption_salt?: string;
+    encryption_salt?: string;
   last_sync?: number; // Timestamp of last successful sync (epoch seconds)
   host_os?: string; // OS where profile was created ("macos", "windows", "linux")
   ephemeral?: boolean;
   extension_group_id?: string;
   proxy_bypass_rules?: string[];
-  created_by_id?: string;
-  created_by_email?: string;
-  dns_blocklist?: string;
+      dns_blocklist?: string;
   password_protected?: boolean;
   fingerprint_profile?: FingerprintProfile;
 }
@@ -144,8 +140,7 @@ export interface Extension {
   created_at: number;
   updated_at: number;
   sync_enabled?: boolean;
-  last_sync?: number;
-  version?: string;
+    version?: string;
   description?: string;
   author?: string;
   homepage_url?: string;
@@ -158,73 +153,20 @@ export interface ExtensionGroup {
   created_at: number;
   updated_at: number;
   sync_enabled?: boolean;
-  last_sync?: number;
-}
+  }
 
-export type SyncMode = "Disabled" | "Regular" | "Encrypted";
 
 export type SyncStatus = "Disabled" | "Syncing" | "Synced" | "Error";
 
-export interface SyncSettings {
-  sync_server_url?: string;
-  sync_token?: string;
-}
 
 /**
  * Capability/limit set derived from the plan by the backend. Features are gated
  * on these flags instead of a single "is paid?" check, so a plan like the future
  * "starter" tier (cross-OS fingerprints + cloud backup, no automation) is just
  * data. Mirrors `apps/backend/src/plans/entitlements.ts`. Resolve via
- * `getEntitlements()` — the desktop populates it, but it stays optional for
  * safety on older state.
  */
-export interface Entitlements {
-  active: boolean;
-  browserAutomation: boolean;
-  crossOsFingerprints: boolean;
-  cloudBackup: boolean;
-  teamCollaboration: boolean;
-  profileLimit: number;
-  requestsPerHour: number;
-}
 
-export interface CloudUser {
-  id: string;
-  email: string;
-  plan: string;
-  planPeriod: string | null;
-  subscriptionStatus: string;
-  profileLimit: number;
-  cloudProfilesUsed: number;
-  proxyBandwidthLimitMb: number;
-  proxyBandwidthUsedMb: number;
-  proxyBandwidthExtraMb: number;
-  teamId?: string;
-  teamName?: string;
-  teamRole?: string;
-  // This device's position among the user's active devices (oldest = 1).
-  // Ordinal 1 / isPrimaryDevice === true is the only device that can run
-  // browser automation. Optional: older backends omit them.
-  deviceOrdinal?: number | null;
-  deviceCount?: number | null;
-  isPrimaryDevice?: boolean | null;
-  // Plan-derived capabilities. The desktop resolves this before handing CloudUser
-  // to the UI; optional to stay safe on older cached state.
-  entitlements?: Entitlements;
-}
-
-export interface ProfileLockInfo {
-  profileId: string;
-  lockedBy: string;
-  lockedByEmail: string;
-  lockedAt: string;
-  expiresAt?: string;
-}
-
-export interface CloudAuthState {
-  user: CloudUser;
-  logged_in_at: string;
-}
 
 export interface ProfileSyncStatusEvent {
   profile_id: string;
@@ -293,19 +235,12 @@ export interface ProfileProxyDiagnosticResult {
   error?: string;
 }
 
-export function isSyncEnabled(profile: BrowserProfile): boolean {
-  return profile.sync_mode != null && profile.sync_mode !== "Disabled";
-}
-
-export const CLOUD_PROXY_ID = "cloud-included-proxy";
-
 export interface StoredProxy {
   id: string;
   name: string;
   proxy_settings: ProxySettings;
   sync_enabled?: boolean;
-  last_sync?: number;
-  is_cloud_managed?: boolean;
+    is_cloud_managed?: boolean;
   is_cloud_derived?: boolean;
   geo_country?: string;
   geo_state?: string;
@@ -314,25 +249,19 @@ export interface StoredProxy {
   geo_isp?: string;
 }
 
-export interface LocationItem {
-  code: string;
-  name: string;
-}
 
 export interface ProfileGroup {
   id: string;
   name: string;
   sync_enabled?: boolean;
-  last_sync?: number;
-}
+  }
 
 export interface GroupWithCount {
   id: string;
   name: string;
   count: number;
   sync_enabled?: boolean;
-  last_sync?: number;
-}
+  }
 
 export interface DetectedProfile {
   browser: string;
@@ -555,21 +484,6 @@ export interface CamoufoxLaunchResult {
 
 export type WayfernOS = "windows" | "macos" | "linux" | "android" | "ios";
 
-export interface WayfernConfig {
-  proxy?: string;
-  screen_max_width?: number;
-  screen_max_height?: number;
-  screen_min_width?: number;
-  screen_min_height?: number;
-  geoip?: string | boolean; // For compatibility with shared config form
-  block_images?: boolean; // For compatibility with shared config form
-  block_webrtc?: boolean;
-  block_webgl?: boolean;
-  executable_path?: string;
-  fingerprint?: string; // JSON string of the complete fingerprint config
-  randomize_fingerprint_on_launch?: boolean; // Generate new fingerprint on every launch
-  os?: WayfernOS; // Operating system for fingerprint generation
-}
 
 // Wayfern fingerprint config - matches the C++ FingerprintData structure
 export interface WayfernFingerprintConfig {
@@ -694,13 +608,6 @@ export interface SyncFollowerState {
   profile_id: string;
   profile_name: string;
   failed_at_url: string | null;
-}
-
-export interface SyncSessionInfo {
-  id: string;
-  leader_profile_id: string;
-  leader_profile_name: string;
-  followers: SyncFollowerState[];
 }
 
 // Traffic stats types
@@ -853,8 +760,7 @@ export interface VpnConfig {
   created_at: number;
   last_used?: number;
   sync_enabled?: boolean;
-  last_sync?: number;
-}
+  }
 
 export interface VpnImportResult {
   success: boolean;

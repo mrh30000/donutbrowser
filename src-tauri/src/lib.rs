@@ -45,21 +45,14 @@ pub mod proxy_runner;
 pub mod proxy_server;
 pub mod proxy_storage;
 mod settings_manager;
-pub mod sync;
-mod synchronizer;
 pub mod traffic_stats;
-mod wayfern_manager;
-mod wayfern_terms;
 mod window_layout;
 // mod theme_detector; // removed: theme detection handled in webview via CSS prefers-color-scheme
-pub mod cloud_auth;
-mod commercial_license;
 mod cookie_manager;
 pub mod events;
 mod mcp_integrations;
 mod mcp_server;
 mod tag_manager;
-mod team_lock;
 mod version_updater;
 pub mod vpn;
 pub mod vpn_worker_runner;
@@ -76,7 +69,6 @@ use profile::manager::{
   list_browser_profiles, rename_profile, update_camoufox_config, update_profile_dns_blocklist,
   update_profile_launch_hook, update_profile_note, update_profile_proxy,
   update_profile_proxy_bypass_rules, update_profile_tags, update_profile_vpn,
-  update_wayfern_config,
 };
 
 use profile::password::{
@@ -99,18 +91,9 @@ use downloader::{cancel_download, download_browser};
 
 use settings_manager::{
   complete_onboarding, dismiss_window_resize_warning, get_app_settings, get_onboarding_completed,
-  get_sync_settings, get_system_info, get_system_language, get_table_sorting_settings,
+  get_system_info, get_system_language, get_table_sorting_settings,
   get_window_resize_warning_dismissed, open_log_directory, read_log_files, save_app_settings,
-  save_sync_settings, save_table_sorting_settings,
-};
-
-use sync::{
-  cancel_profile_sync, check_has_e2e_password, delete_e2e_password, enable_sync_for_all_entities,
-  get_unsynced_entity_counts, is_group_in_use_by_synced_profile, is_proxy_in_use_by_synced_profile,
-  is_vpn_in_use_by_synced_profile, request_profile_sync, rollover_encryption_for_all_entities,
-  set_e2e_password, set_extension_group_sync_enabled, set_extension_sync_enabled,
-  set_group_sync_enabled, set_profile_sync_mode, set_proxy_sync_enabled, set_vpn_sync_enabled,
-  verify_e2e_password,
+  save_table_sorting_settings,
 };
 
 use tag_manager::get_all_tags;
@@ -410,32 +393,7 @@ async fn copy_profile_cookies(
   app_handle: tauri::AppHandle,
   request: cookie_manager::CookieCopyRequest,
 ) -> Result<Vec<cookie_manager::CookieCopyResult>, String> {
-  let target_ids = request.target_profile_ids.clone();
   let results = cookie_manager::CookieManager::copy_cookies(&app_handle, request).await?;
-
-  // Trigger sync for target profiles that have sync enabled
-  if let Some(scheduler) = crate::sync::get_global_scheduler() {
-    let profile_manager = profile::manager::ProfileManager::instance();
-    if let Ok(profiles) = profile_manager.list_profiles() {
-      let sync_ids: Vec<String> = target_ids
-        .iter()
-        .filter(|tid| {
-          profiles
-            .iter()
-            .any(|p| p.id.to_string() == **tid && p.is_sync_enabled())
-        })
-        .cloned()
-        .collect();
-      if !sync_ids.is_empty() {
-        tauri::async_runtime::spawn(async move {
-          for id in sync_ids {
-            scheduler.queue_profile_sync(id).await;
-          }
-        });
-      }
-    }
-  }
-
   Ok(results)
 }
 
@@ -445,68 +403,12 @@ async fn import_cookies_from_file(
   profile_id: String,
   content: String,
 ) -> Result<cookie_manager::CookieImportResult, String> {
-  let result =
-    cookie_manager::CookieManager::import_cookies(&app_handle, &profile_id, &content).await?;
-
-  // Trigger sync for the profile if sync is enabled
-  if let Some(scheduler) = crate::sync::get_global_scheduler() {
-    let profile_manager = profile::manager::ProfileManager::instance();
-    if let Ok(profiles) = profile_manager.list_profiles() {
-      if let Some(profile) = profiles.iter().find(|p| p.id.to_string() == profile_id) {
-        if profile.is_sync_enabled() {
-          let pid = profile_id.clone();
-          tauri::async_runtime::spawn(async move {
-            scheduler.queue_profile_sync(pid).await;
-          });
-        }
-      }
-    }
-  }
-
-  Ok(result)
+  cookie_manager::CookieManager::import_cookies(&app_handle, &profile_id, &content).await
 }
 
 #[tauri::command]
 async fn export_profile_cookies(profile_id: String, format: String) -> Result<String, String> {
   cookie_manager::CookieManager::export_cookies(&profile_id, &format)
-}
-
-#[tauri::command]
-fn check_wayfern_terms_accepted() -> bool {
-  wayfern_terms::WayfernTermsManager::instance().is_terms_accepted()
-}
-
-#[tauri::command]
-fn check_wayfern_downloaded() -> bool {
-  wayfern_terms::WayfernTermsManager::instance().is_wayfern_downloaded()
-}
-
-#[tauri::command]
-async fn accept_wayfern_terms() -> Result<(), String> {
-  wayfern_terms::WayfernTermsManager::instance()
-    .accept_terms()
-    .await
-}
-
-#[tauri::command]
-async fn get_commercial_trial_status(
-  app_handle: tauri::AppHandle,
-) -> Result<commercial_license::TrialStatus, String> {
-  commercial_license::CommercialLicenseManager::instance()
-    .get_trial_status(&app_handle)
-    .await
-}
-
-#[tauri::command]
-async fn acknowledge_trial_expiration(app_handle: tauri::AppHandle) -> Result<(), String> {
-  commercial_license::CommercialLicenseManager::instance()
-    .acknowledge_expiration(&app_handle)
-    .await
-}
-
-#[tauri::command]
-fn has_acknowledged_trial_expiration(app_handle: tauri::AppHandle) -> Result<bool, String> {
-  commercial_license::CommercialLicenseManager::instance().has_acknowledged(&app_handle)
 }
 
 #[tauri::command]
@@ -848,14 +750,6 @@ async fn import_vpn_config(
 
   match storage.import_config(&content, &filename, name.clone()) {
     Ok(config) => {
-      if config.sync_enabled {
-        if let Some(scheduler) = sync::get_global_scheduler() {
-          let id = config.id.clone();
-          tauri::async_runtime::spawn(async move {
-            scheduler.queue_vpn_sync(id).await;
-          });
-        }
-      }
       Ok(vpn::VpnImportResult {
         success: true,
         vpn_id: Some(config.id),
@@ -897,20 +791,9 @@ async fn get_vpn_config(vpn_id: String) -> Result<vpn::VpnConfig, String> {
 }
 
 #[tauri::command]
-async fn delete_vpn_config(app_handle: tauri::AppHandle, vpn_id: String) -> Result<(), String> {
+async fn delete_vpn_config(_app_handle: tauri::AppHandle, vpn_id: String) -> Result<(), String> {
   // First disconnect if connected (stop VPN worker)
   let _ = vpn_worker_runner::stop_vpn_worker_by_vpn_id(&vpn_id).await;
-
-  // Check if sync was enabled before deleting
-  let was_sync_enabled = {
-    let storage = vpn::VPN_STORAGE
-      .lock()
-      .map_err(|e| format!("Failed to lock VPN storage: {e}"))?;
-    storage
-      .load_config(&vpn_id)
-      .map(|c| c.sync_enabled)
-      .unwrap_or(false)
-  };
 
   // Delete from storage
   {
@@ -921,26 +804,6 @@ async fn delete_vpn_config(app_handle: tauri::AppHandle, vpn_id: String) -> Resu
     storage
       .delete_config(&vpn_id)
       .map_err(|e| format!("Failed to delete VPN config: {e}"))?;
-  }
-
-  // If sync was enabled, also delete from remote
-  if was_sync_enabled {
-    let vpn_id_clone = vpn_id.clone();
-    let app_handle_clone = app_handle.clone();
-    tauri::async_runtime::spawn(async move {
-      match sync::SyncEngine::create_from_settings(&app_handle_clone).await {
-        Ok(engine) => {
-          if let Err(e) = engine.delete_vpn(&vpn_id_clone).await {
-            log::warn!("Failed to delete VPN {} from sync: {}", vpn_id_clone, e);
-          } else {
-            log::info!("VPN {} deleted from sync storage", vpn_id_clone);
-          }
-        }
-        Err(e) => {
-          log::debug!("Sync not configured, skipping remote VPN deletion: {}", e);
-        }
-      }
-    });
   }
 
   let _ = events::emit("vpn-configs-changed", ());
@@ -964,15 +827,6 @@ async fn create_vpn_config_manual(
       .map_err(|e| format!("Failed to create VPN config: {e}"))?
   };
 
-  if config.sync_enabled {
-    if let Some(scheduler) = sync::get_global_scheduler() {
-      let id = config.id.clone();
-      tauri::async_runtime::spawn(async move {
-        scheduler.queue_vpn_sync(id).await;
-      });
-    }
-  }
-
   Ok(config)
 }
 
@@ -987,15 +841,6 @@ async fn update_vpn_config(vpn_id: String, name: String) -> Result<vpn::VpnConfi
       .update_config_name(&vpn_id, &name)
       .map_err(|e| format!("Failed to update VPN config: {e}"))?
   };
-
-  if config.sync_enabled {
-    if let Some(scheduler) = sync::get_global_scheduler() {
-      let id = config.id.clone();
-      tauri::async_runtime::spawn(async move {
-        scheduler.queue_vpn_sync(id).await;
-      });
-    }
-  }
 
   Ok(config)
 }
@@ -1233,11 +1078,9 @@ async fn generate_sample_fingerprint(
     last_launch: None,
     release_type: "stable".to_string(),
     camoufox_config: None,
-    wayfern_config: None,
     group_id: None,
     tags: Vec::new(),
     note: None,
-    sync_mode: crate::profile::types::SyncMode::Disabled,
     encryption_salt: None,
     last_sync: None,
     host_os: None,
@@ -1257,14 +1100,6 @@ async fn generate_sample_fingerprint(
     let config: crate::camoufox_manager::CamoufoxConfig =
       serde_json::from_str(&config_json).map_err(|e| format!("Failed to parse config: {e}"))?;
     let manager = crate::camoufox_manager::CamoufoxManager::instance();
-    manager
-      .generate_fingerprint_config(&app_handle, &temp_profile, &config)
-      .await
-      .map_err(|e| format!("Failed to generate fingerprint: {e}"))
-  } else if browser == "wayfern" {
-    let config: crate::wayfern_manager::WayfernConfig =
-      serde_json::from_str(&config_json).map_err(|e| format!("Failed to parse config: {e}"))?;
-    let manager = crate::wayfern_manager::WayfernManager::instance();
     manager
       .generate_fingerprint_config(&app_handle, &temp_profile, &config)
       .await
@@ -1796,22 +1631,12 @@ pub fn run() {
         }
       });
 
-      // Start periodic cleanup task for unused binaries
-      // Only runs when sync is not in progress to avoid deleting browsers
-      // that might be needed for profiles being synced from the cloud
+      // Start periodic cleanup task for unused binaries (every 12 hours)
       tauri::async_runtime::spawn(async move {
-        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(43200)); // Every 12 hours
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(43200));
 
         loop {
           interval.tick().await;
-
-          // Check if sync is in progress before running cleanup
-          if let Some(scheduler) = sync::get_global_scheduler() {
-            if scheduler.is_sync_in_progress().await {
-              log::debug!("Skipping cleanup: sync is in progress");
-              continue;
-            }
-          }
 
           let registry =
             crate::downloaded_browsers_registry::DownloadedBrowsersRegistry::instance();
@@ -2056,24 +1881,9 @@ pub fn run() {
                   // Re-encrypt password-protected profiles when the browser
                   // exits naturally (user closing the window) — the explicit
                   // kill path in browser_runner.rs handles app-driven stops.
-                  // Must run BEFORE `mark_profile_stopped` because that
-                  // releases any queued sync run, and a sync that picks up
-                  // the on-disk dir before re-encryption finishes uploads
-                  // the previous snapshot (issue: encrypted profiles not
-                  // syncing fresh data).
                   if !is_running && profile.password_protected {
                     crate::profile::password::complete_after_quit_and_wait(&profile)
                       .await;
-                  }
-
-                  // Notify sync scheduler of running state changes
-                  if let Some(scheduler) = sync::get_global_scheduler() {
-                    if is_running {
-                      scheduler.mark_profile_running(&profile_id).await;
-                    } else {
-                      // Sync was queued at launch; mark_profile_stopped triggers it
-                      scheduler.mark_profile_stopped(&profile_id).await;
-                    }
                   }
 
                   last_running_states.insert(profile_id, is_running);
@@ -2140,88 +1950,6 @@ pub fn run() {
             log::error!("Failed to load app settings for API startup: {e}");
           }
         }
-      });
-
-      // Start sync subscription and scheduler if configured
-      let app_handle_sync = app.handle().clone();
-      tauri::async_runtime::spawn(async move {
-        use std::sync::Arc;
-
-        let mut subscription_manager = sync::SubscriptionManager::new();
-        let work_rx = subscription_manager.take_work_receiver();
-
-        if let Err(e) = subscription_manager.start(app_handle_sync.clone()).await {
-          log::warn!("Failed to start sync subscription: {e}");
-        }
-
-        if let Some(work_rx) = work_rx {
-          let scheduler = Arc::new(sync::SyncScheduler::new());
-
-          // Set the global scheduler so commands can access it
-          sync::set_global_scheduler(scheduler.clone());
-
-          // Start initial sync for all enabled profiles
-          scheduler.sync_all_enabled_profiles(&app_handle_sync).await;
-
-          // Check for missing synced profiles (deleted locally but exist remotely)
-          match sync::SyncEngine::create_from_settings(&app_handle_sync).await {
-            Ok(engine) => {
-              if let Err(e) = engine
-                .check_for_missing_synced_profiles(&app_handle_sync)
-                .await
-              {
-                log::warn!("Failed to check for missing profiles: {}", e);
-              }
-              if let Err(e) = engine
-                .check_for_missing_synced_entities(&app_handle_sync)
-                .await
-              {
-                log::warn!("Failed to check for missing entities: {}", e);
-              }
-            }
-            Err(e) => {
-              log::warn!("Sync not configured, skipping missing profile check: {}", e);
-            }
-          }
-
-          scheduler
-            .clone()
-            .start(app_handle_sync.clone(), work_rx)
-            .await;
-          log::info!("Sync scheduler started");
-        }
-      });
-
-      // Start cloud auth background refresh loop
-      let app_handle_cloud = app.handle().clone();
-      tauri::async_runtime::spawn(async move {
-        // On startup, refresh sync token, proxy config, and wayfern token in
-        // PARALLEL. Previously they were awaited sequentially, so the wayfern
-        // token request didn't even start until the earlier two API calls had
-        // finished. Wayfern launch can race with this task — a few seconds of
-        // serialized API calls translates directly into a slow first launch
-        // because launch_wayfern blocks waiting for the token to land.
-        // api_call_with_retry handles 401/refresh internally — no direct
-        // refresh_access_token call needed.
-        if cloud_auth::CLOUD_AUTH.is_logged_in().await {
-          let sync_token_fut = async {
-            if let Err(e) = cloud_auth::CLOUD_AUTH.get_or_refresh_sync_token().await {
-              log::warn!("Failed to refresh cloud sync token on startup: {e}");
-            }
-          };
-          let proxy_fut = async {
-            cloud_auth::CLOUD_AUTH.sync_cloud_proxy().await;
-          };
-          let wayfern_fut = async {
-            if cloud_auth::CLOUD_AUTH.has_active_paid_subscription().await {
-              if let Err(e) = cloud_auth::CLOUD_AUTH.request_wayfern_token().await {
-                log::warn!("Failed to request wayfern token on startup: {e}");
-              }
-            }
-          };
-          tokio::join!(sync_token_fut, proxy_fut, wayfern_fut);
-        }
-        cloud_auth::CloudAuthManager::start_sync_token_refresh_loop(app_handle_cloud).await;
       });
 
       Ok(())
@@ -2306,7 +2034,6 @@ pub fn run() {
       parse_txt_proxies,
       import_proxies_from_parsed,
       update_camoufox_config,
-      update_wayfern_config,
       generate_sample_fingerprint,
       get_profile_groups,
       get_groups_with_profile_counts,
@@ -2337,37 +2064,11 @@ pub fn run() {
       get_profile_traffic_snapshot,
       clear_all_traffic_stats,
       get_traffic_stats_for_period,
-      get_sync_settings,
-      save_sync_settings,
-      set_profile_sync_mode,
-      cancel_profile_sync,
-      request_profile_sync,
-      set_proxy_sync_enabled,
-      set_group_sync_enabled,
-      is_proxy_in_use_by_synced_profile,
-      is_group_in_use_by_synced_profile,
-      set_vpn_sync_enabled,
-      is_vpn_in_use_by_synced_profile,
-      set_extension_sync_enabled,
-      set_extension_group_sync_enabled,
-      get_unsynced_entity_counts,
-      enable_sync_for_all_entities,
-      set_e2e_password,
-      check_has_e2e_password,
-      verify_e2e_password,
-      delete_e2e_password,
-      rollover_encryption_for_all_entities,
       read_profile_cookies,
       get_profile_cookie_stats,
       copy_profile_cookies,
       import_cookies_from_file,
       export_profile_cookies,
-      check_wayfern_terms_accepted,
-      check_wayfern_downloaded,
-      accept_wayfern_terms,
-      get_commercial_trial_status,
-      acknowledge_trial_expiration,
-      has_acknowledged_trial_expiration,
       start_mcp_server,
       stop_mcp_server,
       get_mcp_server_status,
@@ -2388,27 +2089,8 @@ pub fn run() {
       get_vpn_status,
       list_active_vpn_connections,
       // Cloud auth commands
-      cloud_auth::cloud_exchange_device_code,
-      cloud_auth::cloud_get_user,
-      cloud_auth::cloud_refresh_profile,
-      cloud_auth::cloud_logout,
-      cloud_auth::cloud_get_proxy_usage,
-      cloud_auth::cloud_get_countries,
-      cloud_auth::cloud_get_regions,
-      cloud_auth::cloud_get_cities,
-      cloud_auth::cloud_get_isps,
-      cloud_auth::create_cloud_location_proxy,
-      cloud_auth::restart_sync_service,
-      cloud_auth::cloud_get_wayfern_token,
-      cloud_auth::cloud_refresh_wayfern_token,
       // Team lock commands
-      team_lock::get_team_locks,
-      team_lock::get_team_lock_status,
       // Synchronizer commands
-      synchronizer::start_sync_session,
-      synchronizer::stop_sync_session,
-      synchronizer::remove_sync_follower,
-      synchronizer::get_sync_sessions,
       // DNS blocklist commands
       dns_blocklist::get_dns_blocklist_cache_status,
       dns_blocklist::refresh_dns_blocklists,
@@ -2460,12 +2142,7 @@ mod tests {
       "list_active_vpn_connections",
       "export_profile_cookies",
       "update_extension",
-      "set_extension_sync_enabled",
-      "set_extension_group_sync_enabled",
-      "get_team_lock_status",
       "generate_sample_fingerprint",
-      "cloud_get_wayfern_token",
-      "cloud_refresh_wayfern_token",
       "lock_profile",
     ];
 
@@ -2586,7 +2263,7 @@ mod tests {
             // Remove trailing comma and whitespace
             let command = line.trim_end_matches(',').trim();
             if !command.is_empty() {
-              // Strip module prefix (e.g., "cloud_auth::cloud_get_user" -> "cloud_get_user")
+              // Strip module prefix (e.g., "profile::create_profile" -> "create_profile")
               let command = command.rsplit("::").next().unwrap_or(command);
               commands.push(command.to_string());
             }

@@ -266,7 +266,6 @@
       "configure": "配置",
       "clone": "克隆配置文件",
       "viewNetwork": "查看网络",
-      "syncSettings": "同步设置",
       "assignToGroup": "分配到组",
       "changeFingerprint": "更改指纹",
       "copyCookiesToProfile": "复制 Cookies 到配置文件",
@@ -1105,20 +1104,6 @@
     "continue": "继续",
     "cancel": "取消"
   },
-  "syncAll": {
-    "title": "为现有项目启用同步",
-    "description": "您有未同步的项目。是否要为所有项目启用同步？",
-    "enableAll": "全部启用",
-    "skip": "跳过",
-    "success": "已为所有项目启用同步",
-    "labels": {
-      "proxies": "代理",
-      "vpns": "VPN",
-      "groups": "分组",
-      "extensions": "扩展",
-      "extensionGroups": "扩展分组"
-    }
-  },
   "crossOs": {
     "viewOnly": "此配置文件在 {{os}} 上创建，不受此系统支持",
     "cannotLaunch": "此配置文件在 {{os}} 上创建，不受此系统支持",
@@ -1251,7 +1236,6 @@
     "extensionsTab": "扩展程序",
     "groupsTab": "分组",
     "managedNotice": "此处管理的扩展程序将在启动时替换配置文件中手动安装的所有扩展程序。",
-    "proRequired": "扩展程序管理是 Pro 功能",
     "empty": "尚未上传任何扩展程序。",
     "noGroups": "尚未创建任何扩展程序组。",
     "createGroup": "创建分组",
@@ -1534,65 +1518,6 @@
     "badgeRunning": "运行中",
     "badgeUnavailable": "不可用",
     "openButton": "打开"
-  },
-  "locationProxy": {
-    "title": "快速位置代理",
-    "description": "选择一个国家来路由此配置文件。系统将自动创建代理。",
-    "country": "国家",
-    "selectCountry": "选择国家",
-    "searchCountry": "搜索国家...",
-    "noCountriesFound": "未找到国家。",
-    "apply": "应用",
-    "creating": "正在创建代理...",
-    "success": "已应用位置代理",
-    "failed": "应用位置代理失败",
-    "titleCreate": "创建位置代理",
-    "descriptionCreate": "创建带 24 小时粘性会话的地理定位代理",
-    "countryLabel": "国家 (必填)",
-    "regionLabel": "地区 (可选)",
-    "cityLabel": "城市 (可选)",
-    "ispLabel": "ISP (可选)",
-    "nameLabel": "名称",
-    "namePlaceholder": "代理名称",
-    "loadingCountries": "正在加载国家...",
-    "selectCountryPh": "选择国家",
-    "searchCountries": "搜索国家...",
-    "loadFailed": "加载国家失败",
-    "selectCountryFirst": "请先选择国家",
-    "loadingRegions": "正在加载地区...",
-    "noRegions": "没有可用的地区",
-    "selectRegion": "选择地区",
-    "searchRegions": "搜索地区...",
-    "loadingCities": "正在加载城市...",
-    "noCities": "没有可用的城市",
-    "selectCity": "选择城市",
-    "searchCities": "搜索城市...",
-    "loadingIsps": "正在加载 ISP...",
-    "noIsps": "没有可用的 ISP",
-    "selectIsp": "选择 ISP",
-    "searchIsps": "搜索 ISP...",
-    "createSuccess": "已创建位置代理",
-    "createFailed": "创建位置代理失败",
-    "creatingButton": "正在创建...",
-    "createButton": "创建"
-  },
-  "wayfernTerms": {
-    "title": "Wayfern 条款和条件",
-    "description": "在使用 Donut Browser 之前,你必须阅读并同意 Wayfern 的条款和条件。",
-    "reviewLabel": "请查看以下条款和条件:",
-    "agreeNotice": "点击「我接受」即表示你同意受这些条款约束。",
-    "acceptButton": "我接受",
-    "acceptSuccess": "已成功接受条款",
-    "acceptFailed": "接受条款失败",
-    "tryAgain": "请重试"
-  },
-  "commercialTrial": {
-    "title": "商业试用期已过期",
-    "description": "你的 2 周商业试用期已结束。",
-    "body": "如果你将 Donut Browser 用于商业目的,需要购买商业许可证才能继续。你仍然可以免费用于个人用途。",
-    "understandButton": "我明白了",
-    "failed": "保存确认失败",
-    "tryAgain": "请重试"
   },
   "permissionDialog": {
     "titleMicrophone": "需要麦克风访问权限",
@@ -1916,39 +1841,6 @@
       }
     }
   },
-  "account": {
-    "refreshed": "账户已刷新",
-    "loggedOut": "已退出",
-    "signedOut": "未登录",
-    "signedOutDescription": "登录以启用云同步、加密配置文件和团队功能。",
-    "plan": "套餐：{{plan}} · {{period}}",
-    "refresh": "刷新",
-    "logout": "退出",
-    "signIn": "登录",
-    "fields": {
-      "plan": "套餐",
-      "status": "状态",
-      "teamRole": "团队角色",
-      "period": "计费周期",
-      "device": "设备"
-    },
-    "tabs": {
-      "account": "账户",
-      "selfHosted": "自托管"
-    },
-    "selfHosted": {
-      "title": "自托管同步服务器",
-      "description": "将 Donut 连接到您自己的 donut-sync 服务器，无需使用托管云即可同步配置文件、代理、组和扩展程序。",
-      "disabledWhileLoggedIn": "登录 Donut 账户时无法使用自托管同步。请先退出登录以使用自定义服务器。",
-      "connectionStatus": "连接：",
-      "statusUnknown": "未测试",
-      "testConnection": "测试连接",
-      "disconnect": "断开连接"
-    },
-    "deviceOrdinal": "第 {{ordinal}} 台，共 {{count}} 台",
-    "automationPrimaryOnly": "浏览器自动化仅在您的主设备（设备 1）上运行。请在该设备上退出登录，才能在此设备上使用。",
-    "automationActiveHere": "浏览器自动化已在此设备上启用。"
-  },
   "shortcutsPage": {
     "title": "键盘快捷键",
     "description": "使用这些快捷键加速您的工作流程。"
@@ -2070,10 +1962,6 @@
       "trialBadge": "2 周免费",
       "commercialDesc": "在 2 周评估期内免费。之后需要付费方案，这有助于本项目的持续维护与发展。"
     }
-  },
-  "wayfernBlocked": {
-    "title": "浏览器自动化已暂停",
-    "description": "您的账户暂时被限制使用 Pro 浏览器功能，通常是因为同时在多台设备上登录。请退出其他设备的登录，然后重新启动配置文件即可恢复。"
   },
   "camoufoxDeprecation": {
     "title": "Camoufox 支持即将结束",

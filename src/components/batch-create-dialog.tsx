@@ -37,11 +37,11 @@ import { useVpnEvents } from "@/hooks/use-vpn-events";
 import { cn } from "@/lib/utils";
 import type {
   BrowserReleaseTypes,
+  CamoufoxOS,
   FingerprintProfile,
-  WayfernOS,
 } from "@/types";
 
-const getCurrentOS = (): WayfernOS => {
+const getCurrentOS = (): CamoufoxOS => {
   if (typeof navigator === "undefined") return "linux";
   const platform = navigator.platform.toLowerCase();
   if (platform.includes("win")) return "windows";
@@ -54,8 +54,7 @@ interface BatchCreateDialogProps {
   onClose: () => void;
   onCreated: () => void;
   selectedGroupId?: string;
-  crossOsUnlocked?: boolean;
-}
+  }
 
 const MAX_BATCH_COUNT = 50;
 
@@ -64,7 +63,6 @@ export function BatchCreateDialog({
   onClose,
   onCreated,
   selectedGroupId,
-  crossOsUnlocked = false,
 }: BatchCreateDialogProps) {
   const { t } = useTranslation();
 
@@ -83,7 +81,6 @@ export function BatchCreateDialog({
   const { vpnConfigs } = useVpnEvents();
   const {
     isBrowserDownloading,
-    downloadBrowser,
     loadDownloadedVersions,
     isVersionDownloaded,
     downloadedVersionsMap,
@@ -92,15 +89,15 @@ export function BatchCreateDialog({
   const loadReleaseTypes = useCallback(async () => {
     try {
       const raw = await invoke<BrowserReleaseTypes>("get_browser_release_types", {
-        browserStr: "wayfern",
+        browserStr: "camoufox",
       });
-      await loadDownloadedVersions("wayfern");
+      await loadDownloadedVersions("camoufox");
       const filtered: BrowserReleaseTypes = {};
       if (raw.stable) filtered.stable = raw.stable;
       setReleaseTypes(filtered);
     } catch {
       try {
-        const downloaded = await loadDownloadedVersions("wayfern");
+        const downloaded = await loadDownloadedVersions("camoufox");
         if (downloaded.length > 0) {
           setReleaseTypes({ stable: downloaded[0] });
         }
@@ -113,7 +110,7 @@ export function BatchCreateDialog({
   useEffect(() => {
     if (isOpen) {
       void loadReleaseTypes();
-      void loadDownloadedVersions("wayfern");
+      void loadDownloadedVersions("camoufox");
     }
   }, [isOpen, loadReleaseTypes, loadDownloadedVersions]);
 
@@ -122,7 +119,7 @@ export function BatchCreateDialog({
       const v = releaseTypes.stable;
       if (isVersionDownloaded(v)) return { version: v, releaseType: "stable" as const };
     }
-    const downloaded = downloadedVersionsMap["wayfern"] ?? [];
+    const downloaded = downloadedVersionsMap.camoufox ?? [];
     if (downloaded.length > 0) {
       return { version: downloaded[0], releaseType: "stable" as const };
     }
@@ -153,12 +150,12 @@ export function BatchCreateDialog({
       try {
         await invoke("create_browser_profile_new", {
           name,
-          browserStr: "wayfern",
+          browserStr: "camoufox",
           version: version.version,
           releaseType: version.releaseType,
           proxyId,
           vpnId,
-          wayfernConfig: { os: getCurrentOS() },
+          camoufoxConfig: { os: getCurrentOS() },
           fingerprintProfile: fpProfile,
           groupId,
           ephemeral: false,
@@ -195,7 +192,7 @@ export function BatchCreateDialog({
     count <= MAX_BATCH_COUNT &&
     !isCreating &&
     !!getCreatableVersion() &&
-    !isBrowserDownloading("wayfern");
+    !isBrowserDownloading("camoufox");
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

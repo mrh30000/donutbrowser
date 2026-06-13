@@ -62,3 +62,6 @@ nodecar/nodecar-bin
 
 # claude
 .claude/
+
+# crash dumps
+*.stackdump

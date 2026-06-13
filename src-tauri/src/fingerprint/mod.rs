@@ -4,7 +4,6 @@ pub mod identity;
 pub mod network;
 pub mod noise;
 pub mod profile;
-pub mod wayfern_adapter;
 
 use profile::FingerprintProfile;
 use std::collections::HashMap;
@@ -24,15 +23,12 @@ pub enum FingerprintError {
 /// Each engine adapter writes to the fields it uses.
 #[derive(Debug, Default)]
 pub struct EngineLaunchConfig {
-    /// Chromium launch arguments (Wayfern)
-    pub args: Vec<String>,
+        pub args: Vec<String>,
     /// Environment variables (Camoufox)
     pub env_vars: HashMap<String, String>,
     /// Firefox preferences (Camoufox)
     pub firefox_prefs: HashMap<String, serde_json::Value>,
-    /// The Wayfern-format fingerprint JSON (Wayfern uses CDP setFingerprint)
-    pub wayfern_fingerprint: Option<serde_json::Value>,
-    /// Camoufox config map (key-value pairs that become CAMOU_CONFIG_N env vars)
+            /// Camoufox config map (key-value pairs that become CAMOU_CONFIG_N env vars)
     pub fingerprint_config: HashMap<String, serde_json::Value>,
 }
 

@@ -69,15 +69,13 @@ impl Extractor {
     // Determine browser type from the destination directory path
     let browser_type = if dest_dir.to_string_lossy().contains("camoufox") {
       "camoufox"
-    } else if dest_dir.to_string_lossy().contains("wayfern") {
-      "wayfern"
-    } else {
+        } else {
       return Ok(());
     };
 
-    // For Camoufox and Wayfern on Linux, we expect the executable directly under version directory
+    // For Camoufox on Linux, we expect the executable directly under version directory
     // e.g., binaries/camoufox/<version>/camoufox, without an extra subdirectory
-    if browser_type == "camoufox" || browser_type == "wayfern" {
+    if browser_type == "camoufox" {
       return Ok(());
     }
 
@@ -982,7 +980,6 @@ impl Extractor {
       "chrome.exe",
       "chromium.exe",
       "camoufox.exe",
-      "wayfern.exe",
     ];
 
     // First try priority executable names
@@ -1050,7 +1047,7 @@ impl Extractor {
               || file_name.contains("chromium")
               || file_name.contains("browser")
               || file_name.contains("camoufox")
-              || file_name.contains("wayfern")
+              
             {
               return Ok(path);
             }
@@ -1101,7 +1098,7 @@ impl Extractor {
       // Firefox variants (used by Camoufox)
       "firefox",
       "firefox-bin",
-      // Chrome/Chromium variants (used by Wayfern)
+      // Chrome/Chromium variants
       "chrome",
       "chromium",
       "chromium-browser",
@@ -1110,11 +1107,7 @@ impl Extractor {
       "camoufox",
       "camoufox-bin",
       "camoufox-browser",
-      // Wayfern variants
-      "wayfern",
-      "wayfern-bin",
-      "wayfern-browser",
-    ];
+          ];
 
     // First, try direct lookup in the main directory
     for exe_name in &exe_names {
@@ -1137,7 +1130,6 @@ impl Extractor {
       "chrome",
       "chromium",
       "camoufox",
-      "wayfern",
       ".",
       "./",
       "Browser",
@@ -1240,7 +1232,7 @@ impl Extractor {
               || name_lower.contains("brave")
               || name_lower.contains("zen")
               || name_lower.contains("camoufox")
-              || name_lower.contains("wayfern")
+              
               || name_lower.ends_with(".appimage")
               || !name_lower.contains('.')
             {
@@ -1296,7 +1288,7 @@ impl Extractor {
               || name_lower.contains("brave")
               || name_lower.contains("zen")
               || name_lower.contains("camoufox")
-              || name_lower.contains("wayfern")
+              
               || file_name.ends_with(".AppImage")
             {
               log::info!(

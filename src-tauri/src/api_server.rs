@@ -73,13 +73,11 @@ pub struct CreateProfileRequest {
   /// pin a specific one.
   #[schema(value_type = Object)]
   pub camoufox_config: Option<serde_json::Value>,
-  /// Wayfern fingerprint/config. Send only when `browser` is `"wayfern"`.
-  /// Omit it, or pass an empty object `{}`, to have a fresh fingerprint
+    /// Omit it, or pass an empty object `{}`, to have a fresh fingerprint
   /// generated automatically at creation. Provide a `fingerprint` field to
   /// pin a specific one.
   #[schema(value_type = Object)]
-  pub wayfern_config: Option<serde_json::Value>,
-  pub group_id: Option<String>,
+    pub group_id: Option<String>,
   pub tags: Option<Vec<String>>,
 }
 
@@ -101,7 +99,6 @@ pub struct UpdateProfileRequest {
   pub extension_group_id: Option<String>,
   pub proxy_bypass_rules: Option<Vec<String>>,
   /// One of "Disabled", "Regular", "Encrypted".
-  pub sync_mode: Option<String>,
 }
 
 #[derive(Clone)]
@@ -413,7 +410,6 @@ impl ApiServer {
       .routes(routes!(download_browser_api))
       .routes(routes!(get_browser_versions))
       .routes(routes!(check_browser_downloaded))
-      .routes(routes!(get_wayfern_token, refresh_wayfern_token))
       .split_for_parts();
 
     let api = ApiDoc::openapi();
@@ -425,8 +421,7 @@ impl ApiServer {
       .layer(middleware::from_fn_with_state(
         state.clone(),
         auth_middleware,
-      ))
-      .layer(middleware::from_fn(terms_check_middleware));
+      ));
 
     let api_for_v1 = api.clone();
     let app = Router::new()
@@ -471,19 +466,6 @@ impl ApiServer {
     self.port = None;
     Ok(())
   }
-}
-
-// Terms and Conditions check middleware
-async fn terms_check_middleware(
-  request: axum::extract::Request,
-  next: Next,
-) -> Result<Response, StatusCode> {
-  // Check if Wayfern terms have been accepted
-  if !crate::wayfern_terms::WayfernTermsManager::instance().is_terms_accepted() {
-    return Err(StatusCode::FORBIDDEN);
-  }
-
-  Ok(next.run(request).await)
 }
 
 // Authentication middleware
@@ -573,17 +555,14 @@ async fn request_logging_middleware(request: axum::extract::Request, next: Next)
   response
 }
 
-/// Chokepoint for the future per-hour automation request limit. The limit
-/// (`requests_per_hour`, default 100) is already plumbed through entitlements;
-/// this middleware is intentionally inert today — it resolves the limit but
-/// never blocks. To enforce, count authenticated requests per rolling hour and
-/// return `StatusCode::TOO_MANY_REQUESTS` once the limit (when > 0) is exceeded.
+/// Chokepoint for the future per-hour automation request limit. Currently
+/// inert — passes all requests through. To enforce, count authenticated
+/// requests per rolling hour and return `StatusCode::TOO_MANY_REQUESTS`
+/// once the limit (when > 0) is exceeded.
 async fn rate_limit_middleware(
   request: axum::extract::Request,
   next: Next,
 ) -> Result<Response, StatusCode> {
-  let _requests_per_hour = crate::cloud_auth::CLOUD_AUTH.requests_per_hour().await;
-  // TODO(rate-limit): enforce `_requests_per_hour` for automation routes.
   Ok(next.run(request).await)
 }
 
@@ -623,7 +602,7 @@ pub async fn get_api_server_status() -> Result<Option<u16>, String> {
   Ok(server_guard.get_port())
 }
 
-/// Serialize a browser config (camoufox/wayfern) to JSON for an API response.
+/// Serialize a browser config (camoufox) to JSON for an API response.
 /// Viewing a profile's fingerprint is available to every API caller; only
 /// editing it (via `update_profile`) and launching/killing profiles
 /// programmatically require an active paid plan.
@@ -733,12 +712,12 @@ async fn get_profile(
 
 /// Create a profile.
 ///
-/// - `browser` must be `"wayfern"` or `"camoufox"`; any other value is rejected
+/// - `browser` must be `"camoufox"` or `"camoufox"`; any other value is rejected
 ///   with 400.
 /// - `version` is optional: omit it or pass `"latest"` to use the newest
 ///   already-downloaded version of that browser. The version must be present
 ///   locally (this endpoint does not download new versions); 400 if none is.
-/// - Omitting the matching `wayfern_config`/`camoufox_config`, or passing an
+/// - Omitting the matching `camoufox_config`, or passing an
 ///   empty object `{}`, generates a fresh fingerprint automatically.
 #[utoipa::path(
   post,
@@ -762,12 +741,12 @@ async fn create_profile(
 ) -> Result<Json<ApiProfileResponse>, StatusCode> {
   let profile_manager = ProfileManager::instance();
 
-  // Only Wayfern and Camoufox profiles are launchable; the rest of the system
+  // Only Camoufox profiles are launchable; the rest of the system
   // (fingerprint generation, launch, run) supports nothing else. Reject anything
   // else up front — otherwise the profile is created with no fingerprint and an
   // unrecognized browser, then crashes with a 500 on /run. Mirrors the MCP
   // create_profile validation.
-  if request.browser != "wayfern" && request.browser != "camoufox" {
+  if request.browser != "camoufox" {
     return Err(StatusCode::BAD_REQUEST);
   }
 
@@ -797,13 +776,7 @@ async fn create_profile(
     None
   };
 
-  // Parse wayfern config if provided
-  let wayfern_config = if let Some(config) = &request.wayfern_config {
-    serde_json::from_value(config.clone()).ok()
-  } else {
-    None
-  };
-
+  
   // Reject a dead/unreachable proxy or VPN before creating the profile. A 402
   // (expired proxy subscription) maps to 402; anything else is a 400.
   if let Err(err) =
@@ -827,8 +800,7 @@ async fn create_profile(
       request.proxy_id.clone(),
       request.vpn_id.clone(),
       camoufox_config,
-      wayfern_config,
-      None,
+            None,
       request.group_id.clone(),
       false,
       None,
@@ -971,14 +943,6 @@ async fn update_profile(
   }
 
   if let Some(camoufox_config) = request.camoufox_config {
-    // Editing a profile's fingerprint config is part of the cross-OS fingerprint
-    // capability (GUI, API, MCP). Viewing it is free; mutating it is not.
-    if !crate::cloud_auth::CLOUD_AUTH
-      .can_use_cross_os_fingerprints()
-      .await
-    {
-      return Err(StatusCode::PAYMENT_REQUIRED);
-    }
     let config: Result<CamoufoxConfig, _> = serde_json::from_value(camoufox_config);
     match config {
       Ok(config) => {
@@ -1036,15 +1000,6 @@ async fn update_profile(
   if let Some(proxy_bypass_rules) = request.proxy_bypass_rules {
     if profile_manager
       .update_profile_proxy_bypass_rules(&state.app_handle, &id, proxy_bypass_rules)
-      .is_err()
-    {
-      return Err(StatusCode::BAD_REQUEST);
-    }
-  }
-
-  if let Some(sync_mode) = request.sync_mode {
-    if crate::sync::set_profile_sync_mode(state.app_handle.clone(), id.clone(), sync_mode)
-      .await
       .is_err()
     {
       return Err(StatusCode::BAD_REQUEST);
@@ -1796,12 +1751,6 @@ async fn run_profile(
   State(state): State<ApiServerState>,
   Json(request): Json<RunProfileRequest>,
 ) -> Result<Json<RunProfileResponse>, StatusCode> {
-  if !crate::cloud_auth::CLOUD_AUTH
-    .can_use_browser_automation()
-    .await
-  {
-    return Err(StatusCode::PAYMENT_REQUIRED);
-  }
 
   let headless = request.headless.unwrap_or(false);
   let url = request.url;
@@ -1819,11 +1768,6 @@ async fn run_profile(
   if profile.is_cross_os() {
     return Err(StatusCode::BAD_REQUEST);
   }
-
-  // Team lock check
-  crate::team_lock::acquire_team_lock_if_needed(profile)
-    .await
-    .map_err(|_| StatusCode::CONFLICT)?;
 
   let remote_debugging_port = {
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
@@ -1882,12 +1826,6 @@ async fn open_url_in_profile(
   State(state): State<ApiServerState>,
   Json(request): Json<OpenUrlRequest>,
 ) -> Result<StatusCode, StatusCode> {
-  if !crate::cloud_auth::CLOUD_AUTH
-    .can_use_browser_automation()
-    .await
-  {
-    return Err(StatusCode::PAYMENT_REQUIRED);
-  }
 
   let browser_runner = crate::browser_runner::BrowserRunner::instance();
 
@@ -1924,12 +1862,6 @@ async fn kill_profile(
 ) -> Result<StatusCode, StatusCode> {
   // Programmatically launching and stopping profiles is a paid feature; the
   // run/open-url handlers gate the same way.
-  if !crate::cloud_auth::CLOUD_AUTH
-    .can_use_browser_automation()
-    .await
-  {
-    return Err(StatusCode::PAYMENT_REQUIRED);
-  }
 
   let profile_manager = ProfileManager::instance();
   let profiles = profile_manager
@@ -1946,9 +1878,6 @@ async fn kill_profile(
     .kill_browser_process(state.app_handle.clone(), profile)
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-  crate::team_lock::release_team_lock_if_needed(profile).await;
-
   Ok(StatusCode::NO_CONTENT)
 }
 
@@ -1994,16 +1923,6 @@ async fn import_profile_cookies(
   .await
   {
     Ok(result) => {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        if let Some(profile) = profiles.iter().find(|p| p.id.to_string() == id) {
-          if profile.is_sync_enabled() {
-            let pid = id.clone();
-            tauri::async_runtime::spawn(async move {
-              scheduler.queue_profile_sync(pid).await;
-            });
-          }
-        }
-      }
       Ok(Json(ImportCookiesResponse {
         cookies_imported: result.cookies_imported,
         cookies_replaced: result.cookies_replaced,
@@ -2116,56 +2035,6 @@ async fn check_browser_downloaded(
   Ok(Json(is_downloaded))
 }
 
-// API Handlers - Wayfern Token
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct WayfernTokenResponse {
-  pub token: Option<String>,
-}
-
-#[utoipa::path(
-  get,
-  path = "/v1/wayfern-token",
-  responses(
-    (status = 200, description = "Current wayfern token", body = WayfernTokenResponse),
-    (status = 401, description = "Unauthorized"),
-  ),
-  security(
-    ("bearer_auth" = [])
-  ),
-  tag = "wayfern"
-)]
-async fn get_wayfern_token(
-  State(_state): State<ApiServerState>,
-) -> Result<Json<WayfernTokenResponse>, StatusCode> {
-  let token = crate::cloud_auth::CLOUD_AUTH.get_wayfern_token().await;
-  Ok(Json(WayfernTokenResponse { token }))
-}
-
-#[utoipa::path(
-  post,
-  path = "/v1/wayfern-token/refresh",
-  responses(
-    (status = 200, description = "Refreshed wayfern token", body = WayfernTokenResponse),
-    (status = 401, description = "Unauthorized"),
-    (status = 500, description = "Failed to refresh token"),
-  ),
-  security(
-    ("bearer_auth" = [])
-  ),
-  tag = "wayfern"
-)]
-async fn refresh_wayfern_token(
-  State(_state): State<ApiServerState>,
-) -> Result<Json<WayfernTokenResponse>, (StatusCode, String)> {
-  crate::cloud_auth::CLOUD_AUTH
-    .request_wayfern_token()
-    .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e))?;
-
-  let token = crate::cloud_auth::CLOUD_AUTH.get_wayfern_token().await;
-  Ok(Json(WayfernTokenResponse { token }))
-}
 
 #[cfg(test)]
 mod tests {
@@ -2180,7 +2049,7 @@ mod tests {
   fn update_profile_request_ignores_unknown_fields() {
     // `browser` is no longer a field, plus a wholly unknown field. Both must
     // be accepted and ignored, not rejected.
-    let json = r#"{"name": "p", "browser": "wayfern", "totally_unknown": 123}"#;
+    let json = r#"{"name": "p", "browser": "camoufox", "totally_unknown": 123}"#;
     let parsed: UpdateProfileRequest =
       serde_json::from_str(json).expect("unknown fields must be ignored, not rejected");
     assert_eq!(parsed.name.as_deref(), Some("p"));
@@ -2188,32 +2057,31 @@ mod tests {
 
   #[test]
   fn create_profile_request_ignores_unknown_fields() {
-    let json = r#"{"name": "p", "browser": "wayfern", "version": "latest", "future_field": true}"#;
+    let json = r#"{"name": "p", "browser": "camoufox", "version": "latest", "future_field": true}"#;
     let parsed: CreateProfileRequest =
       serde_json::from_str(json).expect("unknown fields must be ignored, not rejected");
-    assert_eq!(parsed.browser, "wayfern");
+    assert_eq!(parsed.browser, "camoufox");
   }
 
   #[test]
   fn create_profile_request_allows_omitting_version_and_configs() {
-    // Minimal body: no version, no wayfern_config/camoufox_config. Must
+    // Minimal body: no version, no camoufox_config. Must
     // deserialize (version resolves to latest-downloaded at the handler; an
     // absent config triggers fresh-fingerprint generation).
-    let json = r#"{"name": "p", "browser": "wayfern"}"#;
+    let json = r#"{"name": "p", "browser": "camoufox"}"#;
     let parsed: CreateProfileRequest =
       serde_json::from_str(json).expect("version and configs are optional");
-    assert_eq!(parsed.browser, "wayfern");
+    assert_eq!(parsed.browser, "camoufox");
     assert!(parsed.version.is_none());
-    assert!(parsed.wayfern_config.is_none());
-    assert!(parsed.camoufox_config.is_none());
+        assert!(parsed.camoufox_config.is_none());
   }
 
   #[test]
   fn create_profile_browser_validation_matches_supported_engines() {
     // The handler rejects anything that isn't a launchable engine; this is the
     // same predicate it uses, kept in lockstep with MCP's create_profile.
-    let is_valid = |b: &str| b == "wayfern" || b == "camoufox";
-    assert!(is_valid("wayfern"));
+    let is_valid = |b: &str| b == "camoufox";
+    assert!(is_valid("camoufox"));
     assert!(is_valid("camoufox"));
     assert!(!is_valid("chromium"));
     assert!(!is_valid("firefox"));

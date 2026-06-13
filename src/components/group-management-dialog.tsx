@@ -82,11 +82,7 @@ function getSyncStatusDot(
     case "synced":
       return {
         color: "bg-success",
-        tooltip: group.last_sync
-          ? t("syncTooltips.syncedAt", {
-              time: new Date(group.last_sync * 1000).toLocaleString(),
-            })
-          : t("syncTooltips.synced"),
+        tooltip: t("syncTooltips.synced"),
         animate: false,
       };
     case "waiting":

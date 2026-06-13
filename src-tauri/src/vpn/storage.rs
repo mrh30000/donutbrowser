@@ -350,8 +350,6 @@ impl VpnStorage {
     }
 
     let id = Uuid::new_v4().to_string();
-    let sync_enabled = crate::sync::is_sync_configured();
-
     let config = VpnConfig {
       id,
       name: name.to_string(),
@@ -416,8 +414,6 @@ impl VpnStorage {
       let base = filename.trim_end_matches(".conf");
       format!("{} ({})", base, vpn_type)
     });
-    let sync_enabled = crate::sync::is_sync_configured();
-
     let config = VpnConfig {
       id,
       name: display_name,

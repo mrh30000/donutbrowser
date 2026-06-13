@@ -139,7 +139,6 @@ pub fn now_secs() -> u64 {
 
 impl StoredProxy {
   pub fn new(name: String, proxy_settings: ProxySettings) -> Self {
-    let sync_enabled = crate::sync::is_sync_configured();
     Self {
       id: uuid::Uuid::new_v4().to_string(),
       name,
@@ -428,15 +427,6 @@ impl ProxyManager {
     // Emit event for reactive UI updates
     if let Err(e) = events::emit_empty("proxies-changed") {
       log::error!("Failed to emit proxies-changed event: {e}");
-    }
-
-    if stored_proxy.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let id = stored_proxy.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_proxy_sync(id).await;
-        });
-      }
     }
 
     Ok(stored_proxy)
@@ -848,15 +838,6 @@ impl ProxyManager {
       log::error!("Failed to emit proxies-changed event: {e}");
     }
 
-    if updated_proxy.sync_enabled {
-      if let Some(scheduler) = crate::sync::get_global_scheduler() {
-        let id = updated_proxy.id.clone();
-        tauri::async_runtime::spawn(async move {
-          scheduler.queue_proxy_sync(id).await;
-        });
-      }
-    }
-
     Ok(updated_proxy)
   }
 
@@ -899,11 +880,10 @@ impl ProxyManager {
   // Delete a stored proxy
   pub fn delete_stored_proxy(
     &self,
-    app_handle: &tauri::AppHandle,
+    _app_handle: &tauri::AppHandle,
     proxy_id: &str,
   ) -> Result<(), String> {
-    // Remember if sync was enabled before deleting
-    let was_sync_enabled = {
+    {
       let stored_proxies = self.stored_proxies.lock().unwrap();
 
       // Block deleting cloud-managed proxies
@@ -913,12 +893,7 @@ impl ProxyManager {
       {
         return Err("Cannot delete a cloud-managed proxy".to_string());
       }
-
-      stored_proxies
-        .get(proxy_id)
-        .map(|p| p.sync_enabled)
-        .unwrap_or(false)
-    };
+    }
 
     {
       let mut stored_proxies = self.stored_proxies.lock().unwrap();
@@ -929,26 +904,6 @@ impl ProxyManager {
 
     if let Err(e) = self.delete_proxy_file(proxy_id) {
       log::warn!("Failed to delete proxy file: {e}");
-    }
-
-    // If sync was enabled, also delete from S3
-    if was_sync_enabled {
-      let proxy_id_owned = proxy_id.to_string();
-      let app_handle_clone = app_handle.clone();
-      tauri::async_runtime::spawn(async move {
-        match crate::sync::SyncEngine::create_from_settings(&app_handle_clone).await {
-          Ok(engine) => {
-            if let Err(e) = engine.delete_proxy(&proxy_id_owned).await {
-              log::warn!("Failed to delete proxy {} from sync: {}", proxy_id_owned, e);
-            } else {
-              log::info!("Proxy {} deleted from S3 sync storage", proxy_id_owned);
-            }
-          }
-          Err(e) => {
-            log::debug!("Sync not configured, skipping remote deletion: {}", e);
-          }
-        }
-      });
     }
 
     // Emit event for reactive UI updates

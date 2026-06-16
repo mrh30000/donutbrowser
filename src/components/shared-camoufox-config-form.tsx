@@ -323,26 +323,23 @@ export function SharedCamoufoxConfigForm({
       </div>
 
       <div>
-        {(isEditingDisabled ? (
-            <Alert>
-              <AlertDescription>
-                {readOnly
-                  ? t("fingerprint.editingDisabledRunning")
-                  : t("fingerprint.editingDisabledRandomized")}
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <Alert>
-              <AlertDescription>
-                {t("fingerprint.advancedWarning")}
-              </AlertDescription>
-            </Alert>
-          ))}
+        {isEditingDisabled ? (
+          <Alert>
+            <AlertDescription>
+              {readOnly
+                ? t("fingerprint.editingDisabledRunning")
+                : t("fingerprint.editingDisabledRandomized")}
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Alert>
+            <AlertDescription>
+              {t("fingerprint.advancedWarning")}
+            </AlertDescription>
+          </Alert>
+        )}
 
-        <fieldset
-          disabled={isEditingDisabled}
-          className="space-y-6"
-        >
+        <fieldset disabled={isEditingDisabled} className="space-y-6">
           {/* Blocking Options - Only available for Camoufox */}
           {browserType === "camoufox" && (
             <div className="space-y-3">
@@ -1211,10 +1208,7 @@ export function SharedCamoufoxConfigForm({
 
             {/* Screen Resolution */}
             <div>
-              <fieldset
-                disabled={isEditingDisabled}
-                className="space-y-3"
-              >
+              <fieldset disabled={isEditingDisabled} className="space-y-3">
                 <Label>{t("fingerprint.screenResolution")}</Label>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">

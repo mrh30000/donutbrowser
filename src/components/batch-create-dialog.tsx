@@ -54,7 +54,7 @@ interface BatchCreateDialogProps {
   onClose: () => void;
   onCreated: () => void;
   selectedGroupId?: string;
-  }
+}
 
 const MAX_BATCH_COUNT = 50;
 
@@ -88,9 +88,12 @@ export function BatchCreateDialog({
 
   const loadReleaseTypes = useCallback(async () => {
     try {
-      const raw = await invoke<BrowserReleaseTypes>("get_browser_release_types", {
-        browserStr: "camoufox",
-      });
+      const raw = await invoke<BrowserReleaseTypes>(
+        "get_browser_release_types",
+        {
+          browserStr: "camoufox",
+        },
+      );
       await loadDownloadedVersions("camoufox");
       const filtered: BrowserReleaseTypes = {};
       if (raw.stable) filtered.stable = raw.stable;
@@ -117,7 +120,8 @@ export function BatchCreateDialog({
   const getCreatableVersion = useCallback(() => {
     if (releaseTypes?.stable) {
       const v = releaseTypes.stable;
-      if (isVersionDownloaded(v)) return { version: v, releaseType: "stable" as const };
+      if (isVersionDownloaded(v))
+        return { version: v, releaseType: "stable" as const };
     }
     const downloaded = downloadedVersionsMap.camoufox ?? [];
     if (downloaded.length > 0) {
@@ -133,7 +137,8 @@ export function BatchCreateDialog({
 
     const isVpn = selectedProxyId?.startsWith("vpn-") ?? false;
     const proxyId = isVpn ? undefined : selectedProxyId;
-    const vpnId = isVpn && selectedProxyId ? selectedProxyId.slice(4) : undefined;
+    const vpnId =
+      isVpn && selectedProxyId ? selectedProxyId.slice(4) : undefined;
     const fpProfile = enableFingerprint ? fingerprintProfile : undefined;
 
     setIsCreating(true);
@@ -213,7 +218,8 @@ export function BatchCreateDialog({
               value={count}
               onChange={(e) => {
                 const v = parseInt(e.target.value, 10);
-                if (!isNaN(v)) setCount(Math.min(Math.max(v, 1), MAX_BATCH_COUNT));
+                if (!isNaN(v))
+                  setCount(Math.min(Math.max(v, 1), MAX_BATCH_COUNT));
               }}
               disabled={isCreating}
             />
@@ -224,7 +230,9 @@ export function BatchCreateDialog({
 
           {/* Name prefix */}
           <div className="space-y-2">
-            <Label htmlFor="batch-name-prefix">{t("batchCreate.namePrefix")}</Label>
+            <Label htmlFor="batch-name-prefix">
+              {t("batchCreate.namePrefix")}
+            </Label>
             <Input
               id="batch-name-prefix"
               value={namePrefix}
@@ -372,10 +380,7 @@ export function BatchCreateDialog({
                 }}
                 disabled={isCreating}
               />
-              <Label
-                htmlFor="batch-enable-fingerprint"
-                className="font-medium"
-              >
+              <Label htmlFor="batch-enable-fingerprint" className="font-medium">
                 {t("fingerprintProfile.advancedConfig")}
               </Label>
             </div>

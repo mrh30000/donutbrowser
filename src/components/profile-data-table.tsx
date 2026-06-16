@@ -1170,7 +1170,10 @@ export function ProfilesDataTable({
   const { storedProxies } = useProxyEvents();
   const { vpnConfigs } = useVpnEvents();
   const isProfileLocked = React.useCallback((_profileId: string) => false, []);
-  const getLockInfo = React.useCallback((_profileId: string): { lockedByEmail?: string } | null => null, []);
+  const getLockInfo = React.useCallback(
+    (_profileId: string): { lockedByEmail?: string } | null => null,
+    [],
+  );
 
   const [proxyOverrides, setProxyOverrides] = React.useState<
     Record<string, string | null>
@@ -1213,7 +1216,9 @@ export function ProfilesDataTable({
   >({});
 
   // Country proxy creation state (for inline proxy creation in dropdown)
-  const [countries, setCountries] = React.useState<{ code: string; name: string }[]>([]);
+  const [countries, setCountries] = React.useState<
+    { code: string; name: string }[]
+  >([]);
   const [countriesLoaded, setCountriesLoaded] = React.useState(false);
 
   // Extension groups for the Ext column lookup. Refreshed when the
@@ -1250,7 +1255,9 @@ export function ProfilesDataTable({
   const loadCountries = React.useCallback(async () => {
     if (countriesLoaded || !canCreateLocationProxy) return;
     try {
-      const data = await invoke<{ code: string; name: string }[]>("cloud_get_countries");
+      const data = await invoke<{ code: string; name: string }[]>(
+        "cloud_get_countries",
+      );
       setCountries(data);
       setCountriesLoaded(true);
     } catch (e) {
@@ -1920,9 +1927,7 @@ export function ProfilesDataTable({
 
           // Cross-OS profiles: show OS icon when checkboxes aren't visible, show checkbox when they are
           if (isCrossOs && !meta.showCheckboxes && !isSelected) {
-            const resolvedOs =
-              profile.host_os ||
-              profile.camoufox_config?.os;
+            const resolvedOs = profile.host_os || profile.camoufox_config?.os;
             const osName = resolvedOs
               ? getOSDisplayName(resolvedOs)
               : "another OS";
@@ -1961,9 +1966,7 @@ export function ProfilesDataTable({
 
           // Cross-OS profiles with checkboxes visible: show checkbox (selectable for bulk delete)
           if (isCrossOs && (meta.showCheckboxes || isSelected)) {
-            const resolvedOs =
-              profile.host_os ||
-              profile.camoufox_config?.os;
+            const resolvedOs = profile.host_os || profile.camoufox_config?.os;
             const osName = resolvedOs
               ? getOSDisplayName(resolvedOs)
               : "another OS";
@@ -2124,9 +2127,7 @@ export function ProfilesDataTable({
             await handleProfileStop(profile);
           };
 
-          const buttonVariant = isRunning
-            ? "destructive"
-            : "default";
+          const buttonVariant = isRunning ? "destructive" : "default";
 
           return (
             <div className="flex gap-2 items-center">
@@ -2166,9 +2167,7 @@ export function ProfilesDataTable({
                   </span>
                 </TooltipTrigger>
                 {tooltipContent && (
-                  <TooltipContent>
-                    {tooltipContent}
-                  </TooltipContent>
+                  <TooltipContent>{tooltipContent}</TooltipContent>
                 )}
               </Tooltip>
             </div>

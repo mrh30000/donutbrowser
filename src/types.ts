@@ -26,13 +26,13 @@ export interface BrowserProfile {
   group_id?: string; // Reference to profile group
   tags?: string[];
   note?: string; // User note
-    encryption_salt?: string;
+  encryption_salt?: string;
   last_sync?: number; // Timestamp of last successful sync (epoch seconds)
   host_os?: string; // OS where profile was created ("macos", "windows", "linux")
   ephemeral?: boolean;
   extension_group_id?: string;
   proxy_bypass_rules?: string[];
-      dns_blocklist?: string;
+  dns_blocklist?: string;
   password_protected?: boolean;
   fingerprint_profile?: FingerprintProfile;
 }
@@ -140,7 +140,7 @@ export interface Extension {
   created_at: number;
   updated_at: number;
   sync_enabled?: boolean;
-    version?: string;
+  version?: string;
   description?: string;
   author?: string;
   homepage_url?: string;
@@ -153,11 +153,9 @@ export interface ExtensionGroup {
   created_at: number;
   updated_at: number;
   sync_enabled?: boolean;
-  }
-
+}
 
 export type SyncStatus = "Disabled" | "Syncing" | "Synced" | "Error";
-
 
 /**
  * Capability/limit set derived from the plan by the backend. Features are gated
@@ -166,7 +164,6 @@ export type SyncStatus = "Disabled" | "Syncing" | "Synced" | "Error";
  * data. Mirrors `apps/backend/src/plans/entitlements.ts`. Resolve via
  * safety on older state.
  */
-
 
 export interface ProfileSyncStatusEvent {
   profile_id: string;
@@ -240,7 +237,7 @@ export interface StoredProxy {
   name: string;
   proxy_settings: ProxySettings;
   sync_enabled?: boolean;
-    is_cloud_managed?: boolean;
+  is_cloud_managed?: boolean;
   is_cloud_derived?: boolean;
   geo_country?: string;
   geo_state?: string;
@@ -249,19 +246,18 @@ export interface StoredProxy {
   geo_isp?: string;
 }
 
-
 export interface ProfileGroup {
   id: string;
   name: string;
   sync_enabled?: boolean;
-  }
+}
 
 export interface GroupWithCount {
   id: string;
   name: string;
   count: number;
   sync_enabled?: boolean;
-  }
+}
 
 export interface DetectedProfile {
   browser: string;
@@ -483,7 +479,6 @@ export interface CamoufoxLaunchResult {
 }
 
 export type WayfernOS = "windows" | "macos" | "linux" | "android" | "ios";
-
 
 // Wayfern fingerprint config - matches the C++ FingerprintData structure
 export interface WayfernFingerprintConfig {
@@ -760,7 +755,7 @@ export interface VpnConfig {
   created_at: number;
   last_used?: number;
   sync_enabled?: boolean;
-  }
+}
 
 export interface VpnImportResult {
   success: boolean;

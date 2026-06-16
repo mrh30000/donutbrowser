@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { FaFolder } from "react-icons/fa";
 import { toast } from "sonner";
 import { LoadingButton } from "@/components/loading-button";
+import { SharedCamoufoxConfigForm } from "@/components/shared-camoufox-config-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AnimatedTabs,
@@ -30,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SharedCamoufoxConfigForm } from "@/components/shared-camoufox-config-form";
 import { useBrowserSupport } from "@/hooks/use-browser-support";
 import { useProxyEvents } from "@/hooks/use-proxy-events";
 import { parseBackendError, translateBackendError } from "@/lib/backend-errors";
@@ -48,13 +48,13 @@ const getMappedBrowser = (browser: string): "camoufox" | "camoufox" => {
 interface ImportProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
-    subPage?: boolean;
+  subPage?: boolean;
 }
 
 export function ImportProfileDialog({
   isOpen,
   onClose,
-    subPage,
+  subPage,
 }: ImportProfileDialogProps) {
   const { t } = useTranslation();
   const [detectedProfiles, setDetectedProfiles] = useState<DetectedProfile[]>(
@@ -222,7 +222,6 @@ export function ImportProfileDialog({
     manualProfileName,
     selectedProxyId,
     onClose,
-    selectedProfile,
     t,
   ]);
 

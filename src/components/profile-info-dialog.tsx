@@ -89,7 +89,7 @@ interface ProfileInfoDialogProps {
   onSetPassword?: (profile: BrowserProfile) => void;
   onChangePassword?: (profile: BrowserProfile) => void;
   onRemovePassword?: (profile: BrowserProfile) => void;
-    isRunning?: boolean;
+  isRunning?: boolean;
   isDisabled?: boolean;
   isCrossOs?: boolean;
   syncStatuses: Record<string, { status: string; error?: string }>;
@@ -252,8 +252,7 @@ export function ProfileInfoDialog({
   if (!profile) return null;
 
   const ProfileIcon = getProfileIcon(profile);
-  const isCamoufox =
-    profile.browser === "camoufox";
+  const isCamoufox = profile.browser === "camoufox";
   const isDeleteDisabled = isRunning;
 
   const proxyName = profile.proxy_id
@@ -352,9 +351,7 @@ export function ProfileInfoDialog({
       disabled: isDisabled,
       runningBadge: isRunning,
       hidden:
-        !isCamoufox ||
-        profile.ephemeral === true ||
-        !onCopyCookiesToProfile,
+        !isCamoufox || profile.ephemeral === true || !onCopyCookiesToProfile,
     },
     {
       id: "cookiesManage",
@@ -366,9 +363,7 @@ export function ProfileInfoDialog({
       disabled: isDisabled,
       runningBadge: isRunning,
       hidden:
-        !isCamoufox ||
-        profile.ephemeral === true ||
-        !onOpenCookieManagement,
+        !isCamoufox || profile.ephemeral === true || !onOpenCookieManagement,
     },
     {
       icon: <LuSettings className="size-4" />,
@@ -858,7 +853,6 @@ function ProfileInfoLayout({
                   <LocalDataTransferCard profileId={profile.id} t={t} />
                 </div>
               </div>
-
             </div>
           )}
 

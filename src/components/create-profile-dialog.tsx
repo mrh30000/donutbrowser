@@ -12,8 +12,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { GoPlus } from "react-icons/go";
 import { LuCheck, LuChevronsUpDown, LuLoaderCircle } from "react-icons/lu";
+import { FingerprintConfigForm } from "@/components/fingerprint-config-form";
 import { LoadingButton } from "@/components/loading-button";
 import { ProxyFormDialog } from "@/components/proxy-form-dialog";
+import { SharedCamoufoxConfigForm } from "@/components/shared-camoufox-config-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -48,14 +50,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { FingerprintConfigForm } from "@/components/fingerprint-config-form";
-import { SharedCamoufoxConfigForm } from "@/components/shared-camoufox-config-form";
 import { useBrowserDownload } from "@/hooks/use-browser-download";
 import { useProxyEvents } from "@/hooks/use-proxy-events";
 import { useVpnEvents } from "@/hooks/use-vpn-events";
 import { getBrowserIcon } from "@/lib/browser-utils";
 import { cn } from "@/lib/utils";
-import type { BrowserReleaseTypes, CamoufoxConfig, CamoufoxOS, FingerprintProfile } from "@/types";
+import type {
+  BrowserReleaseTypes,
+  CamoufoxConfig,
+  CamoufoxOS,
+  FingerprintProfile,
+} from "@/types";
 
 const getCurrentOS = (): CamoufoxOS => {
   if (typeof navigator === "undefined") return "linux";
@@ -89,7 +94,7 @@ interface CreateProfileDialogProps {
     password?: string;
   }) => Promise<void>;
   selectedGroupId?: string;
-  }
+}
 
 interface BrowserOption {
   value: BrowserTypeString;
@@ -135,7 +140,8 @@ export function CreateProfileDialog({
 
   // Fingerprint profile state (advanced config)
   const [enableFingerprint, setEnableFingerprint] = useState(false);
-  const [fingerprintProfile, setFingerprintProfile] = useState<FingerprintProfile>({});
+  const [fingerprintProfile, setFingerprintProfile] =
+    useState<FingerprintProfile>({});
 
   // Handle browser selection from the initial screen
   const handleBrowserSelect = (browser: BrowserTypeString) => {
@@ -423,7 +429,9 @@ export function CreateProfileDialog({
           proxyId: resolvedProxyId,
           vpnId: resolvedVpnId,
           camoufoxConfig: finalCamoufoxConfig,
-          fingerprintProfile: enableFingerprint ? fingerprintProfile : undefined,
+          fingerprintProfile: enableFingerprint
+            ? fingerprintProfile
+            : undefined,
           groupId:
             selectedGroupId && selectedGroupId !== "__all__"
               ? selectedGroupId
@@ -584,7 +592,8 @@ export function CreateProfileDialog({
                               <LuLoaderCircle className="size-6 animate-spin" />
                             ) : (
                               (() => {
-                                const IconComponent = getBrowserIcon("camoufox");
+                                const IconComponent =
+                                  getBrowserIcon("camoufox");
                                 return IconComponent ? (
                                   <IconComponent className="size-6" />
                                 ) : null;
@@ -895,7 +904,8 @@ export function CreateProfileDialog({
                                 {t("createProfile.version.downloading", {
                                   browser: "Camoufox",
                                   version:
-                                    getBestAvailableVersion("camoufox")?.version,
+                                    getBestAvailableVersion("camoufox")
+                                      ?.version,
                                 })}
                               </div>
                             )}
@@ -923,19 +933,27 @@ export function CreateProfileDialog({
                                     }
                                   }}
                                 />
-                                <Label htmlFor="enable-fingerprint" className="font-medium">
+                                <Label
+                                  htmlFor="enable-fingerprint"
+                                  className="font-medium"
+                                >
                                   {t("fingerprintProfile.advancedConfig")}
                                 </Label>
                               </div>
                               <p className="text-sm text-muted-foreground ml-6">
-                                {t("fingerprintProfile.advancedConfigDescription")}
+                                {t(
+                                  "fingerprintProfile.advancedConfigDescription",
+                                )}
                               </p>
                             </div>
                             {enableFingerprint && (
                               <FingerprintConfigForm
                                 profile={fingerprintProfile}
                                 onChange={(updates) => {
-                                  setFingerprintProfile((prev) => ({ ...prev, ...updates }));
+                                  setFingerprintProfile((prev) => ({
+                                    ...prev,
+                                    ...updates,
+                                  }));
                                 }}
                               />
                             )}

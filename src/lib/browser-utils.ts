@@ -70,9 +70,7 @@ export function isCrossOsProfile(profile: {
   chrome_config?: { os?: string };
 }): boolean {
   const profileOs =
-    profile.host_os ||
-    profile.camoufox_config?.os ||
-    profile.chrome_config?.os;
+    profile.host_os || profile.camoufox_config?.os || profile.chrome_config?.os;
   if (!profileOs) return false;
   return profileOs !== getCurrentOS();
 }

@@ -136,7 +136,7 @@ interface ExtensionManagementDialogProps {
 export function ExtensionManagementDialog({
   isOpen,
   onClose,
-    subPage,
+  subPage,
   initialTab = "extensions",
 }: ExtensionManagementDialogProps) {
   const { t } = useTranslation();
@@ -1126,16 +1126,13 @@ export function ExtensionManagementDialog({
             >
               <div className="flex items-center justify-between gap-3 shrink-0">
                 <AnimatedTabsList>
-                  <AnimatedTabsTrigger
-                    value="extensions"
-                    
-                  >
+                  <AnimatedTabsTrigger value="extensions">
                     <span>{t("extensions.extensionsTab")}</span>
                     <span className="text-xs text-muted-foreground tabular-nums">
                       {extensions.length}
                     </span>
                   </AnimatedTabsTrigger>
-                  <AnimatedTabsTrigger value="groups" >
+                  <AnimatedTabsTrigger value="groups">
                     <span>{t("extensions.groupsTab")}</span>
                     <span className="text-xs text-muted-foreground tabular-nums">
                       {extensionGroups.length}
@@ -1147,7 +1144,6 @@ export function ExtensionManagementDialog({
                     <RippleButton
                       size="sm"
                       variant="outline"
-                      
                       onClick={() =>
                         document.getElementById("ext-file-input")?.click()
                       }
@@ -1159,7 +1155,6 @@ export function ExtensionManagementDialog({
                   {activeTab === "groups" && (
                     <RippleButton
                       size="sm"
-                      
                       onClick={() => setShowCreateGroup(true)}
                     >
                       <GoPlus className="size-4" />
@@ -1185,7 +1180,6 @@ export function ExtensionManagementDialog({
                     accept=".xpi,.crx,.zip"
                     className="hidden"
                     onChange={handleFileSelect}
-                    
                   />
 
                   {/* Upload form */}

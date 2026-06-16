@@ -1,15 +1,21 @@
 "use client";
 
 import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { open } from "@tauri-apps/plugin-dialog";
 import { readTextFile } from "@tauri-apps/plugin-fs";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { GoPlus } from "react-icons/go";
-import { LuChevronLeft, LuChevronRight, LuSearch, LuUpload, LuX } from "react-icons/lu";
+import {
+  LuChevronLeft,
+  LuChevronRight,
+  LuSearch,
+  LuUpload,
+  LuX,
+} from "react-icons/lu";
 import { getCurrentOS } from "@/lib/browser-utils";
-import { showSuccessToast, showErrorToast } from "@/lib/toast-utils";
+import { showErrorToast, showSuccessToast } from "@/lib/toast-utils";
 import { cn } from "@/lib/utils";
 import type { GroupWithCount } from "@/types";
 import { Button } from "./ui/button";
@@ -339,60 +345,60 @@ const HomeHeader = ({
 
       {showProfileToolbar && (
         <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="shrink-0">
-              <Button
-                size="sm"
-                data-onborda="create-profile"
-                onClick={() => {
-                  onCreateProfileDialogOpen(true);
-                }}
-                className="flex gap-1.5 items-center h-7 px-2.5 text-xs"
-              >
-                <GoPlus className="size-3.5" />
-                {t("header.newProfile")}
-              </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{t("header.createProfile")}</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="shrink-0">
-              <Button
-                size="sm"
-                onClick={() => {
-                  onBatchCreateDialogOpen(true);
-                }}
-                className="flex gap-1.5 items-center h-7 px-2.5 text-xs"
-                variant="outline"
-              >
-                <GoPlus className="size-3.5" />
-                {t("header.batchCreate")}
-              </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{t("batchCreate.title")}</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="shrink-0">
-              <Button
-                size="sm"
-                onClick={() => {
-                  void handleImportConfig();
-                }}
-                className="flex gap-1.5 items-center h-7 px-2.5 text-xs"
-                variant="outline"
-              >
-                <LuUpload className="size-3.5" />
-                {t("profileInfo.importConfig")}
-              </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{t("profileInfo.importConfig")}</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="shrink-0">
+                <Button
+                  size="sm"
+                  data-onborda="create-profile"
+                  onClick={() => {
+                    onCreateProfileDialogOpen(true);
+                  }}
+                  className="flex gap-1.5 items-center h-7 px-2.5 text-xs"
+                >
+                  <GoPlus className="size-3.5" />
+                  {t("header.newProfile")}
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{t("header.createProfile")}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="shrink-0">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    onBatchCreateDialogOpen(true);
+                  }}
+                  className="flex gap-1.5 items-center h-7 px-2.5 text-xs"
+                  variant="outline"
+                >
+                  <GoPlus className="size-3.5" />
+                  {t("header.batchCreate")}
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{t("batchCreate.title")}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="shrink-0">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    void handleImportConfig();
+                  }}
+                  className="flex gap-1.5 items-center h-7 px-2.5 text-xs"
+                  variant="outline"
+                >
+                  <LuUpload className="size-3.5" />
+                  {t("profileInfo.importConfig")}
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{t("profileInfo.importConfig")}</TooltipContent>
+          </Tooltip>
         </>
       )}
     </div>

@@ -6,6 +6,7 @@ import { getCurrent } from "@tauri-apps/plugin-deep-link";
 import { useOnborda } from "onborda";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { BatchCreateDialog } from "@/components/batch-create-dialog";
 import { BatchOperationsDialog } from "@/components/batch-operations-dialog";
 import { CamoufoxConfigDialog } from "@/components/camoufox-config-dialog";
 import { CamoufoxDeprecationDialog } from "@/components/camoufox-deprecation-dialog";
@@ -14,7 +15,6 @@ import { CloseConfirmDialog } from "@/components/close-confirm-dialog";
 import { CommandPalette } from "@/components/command-palette";
 import { CookieCopyDialog } from "@/components/cookie-copy-dialog";
 import { CookieManagementDialog } from "@/components/cookie-management-dialog";
-import { BatchCreateDialog } from "@/components/batch-create-dialog";
 import { CreateProfileDialog } from "@/components/create-profile-dialog";
 import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 import { ExtensionGroupAssignmentDialog } from "@/components/extension-group-assignment-dialog";
@@ -73,7 +73,7 @@ import type {
   CamoufoxConfig,
   FingerprintProfile,
   ProfileProxyDiagnosticResult,
-      WindowLayoutCapabilities,
+  WindowLayoutCapabilities,
   WindowLayoutOptions,
 } from "@/types";
 

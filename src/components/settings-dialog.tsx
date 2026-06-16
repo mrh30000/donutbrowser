@@ -1158,19 +1158,19 @@ export function SettingsDialog({
                   onCheckedChange={(checked) => {
                     updateSetting("disable_auto_updates", checked as boolean);
                   }}
-                  />
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="disable-auto-updates"
-                      className="text-sm font-medium"
-                    >
-                      {t("settings.disableAutoUpdates")}
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.disableAutoUpdatesDescription")}
-                    </p>
-                  </div>
+                />
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="disable-auto-updates"
+                    className="text-sm font-medium"
+                  >
+                    {t("settings.disableAutoUpdates")}
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    {t("settings.disableAutoUpdatesDescription")}
+                  </p>
                 </div>
+              </div>
 
               <div className="flex items-start gap-x-3 p-3 rounded-lg border">
                 <Checkbox

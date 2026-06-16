@@ -11,11 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type {
-  BrowserProfile,
-  CamoufoxConfig,
-  CamoufoxOS,
-} from "@/types";
+import type { BrowserProfile, CamoufoxConfig, CamoufoxOS } from "@/types";
 
 const getCurrentOS = (): CamoufoxOS => {
   if (typeof navigator === "undefined") return "linux";
@@ -69,10 +65,7 @@ export function CamoufoxConfigDialog({
     }
   }, [profile, isAntiDetectBrowser]);
 
-  const updateConfig = (
-    key: keyof CamoufoxConfig,
-    value: unknown,
-  ) => {
+  const updateConfig = (key: keyof CamoufoxConfig, value: unknown) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
   };
 

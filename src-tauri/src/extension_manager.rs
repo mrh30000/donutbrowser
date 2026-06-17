@@ -325,6 +325,7 @@ impl ExtensionManager {
       browser_compatibility,
       created_at: now,
       updated_at: now,
+      sync_enabled: false,
       last_sync: None,
       version,
       description,
@@ -520,6 +521,7 @@ impl ExtensionManager {
       extension_ids: Vec::new(),
       created_at: now,
       updated_at: now,
+      sync_enabled: false,
       last_sync: None,
     };
 

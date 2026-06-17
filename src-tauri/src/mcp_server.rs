@@ -153,7 +153,7 @@ impl McpServer {
   /// with enough state for support to diagnose, without leaking secrets.
   async fn require_capability(feature: &str, allowed: bool) -> Result<(), McpError> {
     if !allowed {
-      log::warn!("[mcp] Rejected '{feature}' — plan does not include it ({summary})");
+      log::warn!("[mcp] Rejected '{feature}' — plan does not include it");
       return Err(McpError {
         code: -32000,
         message: format!("{feature} requires a plan that includes this feature"),
@@ -1925,7 +1925,6 @@ impl McpServer {
         version,
         "stable",
         proxy_id,
-        None,
         None,
         None,
         None,

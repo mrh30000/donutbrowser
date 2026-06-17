@@ -357,7 +357,7 @@ impl VpnStorage {
       config_data: config_data.to_string(),
       created_at: Utc::now().timestamp(),
       last_used: None,
-      sync_enabled,
+      sync_enabled: false,
       last_sync: None,
       updated_at: Some(crate::proxy_manager::now_secs()),
     };
@@ -421,7 +421,7 @@ impl VpnStorage {
       config_data: content.to_string(),
       created_at: Utc::now().timestamp(),
       last_used: None,
-      sync_enabled,
+      sync_enabled: false,
       last_sync: None,
       updated_at: Some(crate::proxy_manager::now_secs()),
     };

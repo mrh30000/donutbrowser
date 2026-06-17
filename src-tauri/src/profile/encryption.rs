@@ -11,7 +11,15 @@
 //! Wrong password fails the AES-GCM auth tag on the first decrypt, which
 //! doubles as password verification.
 
-use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
+use aes_gcm::{
+  aead::{Aead, AeadCore, KeyInit, OsRng},
+  Aes256Gcm, Key,
+};
+use argon2::{password_hash::SaltString, Argon2};
+use base64::{
+  engine::general_purpose::{STANDARD as BASE64, URL_SAFE_NO_PAD},
+  Engine as _,
+};
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use ring::hmac;
 use std::collections::HashMap;
@@ -22,6 +30,100 @@ use std::time::SystemTime;
 
 /// Length of the on-disk HMAC filename in chars.
 const HMAC_FILENAME_LEN: usize = 32;
+
+/// Argon2id key-derivation cache, keyed on (sha256(password), salt).
+/// Entries are evicted whenever the user changes their password.
+type DerivedKeyCache = HashMap<([u8; 32], String), [u8; 32]>;
+static PROFILE_KEY_CACHE: std::sync::LazyLock<Mutex<DerivedKeyCache>> =
+  std::sync::LazyLock::new(|| Mutex::new(HashMap::new()));
+
+fn password_fingerprint(pwd: &str) -> [u8; 32] {
+  use sha2::{Digest, Sha256};
+  let mut hasher = Sha256::new();
+  hasher.update(pwd.as_bytes());
+  let result = hasher.finalize();
+  let mut out = [0u8; 32];
+  out.copy_from_slice(&result);
+  out
+}
+
+/// AES-256-GCM encrypt: `nonce(12B) || ciphertext`.
+pub fn encrypt_bytes(key: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>, String> {
+  let aes_key = Key::<Aes256Gcm>::from(*key);
+  let cipher = Aes256Gcm::new(&aes_key);
+  let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
+
+  let ciphertext = cipher
+    .encrypt(&nonce, plaintext)
+    .map_err(|e| format!("Encryption failed: {e}"))?;
+
+  let mut output = Vec::with_capacity(12 + ciphertext.len());
+  output.extend_from_slice(&nonce);
+  output.extend_from_slice(&ciphertext);
+  Ok(output)
+}
+
+/// AES-256-GCM decrypt of bytes produced by [`encrypt_bytes`].
+pub fn decrypt_bytes(key: &[u8; 32], encrypted: &[u8]) -> Result<Vec<u8>, String> {
+  if encrypted.len() < 12 {
+    return Err("Encrypted data too short".to_string());
+  }
+
+  let nonce_bytes: [u8; 12] = encrypted[..12].try_into().map_err(|_| "Invalid nonce")?;
+  let nonce = aes_gcm::Nonce::from(nonce_bytes);
+  let ciphertext = &encrypted[12..];
+
+  let aes_key = Key::<Aes256Gcm>::from(*key);
+  let cipher = Aes256Gcm::new(&aes_key);
+
+  cipher
+    .decrypt(&nonce, ciphertext)
+    .map_err(|e| format!("Decryption failed: {e}"))
+}
+
+/// 16-byte random salt, base64-encoded.
+pub fn generate_salt() -> String {
+  use aes_gcm::aead::rand_core::RngCore;
+  let mut salt = [0u8; 16];
+  OsRng.fill_bytes(&mut salt);
+  BASE64.encode(salt)
+}
+
+/// Derive a 32-byte AES key from `user_password` + base64 `profile_salt`
+/// via Argon2id. Results are cached by (sha256(password), salt).
+pub fn derive_profile_key(user_password: &str, profile_salt: &str) -> Result<[u8; 32], String> {
+  let pwd_fp = password_fingerprint(user_password);
+  let cache_key = (pwd_fp, profile_salt.to_string());
+
+  if let Ok(cache) = PROFILE_KEY_CACHE.lock() {
+    if let Some(cached) = cache.get(&cache_key) {
+      return Ok(*cached);
+    }
+  }
+
+  let salt_bytes = BASE64
+    .decode(profile_salt)
+    .map_err(|e| format!("Invalid salt encoding: {e}"))?;
+
+  let salt = SaltString::encode_b64(&salt_bytes)
+    .map_err(|e| format!("Failed to create salt string: {e}"))?;
+
+  let argon2 = Argon2::default();
+  let password_hash = argon2
+    .hash_password(user_password.as_bytes(), &salt)
+    .map_err(|e| format!("Key derivation failed: {e}"))?;
+  let hash_value = password_hash.hash.unwrap();
+  let hash_bytes = hash_value.as_bytes();
+
+  let mut key = [0u8; 32];
+  key.copy_from_slice(&hash_bytes[..32]);
+
+  if let Ok(mut cache) = PROFILE_KEY_CACHE.lock() {
+    cache.insert(cache_key, key);
+  }
+
+  Ok(key)
+}
 
 /// Marker file written into encrypted profile dirs so launch code can verify
 /// the password before attempting to decrypt actual user data files.

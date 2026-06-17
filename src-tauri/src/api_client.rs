@@ -265,6 +265,889 @@ pub fn is_nightly_version(version: &str) -> bool {
   version_comp.pre_release.is_some()
 }
 
+/// Centralized function to determine if a browser version/release is nightly/prerelease
+/// This is the single source of truth for nightly detection across the entire codebase
+pub fn is_browser_version_nightly(
+  browser: &str,
+  version: &str,
+  release_name: Option<&str>,
+) -> bool {
+  match browser {
+    "zen" => {
+      // For Zen Browser, only "twilight" is considered nightly
+      version.to_lowercase() == "twilight"
+    }
+    "brave" => {
+      // For Brave Browser, only releases whose name starts with "Release" (case-insensitive) are stable.
+      if let Some(name) = release_name {
+        let normalized = name.trim_start().to_ascii_lowercase();
+        return !normalized.starts_with("release");
+      }
+
+      // Fallback: try cached GitHub releases
+      if let Some(releases) = ApiClient::instance().get_cached_github_releases("brave") {
+        if let Some(found) = releases.iter().find(|r| r.tag_name == version) {
+          let normalized = found.name.trim_start().to_ascii_lowercase();
+          return !normalized.starts_with("release");
+        }
+      }
+
+      // Last resort: when no name available, treat as nightly (non-Release)
+      true
+    }
+    "firefox-developer" => {
+      // For Firefox Developer Edition, always treat as nightly/prerelease
+      // This ensures consistent behavior regardless of cache state or API response parsing
+      true
+    }
+    "firefox" => {
+      // For Firefox, use the category from the API response to determine stability
+      // This will be handled in the API parsing, so this fallback is for cached versions
+      is_nightly_version(version)
+    }
+    "chromium" => {
+      // Chromium builds are generally stable snapshots
+      false
+    }
+    "camoufox" => {
+      // For Camoufox, beta versions are actually the stable releases
+      false
+    }
+    _ => {
+      // Default fallback
+      is_nightly_version(version)
+    }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FirefoxRelease {
+  pub build_number: u32,
+  pub category: String,
+  pub date: String,
+  pub description: Option<String>,
+  pub is_security_driven: bool,
+  pub product: String,
+  pub version: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FirefoxApiResponse {
+  pub releases: HashMap<String, FirefoxRelease>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct BrowserRelease {
+  pub version: String,
+  pub date: String,
+  pub is_prerelease: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct CachedVersionData {
+  releases: Vec<BrowserRelease>,
+  timestamp: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct CachedGithubData {
+  releases: Vec<GithubRelease>,
+  timestamp: u64,
+}
+
+pub struct ApiClient {
+  client: Client,
+  firefox_api_base: String,
+  firefox_dev_api_base: String,
+  github_api_base: String,
+  chromium_api_base: String,
+}
+
+impl ApiClient {
+  pub fn new() -> Self {
+    let client = Client::builder()
+      .timeout(std::time::Duration::from_secs(30))
+      .build()
+      .unwrap_or_else(|_| Client::new());
+
+    Self {
+      client,
+      firefox_api_base: "https://product-details.mozilla.org/1.0".to_string(),
+      firefox_dev_api_base: "https://product-details.mozilla.org/1.0".to_string(),
+      github_api_base: "https://api.github.com".to_string(),
+      chromium_api_base: "https://commondatastorage.googleapis.com/chromium-browser-snapshots"
+        .to_string(),
+    }
+  }
+
+  async fn fetch_github_releases_multiple_pages(
+    &self,
+    base_releases_url: &str,
+  ) -> Result<Vec<GithubRelease>, Box<dyn std::error::Error + Send + Sync>> {
+    let mut all_releases: Vec<GithubRelease> = Vec::new();
+
+    // For now, only fetch 1 page
+    for page in 1..=1 {
+      let url = format!("{base_releases_url}?per_page=100&page={page}");
+      let response = self
+        .client
+        .get(&url)
+        .header(
+          "User-Agent",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        )
+        .send()
+        .await?;
+
+      if !response.status().is_success() {
+        // If the first page fails, propagate error; otherwise stop pagination
+        if page == 1 {
+          return Err(
+            format!(
+              "GitHub API returned status for page {}: {}",
+              page,
+              response.status()
+            )
+            .into(),
+          );
+        } else {
+          break;
+        }
+      }
+
+      let text = response.text().await?;
+      let mut page_releases: Vec<GithubRelease> = serde_json::from_str(&text).map_err(|e| {
+        log::error!("Failed to parse GitHub API response (page {page}): {e}");
+        log::error!(
+          "Response text (first 500 chars): {}",
+          if text.len() > 500 {
+            &text[..500]
+          } else {
+            &text
+          }
+        );
+        format!("Failed to parse GitHub API response: {e}")
+      })?;
+
+      if page_releases.is_empty() {
+        break;
+      }
+
+      all_releases.append(&mut page_releases);
+    }
+
+    Ok(all_releases)
+  }
+
+  pub fn instance() -> &'static ApiClient {
+    &API_CLIENT
+  }
+
+  #[cfg(test)]
+  pub fn new_with_base_urls(
+    firefox_api_base: String,
+    firefox_dev_api_base: String,
+    github_api_base: String,
+    chromium_api_base: String,
+  ) -> Self {
+    Self {
+      client: Client::new(),
+      firefox_api_base,
+      firefox_dev_api_base,
+      github_api_base,
+      chromium_api_base,
+    }
+  }
+
+  fn get_cache_dir() -> Result<PathBuf, Box<dyn std::error::Error + Send + Sync>> {
+    let cache_dir = crate::app_dirs::cache_dir().join("version_cache");
+    fs::create_dir_all(&cache_dir)?;
+    Ok(cache_dir)
+  }
+
+  fn get_current_timestamp() -> u64 {
+    SystemTime::now()
+      .duration_since(UNIX_EPOCH)
+      .unwrap_or_default()
+      .as_secs()
+  }
+
+  fn is_cache_valid(timestamp: u64) -> bool {
+    let current_time = Self::get_current_timestamp();
+    let cache_duration = 10 * 60; // 10 minutes in seconds
+    current_time - timestamp < cache_duration
+  }
+
+  pub fn load_cached_versions(&self, browser: &str) -> Option<Vec<BrowserRelease>> {
+    let cache_dir = Self::get_cache_dir().ok()?;
+    let cache_file = cache_dir.join(format!("{browser}_versions.json"));
+
+    if !cache_file.exists() {
+      return None;
+    }
+
+    let content = fs::read_to_string(&cache_file).ok()?;
+    if let Ok(cached) = serde_json::from_str::<CachedVersionData>(&content) {
+      // Always return cached releases regardless of age - they're always valid
+      log::info!("Using cached versions for {browser}");
+      return Some(cached.releases);
+    }
+
+    // Backward compatibility: legacy caches stored just an array of version strings
+    if let Ok(legacy_versions) = serde_json::from_str::<Vec<String>>(&content) {
+      log::info!("Using legacy cached versions for {browser}; upgrading in-memory");
+      let releases: Vec<BrowserRelease> = legacy_versions
+        .into_iter()
+        .map(|version| BrowserRelease {
+          is_prerelease: is_browser_version_nightly(browser, &version, None),
+          version,
+          date: "".to_string(),
+        })
+        .collect();
+      return Some(releases);
+    }
+
+    None
+  }
+
+  pub fn is_cache_expired(&self, browser: &str) -> bool {
+    let cache_dir = match Self::get_cache_dir() {
+      Ok(dir) => dir,
+      Err(_) => return true, // If we can't get cache dir, consider expired
+    };
+    let cache_file = cache_dir.join(format!("{browser}_versions.json"));
+
+    if !cache_file.exists() {
+      return true; // No cache file means expired
+    }
+
+    let content = match fs::read_to_string(&cache_file) {
+      Ok(content) => content,
+      Err(_) => return true, // Can't read cache, consider expired
+    };
+
+    let cached_data: CachedVersionData = match serde_json::from_str(&content) {
+      Ok(data) => data,
+      Err(_) => return true, // Can't parse cache, consider expired
+    };
+
+    // Check if cache is older than 10 minutes
+    !Self::is_cache_valid(cached_data.timestamp)
+  }
+
+  pub fn save_cached_versions(
+    &self,
+    browser: &str,
+    releases: &[BrowserRelease],
+  ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let cache_dir = Self::get_cache_dir()?;
+    let cache_file = cache_dir.join(format!("{browser}_versions.json"));
+
+    let cached_data = CachedVersionData {
+      releases: releases.to_vec(),
+      timestamp: Self::get_current_timestamp(),
+    };
+
+    let content = serde_json::to_string_pretty(&cached_data)?;
+    fs::write(&cache_file, content)?;
+    log::info!("Cached {} versions for {}", releases.len(), browser);
+    Ok(())
+  }
+
+  fn load_cached_github_releases(&self, browser: &str) -> Option<Vec<GithubRelease>> {
+    let cache_dir = Self::get_cache_dir().ok()?;
+    let cache_file = cache_dir.join(format!("{browser}_github.json"));
+
+    if !cache_file.exists() {
+      return None;
+    }
+
+    let content = fs::read_to_string(&cache_file).ok()?;
+    let cached_data: CachedGithubData = serde_json::from_str(&content).ok()?;
+
+    // Always use cached GitHub releases - cache never expires, only gets updated with new versions
+    Some(cached_data.releases)
+  }
+
+  /// Public accessor for cached GitHub releases (used by other modules for classification)
+  pub fn get_cached_github_releases(&self, browser: &str) -> Option<Vec<GithubRelease>> {
+    self.load_cached_github_releases(browser)
+  }
+
+  fn save_cached_github_releases(
+    &self,
+    browser: &str,
+    releases: &[GithubRelease],
+  ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let cache_dir = Self::get_cache_dir()?;
+    let cache_file = cache_dir.join(format!("{browser}_github.json"));
+
+    let cached_data = CachedGithubData {
+      releases: releases.to_vec(),
+      timestamp: Self::get_current_timestamp(),
+    };
+
+    let content = serde_json::to_string_pretty(&cached_data)?;
+    fs::write(&cache_file, content)?;
+    log::info!("Cached {} GitHub releases for {}", releases.len(), browser);
+    Ok(())
+  }
+
+  pub async fn fetch_firefox_releases_with_caching(
+    &self,
+    no_caching: bool,
+  ) -> Result<Vec<BrowserRelease>, Box<dyn std::error::Error + Send + Sync>> {
+    // Check cache first (unless bypassing)
+    if !no_caching {
+      if let Some(cached_releases) = self.load_cached_versions("firefox") {
+        return Ok(cached_releases);
+      }
+    }
+
+    log::info!("Fetching Firefox releases from Mozilla API...");
+    let url = format!("{}/firefox.json", self.firefox_api_base);
+
+    let response = self
+      .client
+      .get(url)
+      .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36")
+      .send()
+      .await?;
+
+    if !response.status().is_success() {
+      return Err(format!("Failed to fetch Firefox versions: {}", response.status()).into());
+    }
+
+    let firefox_response: FirefoxApiResponse = response.json().await?;
+
+    // Extract releases and filter for stable versions
+    let mut releases: Vec<BrowserRelease> = firefox_response
+      .releases
+      .into_iter()
+      .filter_map(|(key, release)| {
+        // Only include releases that start with "firefox-" and have proper version format
+        if key.starts_with("firefox-") && !release.version.is_empty() {
+          let is_stable = matches!(release.category.as_str(), "major" | "stability");
+          Some(BrowserRelease {
+            version: release.version.clone(),
+            date: release.date,
+            is_prerelease: !is_stable,
+          })
+        } else {
+          None
+        }
+      })
+      .collect();
+
+    // Sort by version number in descending order (newest first)
+    releases.sort_by(|a, b| {
+      let version_a = VersionComponent::parse(&a.version);
+      let version_b = VersionComponent::parse(&b.version);
+      version_b.cmp(&version_a)
+    });
+
+    // Cache the results (unless bypassing cache)
+    if !no_caching {
+      if let Err(e) = self.save_cached_versions("firefox", &releases) {
+        log::error!("Failed to cache Firefox versions: {e}");
+      }
+    }
+
+    Ok(releases)
+  }
+
+  pub async fn fetch_firefox_developer_releases_with_caching(
+    &self,
+    no_caching: bool,
+  ) -> Result<Vec<BrowserRelease>, Box<dyn std::error::Error + Send + Sync>> {
+    // Check cache first (unless bypassing)
+    if !no_caching {
+      if let Some(cached_releases) = self.load_cached_versions("firefox-developer") {
+        return Ok(cached_releases);
+      }
+    }
+
+    log::info!("Fetching Firefox Developer Edition releases from Mozilla API...");
+    let url = format!("{}/devedition.json", self.firefox_dev_api_base);
+
+    let response = self
+      .client
+      .get(&url)
+      .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36")
+      .send()
+      .await?;
+
+    if !response.status().is_success() {
+      let error_msg = format!(
+        "Failed to fetch Firefox Developer Edition versions: {} - URL: {}",
+        response.status(),
+        url
+      );
+      log::error!("{error_msg}");
+      return Err(error_msg.into());
+    }
+
+    let firefox_response: FirefoxApiResponse = response.json().await?;
+
+    // Extract releases and filter for developer edition versions
+    let mut releases: Vec<BrowserRelease> = firefox_response
+      .releases
+      .into_iter()
+      .filter_map(|(key, release)| {
+        // Only include releases that start with "devedition-" and have proper version format
+        if key.starts_with("devedition-") && !release.version.is_empty() {
+          let is_stable = matches!(release.category.as_str(), "major" | "stability");
+          Some(BrowserRelease {
+            version: release.version.clone(),
+            date: release.date,
+            is_prerelease: !is_stable,
+          })
+        } else {
+          None
+        }
+      })
+      .collect();
+
+    // Sort by version number in descending order (newest first)
+    releases.sort_by(|a, b| {
+      let version_a = VersionComponent::parse(&a.version);
+      let version_b = VersionComponent::parse(&b.version);
+      version_b.cmp(&version_a)
+    });
+
+    // Cache the results (unless bypassing cache)
+    if !no_caching {
+      if let Err(e) = self.save_cached_versions("firefox-developer", &releases) {
+        log::error!("Failed to cache Firefox Developer versions: {e}");
+      }
+    }
+
+    Ok(releases)
+  }
+
+  pub async fn fetch_zen_releases_with_caching(
+    &self,
+    no_caching: bool,
+  ) -> Result<Vec<GithubRelease>, Box<dyn std::error::Error + Send + Sync>> {
+    // Check cache first (unless bypassing)
+    if !no_caching {
+      if let Some(cached_releases) = self.load_cached_github_releases("zen") {
+        return Ok(cached_releases);
+      }
+    }
+
+    log::info!("Fetching Zen releases from GitHub API");
+    let base_url = format!(
+      "{}/repos/zen-browser/desktop/releases",
+      self.github_api_base
+    );
+    let mut releases: Vec<GithubRelease> =
+      self.fetch_github_releases_multiple_pages(&base_url).await?;
+
+    // Check for twilight updates and mark alpha releases
+    for release in &mut releases {
+      // Use browser-specific alpha detection for Zen Browser - only "twilight" is nightly
+      release.is_nightly =
+        is_browser_version_nightly("zen", &release.tag_name, Some(&release.name));
+
+      // Check for twilight update if this is a twilight release
+      if release.tag_name.to_lowercase() == "twilight" {
+        if let Ok(has_update) = self.check_twilight_update(release).await {
+          if has_update {
+            log::info!(
+              "Detected update for Zen twilight release: {}",
+              release.tag_name
+            );
+          }
+        }
+      }
+    }
+
+    // Sort releases using the new version sorting system
+    sort_github_releases(&mut releases);
+
+    // Cache the results (unless bypassing cache)
+    if !no_caching {
+      if let Err(e) = self.save_cached_github_releases("zen", &releases) {
+        log::error!("Failed to cache Zen releases: {e}");
+      }
+    }
+
+    Ok(releases)
+  }
+
+  pub async fn fetch_brave_releases_with_caching(
+    &self,
+    no_caching: bool,
+  ) -> Result<Vec<GithubRelease>, Box<dyn std::error::Error + Send + Sync>> {
+    // Check cache first (unless bypassing)
+    if !no_caching {
+      if let Some(cached_releases) = self.load_cached_github_releases("brave") {
+        return Ok(cached_releases);
+      }
+    }
+
+    log::info!("Fetching Brave releases from GitHub API");
+    let base_url = format!(
+      "{}/repos/brave/brave-browser/releases",
+      self.github_api_base
+    );
+    let releases: Vec<GithubRelease> = self.fetch_github_releases_multiple_pages(&base_url).await?;
+
+    // Get platform info to filter appropriate releases
+    let (os, _) = Self::get_platform_info();
+
+    // Filter releases that have assets compatible with the current platform
+    let mut filtered_releases: Vec<GithubRelease> = releases
+      .into_iter()
+      .filter_map(|mut release| {
+        // Check if this release has compatible assets for the current platform
+        let has_compatible_asset = Self::has_compatible_brave_asset(&release.assets, &os);
+
+        if has_compatible_asset {
+          // Use the centralized nightly detection function
+          release.is_nightly =
+            is_browser_version_nightly("brave", &release.tag_name, Some(&release.name));
+          Some(release)
+        } else {
+          None
+        }
+      })
+      .collect();
+
+    // Sort releases using the new version sorting system
+    sort_github_releases(&mut filtered_releases);
+
+    if let Err(e) = self.save_cached_github_releases("brave", &filtered_releases) {
+      log::error!("Failed to cache Brave releases: {e}");
+    }
+
+    Ok(filtered_releases)
+  }
+
+  /// Check if a Camoufox release has compatible assets for the given platform and architecture
+  fn has_compatible_camoufox_asset(
+    &self,
+    assets: &[crate::browser::GithubAsset],
+    os: &str,
+    arch: &str,
+  ) -> bool {
+    let (os_name, arch_name) = match (os, arch) {
+      ("windows", "x64") => ("win", "x86_64"),
+      ("windows", "arm64") => ("win", "arm64"),
+      ("linux", "x64") => ("lin", "x86_64"),
+      ("linux", "arm64") => ("lin", "arm64"),
+      ("macos", "x64") => ("mac", "x86_64"),
+      ("macos", "arm64") => ("mac", "arm64"),
+      _ => return false,
+    };
+
+    // Look for assets matching the pattern: camoufox-{version}-beta.{number}-{os}.{arch}.zip
+    // The separator before OS is a dash, e.g., camoufox-135.0.1-beta.24-lin.x86_64.zip
+    let pattern = format!("-{os_name}.{arch_name}.zip");
+    assets.iter().any(|asset| {
+      let name = asset.name.to_lowercase();
+      name.starts_with("camoufox-") && name.ends_with(&pattern)
+    })
+  }
+
+  fn has_compatible_brave_asset(assets: &[crate::browser::GithubAsset], os: &str) -> bool {
+    match os {
+      "windows" => {
+        // For Windows, look for standalone setup EXE (not the auto-updater one)
+        assets.iter().any(|asset| {
+          let name = asset.name.to_lowercase();
+          name.contains("standalone") && name.ends_with(".exe") && !name.contains("silent")
+        }) || assets.iter().any(|asset| asset.name.ends_with(".exe"))
+      }
+      "macos" => {
+        // For macOS, prefer universal DMG
+        assets.iter().any(|asset| {
+          let name = asset.name.to_lowercase();
+          name.contains("universal") && name.ends_with(".dmg")
+        }) || assets.iter().any(|asset| asset.name.ends_with(".dmg"))
+      }
+      "linux" => {
+        if assets.iter().any(|asset| {
+          let name = asset.name.to_lowercase();
+          name.contains("lin")
+        }) {
+          return true;
+        }
+
+        false
+      }
+      _ => false,
+    }
+  }
+
+  /// Get platform and architecture information  
+  fn get_platform_info() -> (String, String) {
+    let os = if cfg!(target_os = "windows") {
+      "windows"
+    } else if cfg!(target_os = "linux") {
+      "linux"
+    } else if cfg!(target_os = "macos") {
+      "macos"
+    } else {
+      "unknown"
+    };
+
+    let arch = if cfg!(target_arch = "x86_64") {
+      "x64"
+    } else if cfg!(target_arch = "aarch64") {
+      "arm64"
+    } else {
+      "unknown"
+    };
+
+    (os.to_string(), arch.to_string())
+  }
+
+  pub async fn fetch_chromium_latest_version(
+    &self,
+  ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    // Use platform-aware URL for Chromium to match download URL generation
+    let (os, arch) = Self::get_platform_info();
+    let platform_str = match (&os[..], &arch[..]) {
+      ("windows", "x64") => "Win_x64",
+      ("windows", "arm64") => "Win_Arm64",
+      ("linux", "x64") => "Linux_x64",
+      ("linux", "arm64") => return Err("Chromium doesn't support ARM64 on Linux".into()),
+      ("macos", "x64") => "Mac",
+      ("macos", "arm64") => "Mac_Arm",
+      _ => {
+        return Err(format!("Unsupported platform/architecture for Chromium: {os}/{arch}").into())
+      }
+    };
+    let url = format!("{}/{platform_str}/LAST_CHANGE", self.chromium_api_base);
+    let version = self
+      .client
+      .get(&url)
+      .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36")
+      .send()
+      .await?
+      .text()
+      .await?
+      .trim()
+      .to_string();
+
+    Ok(version)
+  }
+
+  pub async fn fetch_chromium_releases_with_caching(
+    &self,
+    no_caching: bool,
+  ) -> Result<Vec<BrowserRelease>, Box<dyn std::error::Error + Send + Sync>> {
+    // Check cache first (unless bypassing)
+    if !no_caching {
+      if let Some(cached_releases) = self.load_cached_versions("chromium") {
+        return Ok(cached_releases);
+      }
+    }
+
+    log::info!("Fetching Chromium releases...");
+
+    // Get the latest version first
+    let latest_version = self.fetch_chromium_latest_version().await?;
+    let latest_num: u32 = latest_version.parse().unwrap_or(0);
+
+    // Generate a list of recent versions (last 20 builds, going back by 1000 each time)
+    let mut versions = Vec::new();
+    for i in 0..20 {
+      let version_num = latest_num.saturating_sub(i * 1000);
+      if version_num > 0 {
+        versions.push(version_num.to_string());
+      }
+    }
+
+    // Convert to BrowserRelease objects
+    let releases: Vec<BrowserRelease> = versions
+      .into_iter()
+      .map(|version| BrowserRelease {
+        version: version.clone(),
+        date: "".to_string(),
+        is_prerelease: false,
+      })
+      .collect();
+
+    // Cache the results (unless bypassing cache)
+    if !no_caching {
+      if let Err(e) = self.save_cached_versions("chromium", &releases) {
+        log::error!("Failed to cache Chromium versions: {e}");
+      }
+    }
+
+    Ok(releases)
+  }
+
+  pub async fn fetch_camoufox_releases_with_caching(
+    &self,
+    no_caching: bool,
+  ) -> Result<Vec<GithubRelease>, Box<dyn std::error::Error + Send + Sync>> {
+    // Check cache first (unless bypassing)
+    if !no_caching {
+      if let Some(cached_releases) = self.load_cached_github_releases("camoufox") {
+        log::info!(
+          "Using cached Camoufox releases, count: {}",
+          cached_releases.len()
+        );
+        return Ok(cached_releases);
+      }
+    }
+
+    log::info!("Fetching Camoufox releases from GitHub API");
+    let base_url = format!("{}/repos/daijro/camoufox/releases", self.github_api_base);
+    let releases: Vec<GithubRelease> = self.fetch_github_releases_multiple_pages(&base_url).await?;
+
+    log::info!(
+      "Fetched {} total Camoufox releases from GitHub",
+      releases.len()
+    );
+
+    // Get platform info to filter appropriate releases
+    let (os, arch) = Self::get_platform_info();
+    log::info!("Filtering for platform: {os}/{arch}");
+
+    // Filter releases that have assets compatible with the current platform
+    let mut compatible_releases: Vec<GithubRelease> = releases
+      .into_iter()
+      .enumerate()
+      .filter_map(|(i, release)| {
+        let has_compatible = self.has_compatible_camoufox_asset(&release.assets, &os, &arch);
+        if !has_compatible {
+          log::info!(
+            "Release {} ({}) has no compatible assets for {}/{}",
+            i,
+            release.tag_name,
+            os,
+            arch
+          );
+          log::info!(
+            "  Available assets: {:?}",
+            release.assets.iter().map(|a| &a.name).collect::<Vec<_>>()
+          );
+        }
+        if has_compatible {
+          Some(release)
+        } else {
+          None
+        }
+      })
+      .collect();
+
+    log::info!(
+      "After platform filtering: {} compatible releases",
+      compatible_releases.len()
+    );
+
+    // Sort by version (latest first) with debugging
+    log::info!(
+      "Before sorting: {:?}",
+      compatible_releases
+        .iter()
+        .map(|r| &r.tag_name)
+        .take(10)
+        .collect::<Vec<_>>()
+    );
+    sort_github_releases(&mut compatible_releases);
+    log::info!(
+      "After sorting: {:?}",
+      compatible_releases
+        .iter()
+        .map(|r| &r.tag_name)
+        .take(10)
+        .collect::<Vec<_>>()
+    );
+
+    // Cache the results (unless bypassing cache)
+    if !no_caching {
+      if let Err(e) = self.save_cached_github_releases("camoufox", &compatible_releases) {
+        log::error!("Failed to cache Camoufox releases: {e}");
+      } else {
+        log::info!("Cached {} Camoufox releases", compatible_releases.len());
+      }
+    }
+
+    Ok(compatible_releases)
+  }
+
+  /// Check if a Zen twilight release has been updated by comparing file size
+  pub async fn check_twilight_update(
+    &self,
+    release: &GithubRelease,
+  ) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
+    if release.tag_name.to_lowercase() != "twilight" {
+      return Ok(false); // Not a twilight release
+    }
+
+    // Find the macOS universal DMG asset
+    let asset = release
+      .assets
+      .iter()
+      .find(|asset| asset.name == "zen.macos-universal.dmg")
+      .ok_or("No macOS universal asset found for twilight release")?;
+
+    // Check if we have cached file size information
+    let cache_dir = Self::get_cache_dir()?;
+    let twilight_cache_file = cache_dir.join("zen_twilight_info.json");
+
+    #[derive(serde::Serialize, serde::Deserialize)]
+    struct TwilightInfo {
+      file_size: u64,
+      last_updated: u64,
+    }
+
+    let current_info = TwilightInfo {
+      file_size: asset.size,
+      last_updated: Self::get_current_timestamp(),
+    };
+
+    if !twilight_cache_file.exists() {
+      // No cache exists, save current info and return true (new)
+      let content = serde_json::to_string_pretty(&current_info)?;
+      fs::write(&twilight_cache_file, content)?;
+      return Ok(true);
+    }
+
+    let cached_content = fs::read_to_string(&twilight_cache_file)?;
+    let cached_info: TwilightInfo = serde_json::from_str(&cached_content)?;
+
+    // Check if file size has changed
+    if cached_info.file_size != current_info.file_size {
+      // File size changed, update cache and return true
+      let content = serde_json::to_string_pretty(&current_info)?;
+      fs::write(&twilight_cache_file, content)?;
+      log::info!(
+        "Zen twilight release updated: file size changed from {} to {}",
+        cached_info.file_size,
+        current_info.file_size
+      );
+      return Ok(true);
+    }
+
+    Ok(false) // No update detected
+  }
+
+  pub fn clear_all_cache(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let cache_dir = Self::get_cache_dir()?;
+
+    if cache_dir.exists() {
+      // Remove all cache files
+      for entry in fs::read_dir(&cache_dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_file() {
+          fs::remove_file(&path)?;
+          log::info!("Removed cache file: {path:?}");
+        }
+      }
+      log::info!("All version cache cleared successfully");
+    }
+
+    Ok(())
+  }
+}
 
 // Global singleton instance
 lazy_static::lazy_static! {

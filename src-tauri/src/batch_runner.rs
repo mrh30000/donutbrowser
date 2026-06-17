@@ -156,9 +156,10 @@ pub async fn batch_launch_profiles(
       .expect("batch semaphore closed unexpectedly");
     let handle = app_handle.clone();
     let interval = options.launch_interval_ms;
+    let task_id_for_spawn = task_id.clone();
     handles.push(tokio::spawn(async move {
       let _permit = permit;
-      emit_status(&task_id, &profile, BatchProfileStatus::Launching, None);
+      emit_status(&task_id_for_spawn, &profile, BatchProfileStatus::Launching, None);
 
       let result = crate::browser_runner::launch_browser_profile_impl(
         handle,
@@ -172,13 +173,13 @@ pub async fn batch_launch_profiles(
 
       let outcome = match result {
         Ok(updated) => {
-          emit_status(&task_id, &updated, BatchProfileStatus::Running, None);
-          emit_status(&task_id, &updated, BatchProfileStatus::Completed, None);
+          emit_status(&task_id_for_spawn, &updated, BatchProfileStatus::Running, None);
+          emit_status(&task_id_for_spawn, &updated, BatchProfileStatus::Completed, None);
           Ok(())
         }
         Err(error) => {
           emit_status(
-            &task_id,
+            &task_id_for_spawn,
             &profile,
             BatchProfileStatus::Failed,
             Some("BATCH_LAUNCH_FAILED".to_string()),

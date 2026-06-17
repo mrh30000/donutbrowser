@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::RngExt;
 
 /// Generate a random noise seed for AudioContext spoofing.
 /// Returns an i32 in the range [-50, 50], matching Camoufox's canvas:aaOffset pattern.

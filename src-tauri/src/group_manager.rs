@@ -90,7 +90,7 @@ impl GroupManager {
     let group = ProfileGroup {
       id: uuid::Uuid::new_v4().to_string(),
       name,
-      sync_enabled,
+      sync_enabled: false,
       last_sync: None,
       updated_at: Some(crate::proxy_manager::now_secs()),
     };

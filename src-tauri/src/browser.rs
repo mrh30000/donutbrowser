@@ -375,9 +375,7 @@ mod windows {
     browser_type: &BrowserType,
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     // On Windows, look for .exe files
-    let possible_paths: Vec<PathBuf> = match browser_type {
-      _ => vec![],
-    };
+    let possible_paths: Vec<PathBuf> = vec![];
 
     for path in &possible_paths {
       if path.exists() && path.is_file() {
@@ -443,9 +441,7 @@ mod windows {
 
   pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
     // On Windows, check for .exe files
-    let possible_executables: Vec<PathBuf> = match browser_type {
-      _ => vec![],
-    };
+    let possible_executables: Vec<PathBuf> = vec![];
 
     for exe_path in &possible_executables {
       if exe_path.exists() && exe_path.is_file() {

@@ -98,7 +98,6 @@ pub struct UpdateProfileRequest {
   pub tags: Option<Vec<String>>,
   pub extension_group_id: Option<String>,
   pub proxy_bypass_rules: Option<Vec<String>>,
-  /// One of "Disabled", "Regular", "Encrypted".
 }
 
 #[derive(Clone)]

@@ -179,8 +179,8 @@ mod macos {
 
     Ok(executable_path)
   }
+}
 
-  
 #[cfg(target_os = "linux")]
 mod linux {
   use super::*;
@@ -728,8 +728,8 @@ mod tests {
       "Browser should include headless flag when requested"
     );
   }
+}
 
-  
 // Global singleton instance
 lazy_static::lazy_static! {
   static ref BROWSER_FACTORY: BrowserFactory = BrowserFactory::new();

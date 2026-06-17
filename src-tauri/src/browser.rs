@@ -179,6 +179,40 @@ mod macos {
 
     Ok(executable_path)
   }
+
+  pub fn is_firefox_version_downloaded(install_dir: &Path) -> bool {
+    let possible_executables = vec![
+      install_dir.join("camoufox-bin"),
+      install_dir.join("camoufox"),
+    ];
+
+    for exe_path in &possible_executables {
+      if exe_path.exists() {
+        return true;
+      }
+    }
+
+    if let Ok(entries) = std::fs::read_dir(install_dir) {
+      for entry in entries.flatten() {
+        if entry.path().extension().is_some_and(|ext| ext == "app") {
+          return true;
+        }
+      }
+    }
+
+    false
+  }
+
+  pub fn prepare_executable(executable_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    use std::os::unix::fs::PermissionsExt;
+    log::info!("Setting execute permissions for: {:?}", executable_path);
+    let metadata = std::fs::metadata(executable_path)?;
+    let mut permissions = metadata.permissions();
+    let mode = permissions.mode();
+    permissions.set_mode(mode | 0o755);
+    std::fs::set_permissions(executable_path, permissions)?;
+    Ok(())
+  }
 }
 
 #[cfg(target_os = "linux")]
@@ -341,7 +375,7 @@ mod windows {
     browser_type: &BrowserType,
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     // On Windows, look for .exe files
-    let possible_paths = match browser_type {
+    let possible_paths: Vec<PathBuf> = match browser_type {
       _ => vec![],
     };
 

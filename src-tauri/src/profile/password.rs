@@ -8,8 +8,9 @@
 
 use crate::events;
 use crate::profile::encryption::{
-  cache_key, decrypt_profile_dir, drop_cached_key, encrypt_profile_dir, fresh_salt, get_cached_key,
-  has_cached_key, rekey_profile_dir, unlock as unlock_dir, verify_key_against_dir,
+  cache_key, decrypt_profile_dir, derive_profile_key, drop_cached_key, encrypt_profile_dir,
+  fresh_salt, get_cached_key, has_cached_key, rekey_profile_dir, unlock as unlock_dir,
+  verify_key_against_dir,
 };
 use crate::profile::ProfileManager;
 use serde_json::json;
@@ -17,19 +18,6 @@ use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::SystemTime;
-
-/// Derive a 32-byte encryption key from a password and salt using Argon2id.
-/// Replaces the deleted `sync::encryption::derive_profile_key`.
-fn derive_profile_key(password: &str, salt: &str) -> Result<[u8; 32], String> {
-  use argon2::{Algorithm, Argon2, Params, Version};
-  let params = Params::new(65536, 3, 1, Some(32)).map_err(|e| e.to_string())?;
-  let argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
-  let mut key = [0u8; 32];
-  argon
-    .hash_password_into(password.as_bytes(), salt.as_bytes(), &mut key)
-    .map_err(|e| e.to_string())?;
-  Ok(key)
-}
 
 /// Glob patterns for files that should be excluded from profile encryption
 /// (browser caches that are cheap to regenerate). Replaces the deleted

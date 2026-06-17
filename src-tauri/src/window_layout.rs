@@ -152,7 +152,8 @@ fn arrange_platform_windows(
   profile_ids: Vec<String>,
   options: WindowLayoutOptions,
 ) -> Result<(), WindowLayoutError> {
-  use windows::Win32::Foundation::{BOOL, HWND, LPARAM};
+  use windows::core::BOOL;
+  use windows::Win32::Foundation::{HWND, LPARAM};
   use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetSystemMetrics, GetWindowThreadProcessId, IsWindowVisible, SetWindowPos,
     HWND_TOP, SM_CXSCREEN, SM_CYSCREEN, SWP_NOACTIVATE, SWP_NOZORDER,
@@ -220,7 +221,7 @@ fn arrange_platform_windows(
     unsafe {
       let _ = SetWindowPos(
         hwnd,
-        HWND_TOP,
+        Some(HWND_TOP),
         rect.x,
         rect.y,
         rect.width,

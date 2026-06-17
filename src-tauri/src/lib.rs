@@ -2139,6 +2139,7 @@ mod tests {
       "update_extension",
       "generate_sample_fingerprint",
       "lock_profile",
+      "resolve_fingerprint_auto_fields",
     ];
 
     // Extract command names from the generate_handler! macro in this file

@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use std::env;
 use std::sync::atomic::{AtomicBool, Ordering};

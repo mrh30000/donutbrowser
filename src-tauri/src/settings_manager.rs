@@ -1093,6 +1093,9 @@ mod tests {
       onboarding_completed: false,
       disable_auto_updates: false,
       keep_decrypted_profiles_in_ram: false,
+      external_browser_path: None,
+      ip_api_url: None,
+      ip_api_key: None,
     };
 
     let save_result = manager.save_settings(&test_settings);

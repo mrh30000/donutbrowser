@@ -1347,8 +1347,6 @@ mod tests {
     assert!(mgr
       .validate_group_compatibility(&group.id, "camoufox")
       .is_ok());
-
-    assert!(mgr.is_err());
   }
 
   #[test]

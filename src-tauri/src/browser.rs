@@ -634,8 +634,6 @@ pub struct GithubAsset {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use std::fs;
-  use tempfile::TempDir;
 
   #[test]
   fn test_browser_type_conversions() {

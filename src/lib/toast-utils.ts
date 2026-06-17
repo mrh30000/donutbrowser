@@ -268,15 +268,6 @@ export function showSyncProgressToast(
     id: options?.id,
     duration: Number.POSITIVE_INFINITY,
     onCancel: () => {
-      if (options?.profileId) {
-        // Fire-and-forget — backend flips the cancel flag for the in-flight
-        // upload/download loops to drain.
-        void invoke("cancel_profile_sync", {
-          profileId: options.profileId,
-        }).catch((err: unknown) => {
-          console.error("Failed to cancel sync:", err);
-        });
-      }
       if (options?.id) {
         dismissToast(options.id);
       }

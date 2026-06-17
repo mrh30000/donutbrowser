@@ -1253,17 +1253,8 @@ export function ProfilesDataTable({
   const canCreateLocationProxy = false;
 
   const loadCountries = React.useCallback(async () => {
-    if (countriesLoaded || !canCreateLocationProxy) return;
-    try {
-      const data = await invoke<{ code: string; name: string }[]>(
-        "cloud_get_countries",
-      );
-      setCountries(data);
-      setCountriesLoaded(true);
-    } catch (e) {
-      console.error("Failed to load countries:", e);
-    }
-  }, [countriesLoaded]);
+    // Location proxy feature removed (cloud auth deleted)
+  }, []);
 
   // Load cached check results for proxies
   React.useEffect(() => {

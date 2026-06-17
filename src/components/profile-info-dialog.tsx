@@ -1106,19 +1106,8 @@ function SyncSectionInline({
   const [isSaving, setIsSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const onChangeMode = async (mode: string) => {
-    setIsSaving(true);
-    setError(null);
-    try {
-      await invoke("set_profile_sync_mode", {
-        profileId: profile.id,
-        syncMode: mode,
-      });
-    } catch (e) {
-      setError(translateBackendError(t as never, e));
-    } finally {
-      setIsSaving(false);
-    }
+  const onChangeMode = async (_mode: string) => {
+    // Sync feature removed (cloud auth deleted)
   };
 
   return (

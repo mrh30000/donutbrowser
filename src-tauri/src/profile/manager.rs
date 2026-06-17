@@ -194,7 +194,7 @@ impl ProfileManager {
           password_protected: false,
           created_at: None,
           updated_at: None,
-        fingerprint_profile: None,
+          fingerprint_profile: None,
         };
 
         match self
@@ -2057,9 +2057,7 @@ pub async fn create_browser_profile_new(
   dns_blocklist: Option<String>,
   launch_hook: Option<String>,
 ) -> Result<BrowserProfile, String> {
-  let _fingerprint_os = camoufox_config
-    .as_ref()
-    .and_then(|c| c.os.as_deref());
+  let _fingerprint_os = camoufox_config.as_ref().and_then(|c| c.os.as_deref());
 
   // A dead/unreachable proxy or VPN (or a 402 from an expired proxy
   // subscription) cancels creation with a translatable error.

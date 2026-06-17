@@ -104,7 +104,6 @@ impl BrowserProfile {
       .host_os
       .as_deref()
       .or_else(|| self.camoufox_config.as_ref().and_then(|c| c.os.as_deref()))
-      
   }
 
   /// Returns true when the profile was created on a different OS than the current host.

@@ -74,7 +74,7 @@ impl BrowserVersionManager {
         // Camoufox supports all platforms and architectures according to the JS code
         Ok(true)
       }
-            _ => Err(format!("Unknown browser: {browser}").into()),
+      _ => Err(format!("Unknown browser: {browser}").into()),
     }
   }
 
@@ -87,7 +87,7 @@ impl BrowserVersionManager {
       "brave",
       "chromium",
       "camoufox",
-          ];
+    ];
 
     all_browsers
       .into_iter()
@@ -424,7 +424,7 @@ impl BrowserVersionManager {
           })
           .collect()
       }
-            _ => {
+      _ => {
         return Err(format!("Unsupported browser: {browser}").into());
       }
     };

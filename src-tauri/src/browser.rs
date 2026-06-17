@@ -228,7 +228,6 @@ mod linux {
     browser_type: &BrowserType,
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let possible_executables: Vec<PathBuf> = match browser_type {
-      
       _ => vec![],
     };
 
@@ -276,7 +275,6 @@ mod linux {
 
   pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
     let possible_executables: Vec<PathBuf> = match browser_type {
-      
       _ => vec![],
     };
 
@@ -358,7 +356,6 @@ mod windows {
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     // On Windows, look for .exe files
     let possible_paths = match browser_type {
-      
       _ => vec![],
     };
 
@@ -378,7 +375,7 @@ mod windows {
             .unwrap_or_default()
             .to_string_lossy()
             .to_lowercase();
-          if name.contains("chromium") || name.contains("chrome")  {
+          if name.contains("chromium") || name.contains("chrome") {
             return Ok(path);
           }
         }
@@ -427,7 +424,6 @@ mod windows {
   pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
     // On Windows, check for .exe files
     let possible_executables: Vec<PathBuf> = match browser_type {
-      
       _ => vec![],
     };
 
@@ -448,7 +444,7 @@ mod windows {
             .unwrap_or_default()
             .to_string_lossy()
             .to_lowercase();
-          if name.contains("chromium") || name.contains("chrome")  {
+          if name.contains("chromium") || name.contains("chrome") {
             return true;
           }
         }
@@ -552,9 +548,6 @@ impl Browser for CamoufoxBrowser {
     Err("Unsupported platform".into())
   }
 }
-
-
-
 
 pub struct BrowserFactory;
 
@@ -662,14 +655,13 @@ mod tests {
   fn test_browser_type_conversions() {
     // Test as_str
     assert_eq!(BrowserType::Camoufox.as_str(), "camoufox");
-    
+
     // Test from_str
     assert_eq!(
       BrowserType::from_str("camoufox").expect("camoufox should be valid"),
       BrowserType::Camoufox
     );
-    assert_eq!(
-                );
+    assert_eq!();
 
     // Test invalid browser type - these should properly fail
     let invalid_result = BrowserType::from_str("invalid");

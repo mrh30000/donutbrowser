@@ -50,6 +50,7 @@ mod window_layout;
 // mod theme_detector; // removed: theme detection handled in webview via CSS prefers-color-scheme
 mod cookie_manager;
 pub mod events;
+pub mod fingerprint;
 mod mcp_integrations;
 mod mcp_server;
 mod tag_manager;
@@ -57,7 +58,6 @@ mod version_updater;
 pub mod vpn;
 pub mod vpn_worker_runner;
 pub mod vpn_worker_storage;
-pub mod fingerprint;
 
 use browser_runner::{
   check_browser_exists, kill_browser_profile, launch_browser_profile, open_url_with_profile,
@@ -65,10 +65,10 @@ use browser_runner::{
 
 use profile::manager::{
   check_browser_status, clone_profile, create_browser_profile_new, delete_profile,
-  export_profile_json, import_profile_json,
-  list_browser_profiles, rename_profile, update_camoufox_config, update_profile_dns_blocklist,
-  update_profile_launch_hook, update_profile_note, update_profile_proxy,
-  update_profile_proxy_bypass_rules, update_profile_tags, update_profile_vpn,
+  export_profile_json, import_profile_json, list_browser_profiles, rename_profile,
+  update_camoufox_config, update_profile_dns_blocklist, update_profile_launch_hook,
+  update_profile_note, update_profile_proxy, update_profile_proxy_bypass_rules,
+  update_profile_tags, update_profile_vpn,
 };
 
 use profile::password::{
@@ -293,12 +293,8 @@ async fn batch_launch_profiles(
   profile_ids: Vec<String>,
   options: Option<crate::batch_runner::BatchLaunchOptions>,
 ) -> Result<String, String> {
-  crate::batch_runner::batch_launch_profiles(
-    app_handle,
-    profile_ids,
-    options.unwrap_or_default(),
-  )
-  .await
+  crate::batch_runner::batch_launch_profiles(app_handle, profile_ids, options.unwrap_or_default())
+    .await
 }
 
 #[tauri::command]
@@ -749,15 +745,13 @@ async fn import_vpn_config(
     .map_err(|e| format!("Failed to lock VPN storage: {e}"))?;
 
   match storage.import_config(&content, &filename, name.clone()) {
-    Ok(config) => {
-      Ok(vpn::VpnImportResult {
-        success: true,
-        vpn_id: Some(config.id),
-        vpn_type: Some(config.vpn_type),
-        name: config.name,
-        error: None,
-      })
-    }
+    Ok(config) => Ok(vpn::VpnImportResult {
+      success: true,
+      vpn_id: Some(config.id),
+      vpn_type: Some(config.vpn_type),
+      name: config.name,
+      error: None,
+    }),
     Err(e) => Ok(vpn::VpnImportResult {
       success: false,
       vpn_id: None,
@@ -1093,7 +1087,7 @@ async fn generate_sample_fingerprint(
     password_protected: false,
     created_at: None,
     updated_at: None,
-  fingerprint_profile: None,
+    fingerprint_profile: None,
   };
 
   if browser == "camoufox" {

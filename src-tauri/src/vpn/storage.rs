@@ -468,7 +468,7 @@ mod tests {
       sync_enabled: false,
       last_sync: None,
       updated_at: None,
-    fingerprint_profile: None,
+      fingerprint_profile: None,
     };
 
     storage.save_config(&config).unwrap();
@@ -494,7 +494,7 @@ mod tests {
       sync_enabled: false,
       last_sync: None,
       updated_at: None,
-    fingerprint_profile: None,
+      fingerprint_profile: None,
     };
 
     let config2 = VpnConfig {
@@ -507,7 +507,7 @@ mod tests {
       sync_enabled: false,
       last_sync: None,
       updated_at: None,
-    fingerprint_profile: None,
+      fingerprint_profile: None,
     };
 
     storage.save_config(&config1).unwrap();
@@ -535,7 +535,7 @@ mod tests {
       sync_enabled: false,
       last_sync: None,
       updated_at: None,
-    fingerprint_profile: None,
+      fingerprint_profile: None,
     };
 
     storage.save_config(&config).unwrap();

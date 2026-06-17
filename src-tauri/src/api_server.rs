@@ -73,11 +73,11 @@ pub struct CreateProfileRequest {
   /// pin a specific one.
   #[schema(value_type = Object)]
   pub camoufox_config: Option<serde_json::Value>,
-    /// Omit it, or pass an empty object `{}`, to have a fresh fingerprint
+  /// Omit it, or pass an empty object `{}`, to have a fresh fingerprint
   /// generated automatically at creation. Provide a `fingerprint` field to
   /// pin a specific one.
   #[schema(value_type = Object)]
-    pub group_id: Option<String>,
+  pub group_id: Option<String>,
   pub tags: Option<Vec<String>>,
 }
 
@@ -775,7 +775,6 @@ async fn create_profile(
     None
   };
 
-  
   // Reject a dead/unreachable proxy or VPN before creating the profile. A 402
   // (expired proxy subscription) maps to 402; anything else is a 400.
   if let Err(err) =
@@ -1750,7 +1749,6 @@ async fn run_profile(
   State(state): State<ApiServerState>,
   Json(request): Json<RunProfileRequest>,
 ) -> Result<Json<RunProfileResponse>, StatusCode> {
-
   let headless = request.headless.unwrap_or(false);
   let url = request.url;
 
@@ -1825,7 +1823,6 @@ async fn open_url_in_profile(
   State(state): State<ApiServerState>,
   Json(request): Json<OpenUrlRequest>,
 ) -> Result<StatusCode, StatusCode> {
-
   let browser_runner = crate::browser_runner::BrowserRunner::instance();
 
   browser_runner
@@ -1921,13 +1918,11 @@ async fn import_profile_cookies(
   )
   .await
   {
-    Ok(result) => {
-      Ok(Json(ImportCookiesResponse {
-        cookies_imported: result.cookies_imported,
-        cookies_replaced: result.cookies_replaced,
-        errors: result.errors,
-      }))
-    }
+    Ok(result) => Ok(Json(ImportCookiesResponse {
+      cookies_imported: result.cookies_imported,
+      cookies_replaced: result.cookies_replaced,
+      errors: result.errors,
+    })),
     Err(e) => {
       let msg = e.to_lowercase();
       if msg.contains("running") {
@@ -2034,7 +2029,6 @@ async fn check_browser_downloaded(
   Ok(Json(is_downloaded))
 }
 
-
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -2072,7 +2066,7 @@ mod tests {
       serde_json::from_str(json).expect("version and configs are optional");
     assert_eq!(parsed.browser, "camoufox");
     assert!(parsed.version.is_none());
-        assert!(parsed.camoufox_config.is_none());
+    assert!(parsed.camoufox_config.is_none());
   }
 
   #[test]

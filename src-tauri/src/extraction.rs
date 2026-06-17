@@ -69,7 +69,7 @@ impl Extractor {
     // Determine browser type from the destination directory path
     let browser_type = if dest_dir.to_string_lossy().contains("camoufox") {
       "camoufox"
-        } else {
+    } else {
       return Ok(());
     };
 
@@ -975,12 +975,7 @@ impl Extractor {
     );
 
     // Look for .exe files, preferring main browser executables
-    let priority_exe_names = [
-      "firefox.exe",
-      "chrome.exe",
-      "chromium.exe",
-      "camoufox.exe",
-    ];
+    let priority_exe_names = ["firefox.exe", "chrome.exe", "chromium.exe", "camoufox.exe"];
 
     // First try priority executable names
     for exe_name in &priority_exe_names {
@@ -1047,7 +1042,6 @@ impl Extractor {
               || file_name.contains("chromium")
               || file_name.contains("browser")
               || file_name.contains("camoufox")
-              
             {
               return Ok(path);
             }
@@ -1107,7 +1101,7 @@ impl Extractor {
       "camoufox",
       "camoufox-bin",
       "camoufox-browser",
-          ];
+    ];
 
     // First, try direct lookup in the main directory
     for exe_name in &exe_names {
@@ -1232,7 +1226,6 @@ impl Extractor {
               || name_lower.contains("brave")
               || name_lower.contains("zen")
               || name_lower.contains("camoufox")
-              
               || name_lower.ends_with(".appimage")
               || !name_lower.contains('.')
             {
@@ -1288,7 +1281,6 @@ impl Extractor {
               || name_lower.contains("brave")
               || name_lower.contains("zen")
               || name_lower.contains("camoufox")
-              
               || file_name.ends_with(".AppImage")
             {
               log::info!(

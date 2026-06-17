@@ -137,7 +137,8 @@ pub async fn batch_launch_profiles(
   let profiles = crate::profile::ProfileManager::instance()
     .list_profiles()
     .map_err(|_| serde_json::json!({ "code": "INTERNAL_ERROR" }).to_string())?;
-  let profiles = profiles_by_ids(profiles, &profile_ids).map_err(|error| error.to_backend_error())?;
+  let profiles =
+    profiles_by_ids(profiles, &profile_ids).map_err(|error| error.to_backend_error())?;
 
   for profile in &profiles {
     emit_status(&task_id, profile, BatchProfileStatus::Queued, None);
@@ -159,7 +160,12 @@ pub async fn batch_launch_profiles(
     let task_id_for_spawn = task_id.clone();
     handles.push(tokio::spawn(async move {
       let _permit = permit;
-      emit_status(&task_id_for_spawn, &profile, BatchProfileStatus::Launching, None);
+      emit_status(
+        &task_id_for_spawn,
+        &profile,
+        BatchProfileStatus::Launching,
+        None,
+      );
 
       let result = crate::browser_runner::launch_browser_profile_impl(
         handle,
@@ -173,8 +179,18 @@ pub async fn batch_launch_profiles(
 
       let outcome = match result {
         Ok(updated) => {
-          emit_status(&task_id_for_spawn, &updated, BatchProfileStatus::Running, None);
-          emit_status(&task_id_for_spawn, &updated, BatchProfileStatus::Completed, None);
+          emit_status(
+            &task_id_for_spawn,
+            &updated,
+            BatchProfileStatus::Running,
+            None,
+          );
+          emit_status(
+            &task_id_for_spawn,
+            &updated,
+            BatchProfileStatus::Completed,
+            None,
+          );
           Ok(())
         }
         Err(error) => {
@@ -227,11 +243,13 @@ pub async fn batch_stop_profiles(
   let profiles = crate::profile::ProfileManager::instance()
     .list_profiles()
     .map_err(|_| serde_json::json!({ "code": "INTERNAL_ERROR" }).to_string())?;
-  let profiles = profiles_by_ids(profiles, &profile_ids).map_err(|error| error.to_backend_error())?;
+  let profiles =
+    profiles_by_ids(profiles, &profile_ids).map_err(|error| error.to_backend_error())?;
 
   for profile in profiles {
     emit_status(&task_id, &profile, BatchProfileStatus::Queued, None);
-    let result = crate::browser_runner::kill_browser_profile(app_handle.clone(), profile.clone()).await;
+    let result =
+      crate::browser_runner::kill_browser_profile(app_handle.clone(), profile.clone()).await;
     match result {
       Ok(()) => {
         emit_status(&task_id, &profile, BatchProfileStatus::Stopped, None);
@@ -322,9 +340,10 @@ mod tests {
 
   #[test]
   fn profiles_by_ids_rejects_missing_profile() {
-    let err = profiles_by_ids(vec![crate::profile::BrowserProfile::default()], &[
-      uuid::Uuid::new_v4().to_string(),
-    ])
+    let err = profiles_by_ids(
+      vec![crate::profile::BrowserProfile::default()],
+      &[uuid::Uuid::new_v4().to_string()],
+    )
     .unwrap_err();
 
     assert_eq!(err.code(), "BATCH_PROFILE_NOT_FOUND");

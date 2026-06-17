@@ -172,7 +172,6 @@ impl McpServer {
   }
 
   pub async fn start(&self, app_handle: AppHandle) -> Result<u16, String> {
-
     if self.is_running() {
       return Err("MCP server is already running".to_string());
     }
@@ -1557,12 +1556,8 @@ impl McpServer {
     match tool_name {
       "list_profiles" => self.handle_list_profiles().await,
       "get_profile" => self.handle_get_profile(arguments).await,
-      "run_profile" => {
-        self.handle_run_profile(arguments).await
-      }
-      "kill_profile" => {
-        self.handle_kill_profile(arguments).await
-      }
+      "run_profile" => self.handle_run_profile(arguments).await,
+      "kill_profile" => self.handle_kill_profile(arguments).await,
       "create_profile" => self.handle_create_profile(arguments).await,
       "update_profile" => self.handle_update_profile(arguments).await,
       "delete_profile" => self.handle_delete_profile(arguments).await,
@@ -1595,9 +1590,7 @@ impl McpServer {
       // API and the get_profile tool, which already expose the config); only
       // editing requires a paid plan.
       "get_profile_fingerprint" => self.handle_get_profile_fingerprint(arguments).await,
-      "update_profile_fingerprint" => {
-        self.handle_update_profile_fingerprint(arguments).await
-      }
+      "update_profile_fingerprint" => self.handle_update_profile_fingerprint(arguments).await,
       "update_profile_proxy_bypass_rules" => {
         self
           .handle_update_profile_proxy_bypass_rules(arguments)
@@ -1620,36 +1613,16 @@ impl McpServer {
       // Cookie management
       "import_profile_cookies" => self.handle_import_profile_cookies(arguments).await,
       // Browser interaction tools (require paid subscription)
-      "navigate" => {
-        self.handle_navigate(arguments).await
-      }
-      "screenshot" => {
-        self.handle_screenshot(arguments).await
-      }
-      "evaluate_javascript" => {
-        self.handle_evaluate_javascript(arguments).await
-      }
-      "click_element" => {
-        self.handle_click_element(arguments).await
-      }
-      "type_text" => {
-        self.handle_type_text(arguments).await
-      }
-      "get_page_content" => {
-        self.handle_get_page_content(arguments).await
-      }
-      "get_page_info" => {
-        self.handle_get_page_info(arguments).await
-      }
-      "get_interactive_elements" => {
-        self.handle_get_interactive_elements(arguments).await
-      }
-      "click_by_index" => {
-        self.handle_click_by_index(arguments).await
-      }
-      "type_by_index" => {
-        self.handle_type_by_index(arguments).await
-      }
+      "navigate" => self.handle_navigate(arguments).await,
+      "screenshot" => self.handle_screenshot(arguments).await,
+      "evaluate_javascript" => self.handle_evaluate_javascript(arguments).await,
+      "click_element" => self.handle_click_element(arguments).await,
+      "type_text" => self.handle_type_text(arguments).await,
+      "get_page_content" => self.handle_get_page_content(arguments).await,
+      "get_page_info" => self.handle_get_page_info(arguments).await,
+      "get_interactive_elements" => self.handle_get_interactive_elements(arguments).await,
+      "click_by_index" => self.handle_click_by_index(arguments).await,
+      "type_by_index" => self.handle_type_by_index(arguments).await,
       _ => Err(McpError {
         code: -32602,
         message: format!("Unknown tool: {tool_name}"),
@@ -3087,7 +3060,7 @@ impl McpServer {
           "screen_min_height": config.screen_min_height,
         })
       }
-            _ => {
+      _ => {
         return Err(McpError {
           code: -32000,
           message: "MCP only supports Camoufox profiles".to_string(),
@@ -3107,7 +3080,6 @@ impl McpServer {
     &self,
     arguments: &serde_json::Value,
   ) -> Result<serde_json::Value, McpError> {
-
     let profile_id = arguments
       .get("profile_id")
       .and_then(|v| v.as_str())
@@ -3122,8 +3094,7 @@ impl McpServer {
       .get("randomize_fingerprint_on_launch")
       .and_then(|v| v.as_bool());
 
-    if let Some(os_val) = os {
-    }
+    if let Some(os_val) = os {}
 
     let profiles = ProfileManager::instance()
       .list_profiles()

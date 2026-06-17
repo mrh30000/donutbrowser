@@ -237,8 +237,7 @@ impl ProfileImporter {
     let mapped = map_browser_type(browser_type);
 
     if let Some(ref pid) = proxy_id {
-      if PROXY_MANAGER.is_cloud_or_derived(pid) || pid == crate::proxy_manager::CLOUD_PROXY_ID {
-      }
+      if PROXY_MANAGER.is_cloud_or_derived(pid) || pid == crate::proxy_manager::CLOUD_PROXY_ID {}
     }
 
     let existing_profiles = self.profile_manager.list_profiles()?;

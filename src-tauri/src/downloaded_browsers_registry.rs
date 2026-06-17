@@ -1300,7 +1300,7 @@ pub async fn ensure_active_browsers_downloaded(
     // Retry transient failures a few times. Each attempt is wrapped in an overall
     // timeout so that a hang anywhere in the download pipeline (version resolution,
     // a stalled stream, extraction) cannot block the next browser forever. This is
-        const MAX_ATTEMPTS: u32 = 3;
+    const MAX_ATTEMPTS: u32 = 3;
     const ATTEMPT_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(600);
     let mut succeeded = false;
     for attempt in 1..=MAX_ATTEMPTS {

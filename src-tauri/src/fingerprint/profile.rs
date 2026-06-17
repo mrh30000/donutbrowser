@@ -46,6 +46,7 @@ pub enum NoiseMode {
   Random,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for NoiseMode {
   fn default() -> Self {
     Self::Default
@@ -58,6 +59,7 @@ pub enum AutoOrManual {
   Manual,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for AutoOrManual {
   fn default() -> Self {
     Self::Manual
@@ -103,6 +105,7 @@ pub enum WebRtcMode {
   Block,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for WebRtcMode {
   fn default() -> Self {
     Self::Allow
@@ -136,6 +139,7 @@ pub enum GeoPermission {
   Block,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for GeoPermission {
   fn default() -> Self {
     Self::Ask
@@ -160,6 +164,7 @@ pub enum FontMode {
   RandomMatch,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for FontMode {
   fn default() -> Self {
     Self::SystemDefault

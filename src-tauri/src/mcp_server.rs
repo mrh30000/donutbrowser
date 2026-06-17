@@ -151,6 +151,7 @@ impl McpServer {
 
   /// Gate an MCP tool on a capability the caller already resolved (e.g.
   /// with enough state for support to diagnose, without leaking secrets.
+  #[allow(dead_code)]
   async fn require_capability(feature: &str, allowed: bool) -> Result<(), McpError> {
     if !allowed {
       log::warn!("[mcp] Rejected '{feature}' — plan does not include it");
@@ -3094,7 +3095,7 @@ impl McpServer {
       .get("randomize_fingerprint_on_launch")
       .and_then(|v| v.as_bool());
 
-    if let Some(os_val) = os {}
+    if let Some(_os_val) = os {}
 
     let profiles = ProfileManager::instance()
       .list_profiles()

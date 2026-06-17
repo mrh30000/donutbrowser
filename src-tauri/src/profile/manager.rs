@@ -419,7 +419,7 @@ impl ProfileManager {
 
   pub fn delete_profile(
     &self,
-    app_handle: &tauri::AppHandle,
+    _app_handle: &tauri::AppHandle,
     profile_id: &str,
   ) -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Attempting to delete profile with ID: {profile_id}");
@@ -484,6 +484,7 @@ impl ProfileManager {
 
   /// Delete a profile from the local filesystem only, without triggering remote sync deletion.
   /// Used when a profile was deleted on another device and the local copy should be cleaned up.
+  #[allow(dead_code)]
   pub fn delete_profile_local_only(
     &self,
     profile_id: &str,
@@ -750,7 +751,7 @@ impl ProfileManager {
 
   pub fn delete_multiple_profiles(
     &self,
-    app_handle: &tauri::AppHandle,
+    _app_handle: &tauri::AppHandle,
     profile_ids: Vec<String>,
   ) -> Result<(), Box<dyn std::error::Error>> {
     let profiles = self.list_profiles()?;
@@ -846,7 +847,7 @@ impl ProfileManager {
       fs::create_dir_all(&dest_dir)?;
     }
 
-    let mut new_profile = BrowserProfile {
+    let new_profile = BrowserProfile {
       id: new_id,
       name: clone_name,
       browser: source.browser,

@@ -222,7 +222,7 @@ impl ProfileImporter {
   #[allow(clippy::too_many_arguments)]
   pub async fn import_profile(
     &self,
-    app_handle: &tauri::AppHandle,
+    _app_handle: &tauri::AppHandle,
     source_path: &str,
     browser_type: &str,
     new_profile_name: &str,

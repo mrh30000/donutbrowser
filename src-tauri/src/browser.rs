@@ -197,15 +197,10 @@ mod linux {
     let _browser_subdir = install_dir.join(browser_type.as_str());
 
     // Try common firefox executable locations (nested and flat)
-    let possible_executables = match browser_type {
-      BrowserType::Camoufox => {
-        vec![
-          install_dir.join("camoufox-bin"),
-          install_dir.join("camoufox"),
-        ]
-      }
-      _ => vec![],
-    };
+    let possible_executables = vec![
+      install_dir.join("camoufox-bin"),
+      install_dir.join("camoufox"),
+    ];
 
     for executable_path in &possible_executables {
       if executable_path.exists() && executable_path.is_file() {
@@ -227,9 +222,7 @@ mod linux {
     install_dir: &Path,
     browser_type: &BrowserType,
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    let possible_executables: Vec<PathBuf> = match browser_type {
-      _ => vec![],
-    };
+    let possible_executables: Vec<PathBuf> = vec![];
 
     for executable_path in &possible_executables {
       if executable_path.exists() && executable_path.is_file() {
@@ -254,15 +247,10 @@ mod linux {
     // rather than "firefox-developer". Support both layouts.
     let _browser_subdir = install_dir.join(browser_type.as_str());
 
-    let possible_executables = match browser_type {
-      BrowserType::Camoufox => {
-        vec![
-          install_dir.join("camoufox-bin"),
-          install_dir.join("camoufox"),
-        ]
-      }
-      _ => vec![],
-    };
+    let possible_executables = vec![
+      install_dir.join("camoufox-bin"),
+      install_dir.join("camoufox"),
+    ];
 
     for exe_path in &possible_executables {
       if exe_path.exists() && exe_path.is_file() {
@@ -273,10 +261,8 @@ mod linux {
     false
   }
 
-  pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
-    let possible_executables: Vec<PathBuf> = match browser_type {
-      _ => vec![],
-    };
+  pub fn is_chromium_version_downloaded(_install_dir: &Path, _browser_type: &BrowserType) -> bool {
+    let possible_executables: Vec<PathBuf> = vec![];
 
     for exe_path in &possible_executables {
       if exe_path.exists() && exe_path.is_file() {
@@ -661,8 +647,6 @@ mod tests {
       BrowserType::from_str("camoufox").expect("camoufox should be valid"),
       BrowserType::Camoufox
     );
-    assert_eq!();
-
     // Test invalid browser type - these should properly fail
     let invalid_result = BrowserType::from_str("invalid");
     assert!(

@@ -10,6 +10,7 @@ impl BatchError {
     Self { code }
   }
 
+  #[allow(dead_code)]
   pub fn code(&self) -> &'static str {
     self.code
   }

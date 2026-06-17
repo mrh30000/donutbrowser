@@ -531,6 +531,7 @@ impl SettingsManager {
     Ok(())
   }
 
+  #[allow(dead_code)]
   pub async fn store_sync_token(
     &self,
     _app_handle: &tauri::AppHandle,

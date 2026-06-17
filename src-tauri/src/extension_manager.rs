@@ -289,6 +289,7 @@ impl ExtensionManager {
     self.get_extension_dir(ext_id).join("file")
   }
 
+  #[allow(dead_code)]
   pub fn get_file_dir_public(&self, ext_id: &str) -> PathBuf {
     self.get_file_dir(ext_id)
   }
@@ -465,7 +466,7 @@ impl ExtensionManager {
     _app_handle: &tauri::AppHandle,
     id: &str,
   ) -> Result<(), Box<dyn std::error::Error>> {
-    let ext = self.get_extension(id)?;
+    let _ext = self.get_extension(id)?;
     let ext_dir = self.get_extension_dir(id);
     if ext_dir.exists() {
       fs::remove_dir_all(&ext_dir)?;

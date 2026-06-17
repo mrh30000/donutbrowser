@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Rect {
   pub x: i32,
@@ -49,6 +50,7 @@ impl WindowLayoutError {
     Self { code }
   }
 
+  #[allow(dead_code)]
   pub fn code(&self) -> &'static str {
     self.code
   }
@@ -58,6 +60,7 @@ impl WindowLayoutError {
   }
 }
 
+#[allow(dead_code)]
 pub fn calculate_layouts(
   count: usize,
   work_area: Rect,

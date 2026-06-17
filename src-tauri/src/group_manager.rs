@@ -143,6 +143,7 @@ impl GroupManager {
     Ok(updated_group)
   }
 
+  #[allow(dead_code)]
   pub fn update_group_internal(
     &self,
     group: &ProfileGroup,

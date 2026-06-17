@@ -11,6 +11,7 @@ impl ProxyDiagnosticError {
     Self { code }
   }
 
+  #[allow(dead_code)]
   pub fn code(&self) -> &'static str {
     self.code
   }
@@ -214,8 +215,8 @@ async fn diagnose_one_profile(
   for source in sources {
     match client.get(source.url()).send().await {
       Ok(response) => match response.json::<serde_json::Value>().await {
-        Ok(value) => match parse_source_response(source, value) {
-          Ok(parsed) => {
+        Ok(value) => {
+          if let Ok(parsed) = parse_source_response(source, value) {
             return ProfileProxyDiagnosticResult {
               profile_id: profile.id.to_string(),
               profile_name: profile.name,
@@ -230,8 +231,7 @@ async fn diagnose_one_profile(
               error: None,
             };
           }
-          Err(_) => {}
-        },
+        }
         Err(error) => {
           timed_out |= error.is_timeout();
         }

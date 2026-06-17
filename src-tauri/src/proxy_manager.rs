@@ -159,6 +159,7 @@ impl StoredProxy {
   }
 
   /// Migrate legacy geo_state to geo_region
+  #[allow(dead_code)]
   pub fn migrate_geo_fields(&mut self) {
     if self.geo_region.is_none() && self.geo_state.is_some() {
       self.geo_region = self.geo_state.take();
@@ -433,6 +434,7 @@ impl ProxyManager {
   }
 
   // Check if a cloud-managed proxy exists
+  #[allow(dead_code)]
   pub fn has_cloud_proxy(&self) -> bool {
     let stored_proxies = self.stored_proxies.lock().unwrap();
     stored_proxies.contains_key(CLOUD_PROXY_ID)

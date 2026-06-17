@@ -2125,7 +2125,15 @@ pub fn export_profile_json(profile_id: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub async fn import_profile_json(
+pub async fn import_profile_json(json: String) -> Result<BrowserProfile, String> {
+  let mut profile: BrowserProfile =
+    serde_json::from_str(&json).map_err(|e| format!("Invalid profile JSON: {e}"))?;
+  profile.id = uuid::Uuid::new_v4();
+  ProfileManager::instance()
+    .save_profile(&profile)
+    .map_err(|e| format!("Failed to save imported profile: {e}"))?;
+  Ok(profile)
+}
 
 lazy_static::lazy_static! {
   static ref PROFILE_MANAGER: ProfileManager = ProfileManager::new();

@@ -820,8 +820,8 @@ impl BrowserVersionManager {
       .fetch_camoufox_releases_with_caching(no_caching)
       .await
   }
+}
 
-  
 #[tauri::command]
 pub async fn get_browser_release_types(
   browser_str: String,

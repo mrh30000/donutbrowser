@@ -34,13 +34,11 @@ pub struct BrowserProfile {
   #[serde(default)]
   pub camoufox_config: Option<CamoufoxConfig>, // Camoufox configuration
   #[serde(default)]
-  #[serde(default)]
   pub group_id: Option<String>, // Reference to profile group
   #[serde(default)]
   pub tags: Vec<String>, // Free-form tags
   #[serde(default)]
   pub note: Option<String>, // User note
-  #[serde(default)]
   #[serde(default)]
   pub encryption_salt: Option<String>,
   #[serde(default)]

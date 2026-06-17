@@ -799,6 +799,7 @@ async fn create_profile(
       request.proxy_id.clone(),
       request.vpn_id.clone(),
       camoufox_config,
+      None,
       request.group_id.clone(),
       false,
       None,

@@ -15,7 +15,7 @@ use aes_gcm::{
   aead::{Aead, AeadCore, KeyInit, OsRng},
   Aes256Gcm, Key,
 };
-use argon2::{password_hash::SaltString, Argon2};
+use argon2::{password_hash::SaltString, Argon2, PasswordHasher};
 use base64::{
   engine::general_purpose::{STANDARD as BASE64, URL_SAFE_NO_PAD},
   Engine as _,

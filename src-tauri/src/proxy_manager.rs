@@ -143,7 +143,7 @@ impl StoredProxy {
       id: uuid::Uuid::new_v4().to_string(),
       name,
       proxy_settings,
-      sync_enabled,
+      sync_enabled: false,
       last_sync: None,
       updated_at: Some(now_secs()),
       is_cloud_managed: false,

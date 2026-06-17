@@ -40,8 +40,6 @@ pub struct AppSettings {
   #[serde(default)]
   pub sync_server_url: Option<String>, // URL of the sync server
   #[serde(default)]
-  #[serde(default)]
-  #[serde(default)]
   pub mcp_enabled: bool, // Enable MCP (Model Context Protocol) server
   #[serde(default)]
   pub mcp_port: Option<u16>, // Port for MCP server (default 51080)

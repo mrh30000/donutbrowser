@@ -206,10 +206,9 @@ mod tests {
     };
     let mut config = EngineLaunchConfig::default();
     adapter.apply(&profile, &mut config).unwrap();
-    assert!(config
+    assert!(!config
       .fingerprint_config
-      .get("navigator.userAgent")
-      .is_none());
+      .contains_key("navigator.userAgent"));
   }
 
   #[test]
@@ -238,7 +237,7 @@ mod tests {
     };
     let mut config = EngineLaunchConfig::default();
     adapter.apply(&profile, &mut config).unwrap();
-    assert!(config.fingerprint_config.get("canvas:aaOffset").is_some());
+    assert!(config.fingerprint_config.contains_key("canvas:aaOffset"));
   }
 
   #[test]

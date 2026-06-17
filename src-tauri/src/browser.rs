@@ -227,7 +227,7 @@ mod linux {
     install_dir: &Path,
     browser_type: &BrowserType,
   ) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    let possible_executables = match browser_type {
+    let possible_executables: Vec<PathBuf> = match browser_type {
       
       _ => vec![],
     };
@@ -275,7 +275,7 @@ mod linux {
   }
 
   pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
-    let possible_executables = match browser_type {
+    let possible_executables: Vec<PathBuf> = match browser_type {
       
       _ => vec![],
     };
@@ -426,7 +426,7 @@ mod windows {
 
   pub fn is_chromium_version_downloaded(install_dir: &Path, browser_type: &BrowserType) -> bool {
     // On Windows, check for .exe files
-    let possible_executables = match browser_type {
+    let possible_executables: Vec<PathBuf> = match browser_type {
       
       _ => vec![],
     };

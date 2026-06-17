@@ -194,8 +194,8 @@ impl CookieManager {
     let profile_data_path = profile.get_profile_data_path(profiles_dir);
     chrome_decrypt::get_encryption_key(&profile_data_path)
   }
+}
 
-  
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -635,9 +635,5 @@ mod tests {
 
     let _ = std::fs::remove_file(&tmp);
   }
-
-  /// Chrome → Camoufox: write cookies to a Chrome DB, read them back, and
-  /// verify they land in a Firefox DB with values intact, correct schemeMap,
-  /// and non-expired timestamps. This is the path exercised by the
-  /// "copy cookies between profiles of different browser types" feature.
+}
   

@@ -8,16 +8,16 @@
 <br>
 
 <p align="center">
-  <a style="text-decoration: none;" href="https://github.com/zhom/donutbrowser/releases/latest" target="_blank"><img alt="GitHub release" src="https://img.shields.io/github/v/release/zhom/donutbrowser">
+  <a style="text-decoration: none;" href="https://github.com/mrh30000/donutbrowser/releases/latest" target="_blank"><img alt="GitHub release" src="https://img.shields.io/github/v/release/mrh30000/donutbrowser">
   </a>
-  <a style="text-decoration: none;" href="https://github.com/zhom/donutbrowser/issues" target="_blank">
+  <a style="text-decoration: none;" href="https://github.com/mrh30000/donutbrowser/issues" target="_blank">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs Welcome">
   </a>
-  <a style="text-decoration: none;" href="https://github.com/zhom/donutbrowser/blob/main/LICENSE" target="_blank">
+  <a style="text-decoration: none;" href="https://github.com/mrh30000/donutbrowser/blob/main/LICENSE" target="_blank">
     <img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License">
   </a>
-  <a style="text-decoration: none;" href="https://github.com/zhom/donutbrowser/network/members" target="_blank">
-    <img src="https://img.shields.io/github/forks/zhom/donutbrowser?style=social" alt="GitHub forks">
+  <a style="text-decoration: none;" href="https://github.com/mrh30000/donutbrowser/network/members" target="_blank">
+    <img src="https://img.shields.io/github/forks/mrh30000/donutbrowser?style=social" alt="GitHub forks">
   </a>
 </p>
 
@@ -46,7 +46,7 @@
 
 | | Apple Silicon | Intel |
 |---|---|---|
-| **DMG** | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_aarch64.dmg) | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_x64.dmg) |
+| **DMG** | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_aarch64.dmg) | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_x64.dmg) |
 
 Or install via Homebrew:
 
@@ -56,15 +56,15 @@ brew install --cask donut
 
 ### Windows
 
-[Download Windows Installer (x64)](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_x64-setup.exe) · [Portable (x64)](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_x64-portable.zip)
+[Download Windows Installer (x64)](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_x64-setup.exe) · [Portable (x64)](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_x64-portable.zip)
 
 ### Linux
 
 | Format | x86_64 | ARM64 |
 |---|---|---|
-| **deb** | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_amd64.deb) | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_arm64.deb) |
-| **rpm** | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut-0.26.0-1.x86_64.rpm) | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut-0.26.0-1.aarch64.rpm) |
-| **AppImage** | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_amd64.AppImage) | [Download](https://github.com/zhom/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_aarch64.AppImage) |
+| **deb** | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_amd64.deb) | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_arm64.deb) |
+| **rpm** | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut-0.26.0-1.x86_64.rpm) | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut-0.26.0-1.aarch64.rpm) |
+| **AppImage** | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_amd64.AppImage) | [Download](https://github.com/mrh30000/donutbrowser/releases/download/v0.26.0/Donut_0.26.0_aarch64.AppImage) |
 <!-- install-links-end -->
 
 Or install via package manager:
@@ -89,7 +89,7 @@ If that gives an EGL display error, try adding `WEBKIT_DISABLE_DMABUF_RENDERER=1
 ### Nix
 
 ```bash
-nix run github:zhom/donutbrowser#release-start
+nix run github:mrh30000/donutbrowser#release-start
 ```
 
 ## Self-Hosting Sync
@@ -102,16 +102,16 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Community
 
-- **Issues**: [GitHub Issues](https://github.com/zhom/donutbrowser/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/zhom/donutbrowser/discussions)
+- **Issues**: [GitHub Issues](https://github.com/mrh30000/donutbrowser/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/mrh30000/donutbrowser/discussions)
 
 ## Star History
 
 <a href="https://www.star-history.com/?repos=zhom%2Fdonutbrowser&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=zhom/donutbrowser&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=zhom/donutbrowser&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=zhom/donutbrowser&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=mrh30000/donutbrowser&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=mrh30000/donutbrowser&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=mrh30000/donutbrowser&type=date&legend=top-left" />
  </picture>
 </a>
 

@@ -5,7 +5,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORK_DIR="$(mktemp -d)"
 trap 'rm -rf "$WORK_DIR"' EXIT
 
-GITHUB_REPO="zhom/donutbrowser"
+GITHUB_REPO="mrh30000/donutbrowser"
 
 # Load .env if running locally
 if [[ -f "$REPO_ROOT/.env" ]]; then

@@ -1453,7 +1453,7 @@ export default function Home() {
           label: t("common.buttons.learnMore"),
           onClick: () => {
             const event = new CustomEvent("url-open-request", {
-              detail: "https://github.com/zhom/donutbrowser/discussions",
+              detail: "https://github.com/mrh30000/donutbrowser/discussions",
             });
             window.dispatchEvent(event);
           },

@@ -23,7 +23,7 @@ env:
 
 jobs:
   analyze-issue:
-    if: github.repository == 'zhom/donutbrowser' && github.event_name == 'issues'
+    if: github.repository == 'mrh30000/donutbrowser' && github.event_name == 'issues'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -475,7 +475,7 @@ jobs:
           gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file /tmp/ai-comment.txt
 
   analyze-pr:
-    if: github.repository == 'zhom/donutbrowser' && github.event_name == 'pull_request_target' && github.actor != 'dependabot[bot]'
+    if: github.repository == 'mrh30000/donutbrowser' && github.event_name == 'pull_request_target' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -608,7 +608,7 @@ jobs:
 
   opencode-command:
     if: |
-      github.repository == 'zhom/donutbrowser' &&
+      github.repository == 'mrh30000/donutbrowser' &&
       (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment') &&
       (contains(github.event.comment.body, ' /oc') ||
        startsWith(github.event.comment.body, '/oc') ||

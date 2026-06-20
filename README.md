@@ -122,6 +122,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 	<tbody>
 		<tr>
             <td align="center">
+                <a href="https://github.com/mrh30000">
+                    <img src="https://avatars.githubusercontent.com/u/63270172?v=4" width="100;" alt="mrh30000"/>
+                    <br />
+                    <sub><b>RUOHANG MO</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/zhom">
                     <img src="https://avatars.githubusercontent.com/u/2717306?v=4" width="100;" alt="zhom"/>
                     <br />
@@ -156,6 +163,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
                     <sub><b>Huy Le</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/drunkod">
                     <img src="https://avatars.githubusercontent.com/u/9677471?v=4" width="100;" alt="drunkod"/>
@@ -163,8 +172,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
                     <sub><b>drunkod</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/JorySeverijnse">
                     <img src="https://avatars.githubusercontent.com/u/117462355?v=4" width="100;" alt="JorySeverijnse"/>

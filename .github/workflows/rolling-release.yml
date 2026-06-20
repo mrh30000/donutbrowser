@@ -68,7 +68,11 @@ jobs:
       contents: read
 
   rolling-release:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [security-scan, lint-js, lint-rust, codeql, spellcheck]
     permissions:
       contents: write
@@ -278,7 +282,11 @@ jobs:
           rm -f $RUNNER_TEMP/build_certificate.p12 || true
 
   update-nightly-release:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [rolling-release]
     runs-on: ubuntu-latest
     permissions:
@@ -382,7 +390,11 @@ jobs:
             --prerelease
 
   deploy-website:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [update-nightly-release]
     runs-on: ubuntu-latest
     steps:
@@ -390,7 +402,11 @@ jobs:
         run: curl -fsSL -X POST "${{ secrets.CLOUDFLARE_WEB_DEPLOYMENT_HOOK }}"
 
   notify-discord:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [update-nightly-release]
     runs-on: ubuntu-latest
     steps:

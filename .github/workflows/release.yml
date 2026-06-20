@@ -69,7 +69,11 @@ jobs:
       contents: read
 
   release:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [security-scan, lint-js, lint-rust, codeql, spellcheck]
     permissions:
       contents: write
@@ -281,7 +285,11 @@ jobs:
           rm -f $RUNNER_TEMP/build_certificate.p12 || true
 
   changelog:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [release]
     runs-on: ubuntu-latest
     permissions:
@@ -450,7 +458,11 @@ jobs:
           gh release edit "$TAG" --notes-file /tmp/release-changelog.md
 
   notify-discord:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [release, changelog]
     runs-on: ubuntu-latest
     steps:
@@ -529,7 +541,11 @@ jobs:
           curl -fsSL -H "Content-Type: application/json" -d "$PAYLOAD" "$DISCORD_WEBHOOK_URL"
 
   deploy-website:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [release]
     runs-on: ubuntu-latest
     steps:
@@ -537,7 +553,11 @@ jobs:
         run: curl -fsSL -X POST "${{ secrets.CLOUDFLARE_WEB_DEPLOYMENT_HOOK }}"
 
   docker:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [release]
     uses: ./.github/workflows/docker-sync.yml
     with:
@@ -545,7 +565,11 @@ jobs:
     secrets: inherit
 
   update-flake:
-    if: github.repository == 'mrh30000/donutbrowser'
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      github.repository == 'mrh30000/donutbrowser'
     needs: [release, changelog]
     runs-on: ubuntu-latest
     permissions:
